@@ -1,0 +1,57 @@
+name: Fabricar App Android
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar Java 21 para Android
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Preparar carpeta web y Capacitor con AdMob
+        run: |
+          mkdir -p www
+          cp index.html manifest.json sw.js icon.svg www/
+          npm init -y
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/admob@6
+          npx cap init "Mi Cuadrante" "com.k4nt3r0.micuadrante" --web-dir www
+          npx cap add android
+
+      - name: Inyectar ID de App de AdMob en AndroidManifest
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i 's|</application>|<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-6672720525194990~3491583985"/><meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="false"/></application>|g' "$MANIFEST"
+          npx cap sync android
+
+      - name: Compilar APK de prueba e Instalador AAB para Google Play
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease
+
+      - name: Subir APK listo para instalar en el movil
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiCuadrante-APK-Instalable
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Subir AAB para Google Play Store
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiCuadrante-GooglePlay-AAB
+          path: android/app/build/outputs/bundle/release/app-release-unsigned.aab
