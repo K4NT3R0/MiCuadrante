@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mi Cuadrante: Turnos y Horas Extra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; color: black !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 select-none">
+
+  <!-- HEADER SUPERIOR -->
+  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 no-print">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/40">
+          <i class="fa-solid fa-calendar-check text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base leading-tight tracking-tight">Mi Cuadrante</h1>
+          <p class="text-[11px] text-emerald-400 font-medium">Turnos y Nómina Extra</p>
+        </div>
+      </div>
+
+      <button onclick="openProModal()" id="proHeaderBtn" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-full shadow flex items-center gap-1.5 active:scale-95 transition">
+        <i class="fa-solid fa-crown text-[11px]"></i> PRO
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="max-w-md mx-auto px-3 pt-3 space-y-4">
+
+    <!-- TARJETA RESUMEN ECONÓMICO DEL MES -->
+    <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800 rounded-2xl p-4 shadow-xl">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-1">
+          <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center active:scale-90 transition no-print">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+          </button>
+          <h2 id="currentMonthLabel" class="font-bold text-base capitalize px-2 min-w-[140px] text-center">Noviembre 2026</h2>
+          <button onclick="changeMonth(1)" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center active:scale-90 transition no-print">
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+          </button>
+        </div>
+        <button onclick="triggerExportWithAd()" class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 active:scale-95 transition no-print">
+          <i class="fa-solid fa-file-export"></i> Exportar
+        </button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 pt-1 border-t border-slate-800/80">
+        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
+          <span class="text-[11px] text-slate-400 block">Extra Acumulado</span>
+          <span id="statTotalMoney" class="text-lg font-extrabold text-emerald-400">0,00 €</span>
+        </div>
+        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
+          <span class="text-[11px] text-slate-400 block">Horas Extra</span>
+          <span id="statTotalHours" class="text-lg font-bold text-sky-400">0 h</span>
+        </div>
+        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
+          <span class="text-[11px] text-slate-400 block">Dietas / Km</span>
+          <span id="statAllowances" class="text-lg font-bold text-amber-400">0,00 €</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVEGACIÓN POR PESTAÑAS (4 PESTAÑAS) -->
+    <div class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
+      <button onclick="switchTab('calendar')" id="tabBtn-calendar" class="py-2 text-[11px] font-semibold rounded-lg bg-slate-800 text-white shadow transition">
+        <i class="fa-regular fa-calendar block mb-0.5 text-xs"></i> Cuadrante
+      </button>
+      <button onclick="switchTab('cycles')" id="tabBtn-cycles" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-rotate block mb-0.5 text-xs text-emerald-400"></i> Ciclos
+      </button>
+      <button onclick="switchTab('details')" id="tabBtn-details" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-chart-pie block mb-0.5 text-xs"></i> Desglose
+      </button>
+      <button onclick="switchTab('rates')" id="tabBtn-rates" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
+        <i class="fa-solid fa-sliders block mb-0.5 text-xs"></i> Tarifas
+      </button>
+    </div>
+
+    <!-- VISTA 1: CALENDARIO -->
+    <section id="view-calendar" class="space-y-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 no-print">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <i class="fa-solid fa-paintbrush text-emerald-400 mr-1"></i> Modo toque:
+          </span>
+          <span id="paintModeHint" class="text-[11px] text-emerald-400 font-medium">Abrir detalle del día</span>
+        </div>
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5" id="paintSelector"></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-lg">
+        <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400 mb-2">
+          <div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div class="text-rose-400">SÁB</div><div class="text-rose-400">DOM</div>
+        </div>
+        <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
+      </div>
+    </section>
+
+    <!-- VISTA 2: GENERADOR AUTOMÁTICO DE CICLOS -->
+    <section id="view-cycles" class="hidden space-y-4 no-print">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Automatización</span>
+          <h3 class="font-bold text-sm text-white mt-1">Generador de Rueda de Turnos</h3>
+          <p class="text-[11px] text-slate-400">Crea tu secuencia una vez y rellena el mes o todo el año automáticamente.</p>
+        </div>
+
+        <!-- Plantillas rápidas -->
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1.5">Plantillas habituales (1 toque):</label>
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="loadPresetCycle(['M','M','T','T','N','N','L','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
+              2M - 2T - 2N - 4L
+            </button>
+            <button onclick="loadPresetCycle(['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
+              5x2 Rotativo (M/T/N)
+            </button>
+            <button onclick="loadPresetCycle(['M','M','M','T','T','T','N','N','N','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
+              3M - 3T - 3N - 3L
+            </button>
+            <button onclick="loadPresetCycle(['M','N','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
+              Guardia 24h + 3L
+            </button>
+          </div>
+        </div>
+
+        <!-- Botones para añadir a la secuencia -->
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1.5">Añadir día a tu secuencia:</label>
+          <div class="grid grid-cols-6 gap-1.5" id="cycleAdderBtns"></div>
+        </div>
+
+        <!-- Visualizador de la secuencia actual -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] text-slate-400 font-medium">Tu patrón (<strong id="cycleLengthLabel" class="text-white">0</strong> días):</span>
+            <div class="flex gap-2">
+              <button onclick="popCycleStep()" class="text-[11px] text-amber-400 hover:underline"><i class="fa-solid fa-delete-left mr-0.5"></i>Borrar último</button>
+              <button onclick="clearCyclePattern()" class="text-[11px] text-rose-400 hover:underline">Vaciar</button>
+            </div>
+          </div>
+          <div id="cycleSequencePreview" class="flex flex-wrap gap-1.5 min-h-[34px] items-center"></div>
+        </div>
+
+        <!-- Fecha de inicio del ciclo -->
+        <div class="grid grid-cols-2 gap-2.5 pt-1">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Día 1 del patrón empieza el:</label>
+            <input type="date" id="cycleStartDate" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs font-semibold text-white outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Si ya hay turno ese día:</label>
+            <select id="cycleOverwriteMode" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs font-semibold text-white outline-none focus:border-emerald-500">
+              <option value="overwrite">Sobrescribir turno</option>
+              <option value="keep">Respetar existentes</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Botones de Acción (Gratis Mes / Ad o PRO Año) -->
+        <div class="space-y-2 pt-2">
+          <button onclick="applyCycleToCalendar('month')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition active:scale-98">
+            <i class="fa-solid fa-calendar-Plus mr-1"></i> Rellenar Mes Actual
+          </button>
+          <button onclick="triggerYearCycleWithAd()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition active:scale-98">
+            <i class="fa-solid fa-bolt text-amber-300"></i> Rellenar Año Completo (365 días)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 3: DESGLOSE MENSUAL -->
+    <section id="view-details" class="hidden space-y-3">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Resumen de Turnos y Conceptos</h3>
+        <div id="breakdownContent" class="space-y-2 text-xs"></div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Registro Diario con Extras</h3>
+        <div id="logListContent" class="space-y-2 max-h-80 overflow-y-auto"></div>
+      </div>
+    </section>
+
+    <!-- VISTA 4: CONFIGURACIÓN DE TARIFAS Y BACKUP -->
+    <section id="view-rates" class="hidden space-y-4 no-print">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div>
+          <h3 class="font-bold text-sm text-white">Configura tus Precios (€ Brutos)</h3>
+          <p class="text-[11px] text-slate-400">Personaliza cuánto cobras por cada concepto según tu convenio o empresa.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Normal (€/h)</label>
+            <input type="number" step="0.5" id="rate_he_normal" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Nocturna (€/h)</label>
+            <input type="number" step="0.5" id="rate_he_night" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Festiva (€/h)</label>
+            <input type="number" step="0.5" id="rate_he_holiday" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Plus Turno Noche (€/día)</label>
+            <input type="number" step="0.5" id="rate_plus_night" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Plus Retén / Parada (€/día)</label>
+            <input type="number" step="0.5" id="rate_plus_special" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1">Valor 1 Dieta (€)</label>
+            <input type="number" step="0.5" id="rate_meal" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+          <div class="col-span-2">
+            <label class="text-[11px] text-slate-400 block mb-1">Kilometraje (€/km)</label>
+            <input type="number" step="0.01" id="rate_km" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
+          </div>
+        </div>
+
+        <button onclick="saveRates()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition active:scale-98 mt-2">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Mis Tarifas
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+        <h3 class="font-bold text-sm text-white">Copia de Seguridad (Backup Local)</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="downloadBackup()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-download text-emerald-400"></i> Guardar Datos
+          </button>
+          <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-upload text-sky-400"></i> Restaurar
+            <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
+          </label>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DETALLE DE UN DÍA -->
+  <div id="dayModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 no-print">
+    <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Editar Jornada</span>
+          <h3 id="modalDateTitle" class="text-base font-bold text-white">Lunes, 4 de Noviembre</h3>
+        </div>
+        <button onclick="closeDayModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div>
+        <label class="text-xs font-semibold text-slate-300 block mb-2">Turno Principal</label>
+        <div id="modalShiftGrid" class="grid grid-cols-3 gap-2"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-2 pt-1">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Normal</label>
+          <input type="number" step="0.5" min="0" id="day_he_normal" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Noche</label>
+          <input type="number" step="0.5" min="0" id="day_he_night" class="w-full bg-transparent text-base font-bold text-sky-400 outline-none" placeholder="0">
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Festiva</label>
+          <input type="number" step="0.5" min="0" id="day_he_holiday" class="w-full bg-transparent text-base font-bold text-amber-400 outline-none" placeholder="0">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <label class="text-[10px] text-slate-400 block mb-1">Nº de Dietas</label>
+          <input type="number" step="0.5" min="0" id="day_meals" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
+        </div>
+        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+          <label class="text-[10px] text-slate-400 block mb-1">Kilómetros (Km)</label>
+          <input type="number" step="1" min="0" id="day_km" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
+        </div>
+      </div>
+
+      <div>
+        <input type="text" id="day_note" placeholder="Nota opcional (ej. Parada línea 2, cambio con Juan...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500">
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="clearCurrentDay()" class="w-1/3 bg-rose-950/60 border border-rose-800/60 text-rose-300 font-semibold py-2.5 rounded-xl text-xs">
+          Borrar Día
+        </button>
+        <button onclick="saveDayModal()" class="w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">
+          Guardar Cambios
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL MONETIZACIÓN: INTERSTICIAL / EXPORTACIÓN -->
+  <div id="adExportModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs hidden items-center justif
