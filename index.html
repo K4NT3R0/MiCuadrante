@@ -1,319 +1,334 @@
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mi Cuadrante: Turnos y Horas Extra</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @media print {
-      .no-print { display: none !important; }
-      body { background: white !important; color: black !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020617">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Mi Cuadrante: Turnos y Horas Extra</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style type="text/tailwindcss">
+@layer components{
+.card{@apply bg-slate-900 border border-slate-800 rounded-2xl p-4}
+.inp{@apply w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none}
+.btn{@apply font-bold rounded-xl text-xs py-2.5 transition active:scale-95}
+.lbl{@apply text-[11px] text-slate-400 block mb-1}
+}
+body{font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent}
+.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #34d399;outline-offset:2px}
+@media print{.no-print{display:none!important}*{background:#fff!important;color:#000!important;border-color:#ccc!important}}
+</style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-32 select-none">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24">
 
-  <!-- HEADER SUPERIOR -->
-  <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 no-print">
-    <div class="max-w-md mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/40">
-          <i class="fa-solid fa-calendar-check text-white text-lg"></i>
-        </div>
-        <div>
-          <h1 class="font-bold text-base leading-tight tracking-tight">Mi Cuadrante</h1>
-          <p class="text-[11px] text-emerald-400 font-medium">Turnos y Nómina Extra</p>
-        </div>
-      </div>
-
-      <button onclick="openProModal()" id="proHeaderBtn" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold text-xs px-3 py-1.5 rounded-full shadow flex items-center gap-1.5 active:scale-95 transition">
-        <i class="fa-solid fa-crown text-[11px]"></i> PRO
-      </button>
+<header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 no-print">
+  <div class="max-w-md mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/40"><i class="fa-solid fa-calendar-check text-white text-lg"></i></div>
+      <div><h1 class="font-bold text-base leading-tight">Mi Cuadrante</h1><p class="text-[11px] text-emerald-400 font-medium">Turnos y Nómina Extra</p></div>
     </div>
-  </header>
+    <button onclick="goToday()" class="bg-slate-800 text-slate-200 font-semibold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-calendar-day text-emerald-400"></i> Hoy</button>
+  </div>
+</header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
-  <main class="max-w-md mx-auto px-3 pt-3 space-y-4">
+<main class="max-w-md mx-auto px-3 pt-3 space-y-4">
 
-    <!-- TARJETA RESUMEN ECONÓMICO DEL MES -->
-    <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800 rounded-2xl p-4 shadow-xl">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-1">
-          <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center active:scale-90 transition no-print">
-            <i class="fa-solid fa-chevron-left text-xs"></i>
-          </button>
-          <h2 id="currentMonthLabel" class="font-bold text-base capitalize px-2 min-w-[140px] text-center">Noviembre 2026</h2>
-          <button onclick="changeMonth(1)" class="w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 flex items-center justify-center active:scale-90 transition no-print">
-            <i class="fa-solid fa-chevron-right text-xs"></i>
-          </button>
-        </div>
-        <button onclick="triggerExportWithAd()" class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 active:scale-95 transition no-print">
-          <i class="fa-solid fa-file-export"></i> Exportar
-        </button>
+  <section class="card bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 shadow-xl">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-1">
+        <button onclick="changeMonth(-1)" aria-label="Mes anterior" class="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center active:scale-90 transition no-print"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+        <h2 id="monthLabel" class="font-bold text-base capitalize px-2 min-w-[140px] text-center" aria-live="polite"></h2>
+        <button onclick="changeMonth(1)" aria-label="Mes siguiente" class="w-9 h-9 rounded-lg bg-slate-800/80 flex items-center justify-center active:scale-90 transition no-print"><i class="fa-solid fa-chevron-right text-xs"></i></button>
       </div>
-
-      <div class="grid grid-cols-3 gap-2 pt-1 border-t border-slate-800/80">
-        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
-          <span class="text-[11px] text-slate-400 block">Extra Acumulado</span>
-          <span id="statTotalMoney" class="text-lg font-extrabold text-emerald-400">0,00 €</span>
-        </div>
-        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
-          <span class="text-[11px] text-slate-400 block">Horas Extra</span>
-          <span id="statTotalHours" class="text-lg font-bold text-sky-400">0 h</span>
-        </div>
-        <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60">
-          <span class="text-[11px] text-slate-400 block">Dietas / Km</span>
-          <span id="statAllowances" class="text-lg font-bold text-amber-400">0,00 €</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- NAVEGACIÓN POR PESTAÑAS (4 PESTAÑAS) -->
-    <div class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
-      <button onclick="switchTab('calendar')" id="tabBtn-calendar" class="py-2 text-[11px] font-semibold rounded-lg bg-slate-800 text-white shadow transition">
-        <i class="fa-regular fa-calendar block mb-0.5 text-xs"></i> Cuadrante
-      </button>
-      <button onclick="switchTab('cycles')" id="tabBtn-cycles" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
-        <i class="fa-solid fa-rotate block mb-0.5 text-xs text-emerald-400"></i> Ciclos
-      </button>
-      <button onclick="switchTab('details')" id="tabBtn-details" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
-        <i class="fa-solid fa-chart-pie block mb-0.5 text-xs"></i> Desglose
-      </button>
-      <button onclick="switchTab('rates')" id="tabBtn-rates" class="py-2 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-white transition">
-        <i class="fa-solid fa-sliders block mb-0.5 text-xs"></i> Tarifas
-      </button>
-    </div>
-
-    <!-- VISTA 1: CALENDARIO -->
-    <section id="view-calendar" class="space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 no-print">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            <i class="fa-solid fa-paintbrush text-emerald-400 mr-1"></i> Modo toque:
-          </span>
-          <span id="paintModeHint" class="text-[11px] text-emerald-400 font-medium">Abrir detalle del día</span>
-        </div>
-        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5" id="paintSelector"></div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 shadow-lg">
-        <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400 mb-2">
-          <div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div class="text-rose-400">SÁB</div><div class="text-rose-400">DOM</div>
-        </div>
-        <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
-      </div>
-    </section>
-
-    <!-- VISTA 2: GENERADOR AUTOMÁTICO DE CICLOS -->
-    <section id="view-cycles" class="hidden space-y-4 no-print">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-4">
-        <div>
-          <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Automatización</span>
-          <h3 class="font-bold text-sm text-white mt-1">Generador de Rueda de Turnos</h3>
-          <p class="text-[11px] text-slate-400">Crea tu secuencia una vez y rellena el mes o todo el año automáticamente.</p>
-        </div>
-
-        <!-- Plantillas rápidas -->
-        <div>
-          <label class="text-[11px] font-semibold text-slate-300 block mb-1.5">Plantillas habituales (1 toque):</label>
-          <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            <button onclick="loadPresetCycle(['M','M','T','T','N','N','L','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
-              2M - 2T - 2N - 4L
-            </button>
-            <button onclick="loadPresetCycle(['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
-              5x2 Rotativo (M/T/N)
-            </button>
-            <button onclick="loadPresetCycle(['M','M','M','T','T','T','N','N','N','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
-              3M - 3T - 3N - 3L
-            </button>
-            <button onclick="loadPresetCycle(['M','N','L','L','L'])" class="bg-slate-950 border border-slate-800 hover:border-emerald-500/50 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">
-              Guardia 24h + 3L
-            </button>
-          </div>
-        </div>
-
-        <!-- Botones para añadir a la secuencia -->
-        <div>
-          <label class="text-[11px] font-semibold text-slate-300 block mb-1.5">Añadir día a tu secuencia:</label>
-          <div class="grid grid-cols-6 gap-1.5" id="cycleAdderBtns"></div>
-        </div>
-
-        <!-- Visualizador de la secuencia actual -->
-        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] text-slate-400 font-medium">Tu patrón (<strong id="cycleLengthLabel" class="text-white">0</strong> días):</span>
-            <div class="flex gap-2">
-              <button onclick="popCycleStep()" class="text-[11px] text-amber-400 hover:underline"><i class="fa-solid fa-delete-left mr-0.5"></i>Borrar último</button>
-              <button onclick="clearCyclePattern()" class="text-[11px] text-rose-400 hover:underline">Vaciar</button>
-            </div>
-          </div>
-          <div id="cycleSequencePreview" class="flex flex-wrap gap-1.5 min-h-[34px] items-center"></div>
-        </div>
-
-        <!-- Fecha de inicio del ciclo -->
-        <div class="grid grid-cols-2 gap-2.5 pt-1">
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Día 1 del patrón empieza el:</label>
-            <input type="date" id="cycleStartDate" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs font-semibold text-white outline-none focus:border-emerald-500">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Si ya hay turno ese día:</label>
-            <select id="cycleOverwriteMode" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-2 text-xs font-semibold text-white outline-none focus:border-emerald-500">
-              <option value="overwrite">Sobrescribir turno</option>
-              <option value="keep">Respetar existentes</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Botones de Acción (Gratis Mes / Ad o PRO Año) -->
-        <div class="space-y-2 pt-2">
-          <button onclick="applyCycleToCalendar('month')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition active:scale-98">
-            <i class="fa-solid fa-calendar-Plus mr-1"></i> Rellenar Mes Actual
-          </button>
-          <button onclick="triggerYearCycleWithAd()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg flex items-center justify-center gap-1.5 transition active:scale-98">
-            <i class="fa-solid fa-bolt text-amber-300"></i> Rellenar Año Completo (365 días)
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- VISTA 3: DESGLOSE MENSUAL -->
-    <section id="view-details" class="hidden space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Resumen de Turnos y Conceptos</h3>
-        <div id="breakdownContent" class="space-y-2 text-xs"></div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Registro Diario con Extras</h3>
-        <div id="logListContent" class="space-y-2 max-h-80 overflow-y-auto"></div>
-      </div>
-    </section>
-
-    <!-- VISTA 4: CONFIGURACIÓN DE TARIFAS Y BACKUP -->
-    <section id="view-rates" class="hidden space-y-4 no-print">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div>
-          <h3 class="font-bold text-sm text-white">Configura tus Precios (€ Brutos)</h3>
-          <p class="text-[11px] text-slate-400">Personaliza cuánto cobras por cada concepto según tu convenio o empresa.</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3 pt-2">
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Normal (€/h)</label>
-            <input type="number" step="0.5" id="rate_he_normal" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Nocturna (€/h)</label>
-            <input type="number" step="0.5" id="rate_he_night" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Hora Extra Festiva (€/h)</label>
-            <input type="number" step="0.5" id="rate_he_holiday" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Plus Turno Noche (€/día)</label>
-            <input type="number" step="0.5" id="rate_plus_night" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Plus Retén / Parada (€/día)</label>
-            <input type="number" step="0.5" id="rate_plus_special" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1">Valor 1 Dieta (€)</label>
-            <input type="number" step="0.5" id="rate_meal" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-          <div class="col-span-2">
-            <label class="text-[11px] text-slate-400 block mb-1">Kilometraje (€/km)</label>
-            <input type="number" step="0.01" id="rate_km" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-semibold text-white focus:border-emerald-500 outline-none">
-          </div>
-        </div>
-
-        <button onclick="saveRates()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg transition active:scale-98 mt-2">
-          <i class="fa-solid fa-floppy-disk mr-1"></i> Guardar Mis Tarifas
-        </button>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-2.5">
-        <h3 class="font-bold text-sm text-white">Copia de Seguridad (Backup Local)</h3>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="downloadBackup()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5">
-            <i class="fa-solid fa-download text-emerald-400"></i> Guardar Datos
-          </button>
-          <label class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-upload text-sky-400"></i> Restaurar
-            <input type="file" accept=".json" onchange="restoreBackup(event)" class="hidden">
-          </label>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- MODAL DETALLE DE UN DÍA -->
-  <div id="dayModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs hidden items-end sm:items-center justify-center p-0 sm:p-4 no-print">
-    <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Editar Jornada</span>
-          <h3 id="modalDateTitle" class="text-base font-bold text-white">Lunes, 4 de Noviembre</h3>
-        </div>
-        <button onclick="closeDayModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div>
-        <label class="text-xs font-semibold text-slate-300 block mb-2">Turno Principal</label>
-        <div id="modalShiftGrid" class="grid grid-cols-3 gap-2"></div>
-      </div>
-
-      <div class="grid grid-cols-3 gap-2 pt-1">
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Normal</label>
-          <input type="number" step="0.5" min="0" id="day_he_normal" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
-        </div>
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Noche</label>
-          <input type="number" step="0.5" min="0" id="day_he_night" class="w-full bg-transparent text-base font-bold text-sky-400 outline-none" placeholder="0">
-        </div>
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <label class="text-[10px] text-slate-400 block mb-1">H. Extra Festiva</label>
-          <input type="number" step="0.5" min="0" id="day_he_holiday" class="w-full bg-transparent text-base font-bold text-amber-400 outline-none" placeholder="0">
-        </div>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <label class="text-[10px] text-slate-400 block mb-1">Nº de Dietas</label>
-          <input type="number" step="0.5" min="0" id="day_meals" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
-        </div>
-        <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-          <label class="text-[10px] text-slate-400 block mb-1">Kilómetros (Km)</label>
-          <input type="number" step="1" min="0" id="day_km" class="w-full bg-transparent text-base font-bold text-white outline-none" placeholder="0">
-        </div>
-      </div>
-
-      <div>
-        <input type="text" id="day_note" placeholder="Nota opcional (ej. Parada línea 2, cambio con Juan...)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500">
-      </div>
-
-      <div class="flex gap-2 pt-2">
-        <button onclick="clearCurrentDay()" class="w-1/3 bg-rose-950/60 border border-rose-800/60 text-rose-300 font-semibold py-2.5 rounded-xl text-xs">
-          Borrar Día
-        </button>
-        <button onclick="saveDayModal()" class="w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs shadow-lg">
-          Guardar Cambios
-        </button>
+      <div class="flex gap-1.5 no-print">
+        <button onclick="window.print()" aria-label="Imprimir o guardar PDF" class="w-9 h-9 rounded-lg bg-slate-800/80 text-slate-300 flex items-center justify-center active:scale-95"><i class="fa-solid fa-print text-xs"></i></button>
+        <button onclick="exportCSV()" class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 rounded-lg flex items-center gap-1.5 active:scale-95"><i class="fa-solid fa-file-csv"></i> Excel</button>
       </div>
     </div>
+    <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80">
+      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Extra</span><span id="stMoney" class="text-base font-extrabold text-emerald-400">0 €</span></div>
+      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Horas extra</span><span id="stHours" class="text-base font-bold text-sky-400">0 h</span></div>
+      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Dietas / Km</span><span id="stAl" class="text-base font-bold text-amber-400">0 €</span></div>
+    </div>
+    <p class="text-xs text-slate-400 mt-2.5 text-center">Total estimado del mes: <b id="stTotal" class="text-white">0 €</b></p>
+  </section>
+
+  <div role="tablist" class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
+    <button role="tab" onclick="tab('calendar')" id="tab-calendar"><i class="fa-regular fa-calendar block mb-0.5 text-xs"></i>Cuadrante</button>
+    <button role="tab" onclick="tab('cycles')" id="tab-cycles"><i class="fa-solid fa-rotate block mb-0.5 text-xs"></i>Ciclos</button>
+    <button role="tab" onclick="tab('details')" id="tab-details"><i class="fa-solid fa-chart-pie block mb-0.5 text-xs"></i>Desglose</button>
+    <button role="tab" onclick="tab('rates')" id="tab-rates"><i class="fa-solid fa-sliders block mb-0.5 text-xs"></i>Tarifas</button>
   </div>
 
-  <!-- MODAL MONETIZACIÓN: INTERSTICIAL / EXPORTACIÓN -->
-  <div id="adExportModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs hidden items-center justif
+  <div id="backupBanner" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-xl p-3 text-xs flex items-center justify-between gap-2 no-print"><span id="backupMsg"></span><button onclick="downloadBackup()" class="shrink-0 font-bold bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg">Guardar copia</button></div>
+
+  <section id="view-calendar" class="space-y-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 no-print">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-paintbrush text-emerald-400 mr-1"></i>Modo toque</span>
+        <span id="paintHint" class="text-[11px] text-emerald-400 font-medium"></span>
+      </div>
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar" id="paintSelector"></div>
+    </div>
+    <div class="card p-3 shadow-lg">
+      <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400 mb-2"><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div class="text-rose-400">SÁB</div><div class="text-rose-400">DOM</div></div>
+      <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
+      <p class="text-[10px] text-slate-500 mt-2 text-center no-print">Desliza para cambiar de mes · Festivos nacionales en rojo</p>
+    </div>
+  </section>
+
+  <section id="view-cycles" class="hidden space-y-4 no-print">
+    <div class="card space-y-4">
+      <div><span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Automatización</span>
+        <h3 class="font-bold text-sm text-white mt-1">Generador de rueda de turnos</h3>
+        <p class="text-[11px] text-slate-400">Crea tu secuencia una vez y rellena el mes o el año.</p></div>
+      <div><label class="lbl font-semibold text-slate-300">Plantillas habituales</label>
+        <div id="presets" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div></div>
+      <div><label class="lbl font-semibold text-slate-300">Añadir día al patrón</label>
+        <div class="grid grid-cols-6 gap-1.5" id="cycleAdderBtns"></div></div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] text-slate-400">Tu patrón (<b id="cycleLen" class="text-white">0</b> días):</span>
+          <div class="flex gap-3"><button onclick="S.cycle.pop();save();renderCycle()" class="text-[11px] text-amber-400"><i class="fa-solid fa-delete-left mr-0.5"></i>Último</button>
+          <button onclick="S.cycle=[];save();renderCycle()" class="text-[11px] text-rose-400">Vaciar</button></div>
+        </div>
+        <div id="cycleSequencePreview" class="flex flex-wrap gap-1.5 min-h-[34px] items-center"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div><label class="lbl" for="cycleStart">Día 1 del patrón:</label><input type="date" id="cycleStart" class="inp text-xs"></div>
+        <div><label class="lbl" for="cycleMode">Si ya hay turno:</label><select id="cycleMode" class="inp text-xs"><option value="overwrite">Sobrescribir</option><option value="keep">Respetar existentes</option></select></div>
+      </div>
+      <div class="space-y-2">
+        <button onclick="applyCycle('month')" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-calendar-plus mr-1"></i>Rellenar mes actual</button>
+        <button onclick="applyCycle('year')" class="btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"><i class="fa-solid fa-bolt text-amber-300 mr-1"></i>Rellenar año completo</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-details" class="hidden space-y-3">
+    <div class="card space-y-3"><h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Resumen del mes</h3><div id="breakdown" class="space-y-2 text-xs"></div></div>
+    <div class="card space-y-3"><h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Registro diario con extras</h3><div id="logList" class="space-y-2 max-h-80 overflow-y-auto"></div></div>
+  </section>
+
+  <section id="view-rates" class="hidden space-y-4 no-print">
+    <div class="card space-y-3">
+      <div><h3 class="font-bold text-sm text-white">Tus precios (€ brutos)</h3><p class="text-[11px] text-slate-400">Según tu convenio o empresa.</p></div>
+      <div id="rateFields" class="grid grid-cols-2 gap-3 pt-1"></div>
+      <button onclick="saveRates()" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-floppy-disk mr-1"></i>Guardar tarifas</button>
+    </div>
+    <div class="card space-y-2.5">
+      <h3 class="font-bold text-sm text-white">Copia de seguridad</h3>
+      <p class="text-[11px] text-slate-400">Tus datos viven solo en este dispositivo: sin cuentas, sin anuncios y sin pedir ubicación ni contactos. Guarda una copia de vez en cuando.</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="downloadBackup()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-download text-emerald-400 mr-1"></i>Guardar datos</button>
+        <label class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs text-center cursor-pointer"><i class="fa-solid fa-upload text-sky-400 mr-1"></i>Restaurar<input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
+        <button onclick="exportICS()" class="col-span-2 bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs"><i class="fa-regular fa-calendar-plus text-amber-400 mr-1"></i>Añadir turnos a mi calendario (.ics)</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="dayModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-end sm:items-center justify-center no-print" role="dialog" aria-modal="true" aria-labelledby="mTitle" onclick="if(event.target===this)closeDay()">
+  <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+      <div><span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Editar jornada</span><h3 id="mTitle" class="text-base font-bold text-white capitalize"></h3></div>
+      <button onclick="closeDay()" aria-label="Cerrar" class="w-9 h-9 rounded-full bg-slate-800 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-xs font-semibold text-slate-300">Turno principal</label>
+        <button id="copyPrev" onclick="copyPrev()" class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 disabled:opacity-40"><i class="fa-regular fa-copy"></i> Copiar día anterior</button>
+      </div>
+      <div id="mShifts" class="grid grid-cols-3 gap-2"></div>
+    </div>
+    <div id="mFields" class="grid grid-cols-3 gap-2"></div>
+    <input type="text" id="d_note" maxlength="200" aria-label="Nota" placeholder="Nota (ej. parada línea 2, cambio con Juan…)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
+    <div class="flex gap-2 pt-1">
+      <button onclick="clearDay()" class="btn w-1/3 bg-rose-950/60 border border-rose-800/60 text-rose-300">Borrar</button>
+      <button onclick="saveDay()" class="btn w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 border border-slate-700 text-sm px-4 py-2 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity no-print"></div>
+
+<script>
+const $=id=>document.getElementById(id), p2=n=>String(n).padStart(2,'0'), num=v=>parseFloat(v)||0;
+const eur=n=>n.toLocaleString('es-ES',{style:'currency',currency:'EUR'});
+const ymd=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SH={M:{n:'Mañana',c:'bg-amber-500/20 text-amber-300 border-amber-500/40'},T:{n:'Tarde',c:'bg-orange-500/20 text-orange-300 border-orange-500/40'},N:{n:'Noche',c:'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'},L:{n:'Libre',c:'bg-slate-800 text-slate-400 border-slate-700'},V:{n:'Vacac.',c:'bg-sky-500/20 text-sky-300 border-sky-500/40'},R:{n:'Retén',c:'bg-rose-500/20 text-rose-300 border-rose-500/40'}};
+const PRESETS=[['2M - 2T - 2N - 4L',['M','M','T','T','N','N','L','L','L','L']],['5x2 rotativo (M/T/N)',['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L']],['3M - 3T - 3N - 3L',['M','M','M','T','T','T','N','N','N','L','L','L']],['Guardia 24h + 3L',['M','N','L','L','L']]];
+const RATES=[['he','Hora extra normal','€/h'],['hn','Hora extra nocturna','€/h'],['hf','Hora extra festiva','€/h'],['pn','Plus turno noche','€/día'],['pr','Plus retén / parada','€/día'],['meal','Valor 1 dieta','€'],['km','Kilometraje','€/km']];
+const DF=[['he','H. extra normal'],['hn','H. extra noche'],['hf','H. extra festiva'],['meals','Nº dietas'],['km','Kilómetros']];
+const KEY='miCuadrante.v2', TB='py-2 text-[11px] font-semibold rounded-lg transition ';
+let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
+cur.setDate(1);
+
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.days)S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:+j.lastBackup||0}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('No se pudo guardar en este dispositivo')}}
+let tt;function toast(m,act,fn){
+  const t=$('toast'),hide=()=>t.classList.add('opacity-0','pointer-events-none');
+  t.replaceChildren(m);
+  if(act){const b=document.createElement('button');b.textContent=act;b.className='ml-3 text-emerald-400 font-bold underline';b.onclick=()=>{fn();hide()};t.append(b);t.classList.remove('pointer-events-none')}
+  else t.classList.add('pointer-events-none');
+  t.classList.remove('opacity-0');clearTimeout(tt);tt=setTimeout(hide,act?6000:2200);
+}
+
+/* Festivos nacionales de España (fijos + Viernes Santo) */
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),t=h+l-7*m+114;return new Date(y,Math.floor(t/31)-1,t%31+1)}
+const HC={};
+function isHol(d){const y=d.getFullYear();if(!HC[y]){const s=new Set(['01-01','01-06','05-01','08-15','10-12','11-01','12-06','12-08','12-25']),e=easter(y);e.setDate(e.getDate()-2);s.add(p2(e.getMonth()+1)+'-'+p2(e.getDate()));HC[y]=s}return HC[y].has(p2(d.getMonth()+1)+'-'+p2(d.getDate()))}
+
+function summary(y,m){
+  const o={cnt:{},ex:0,al:0,hrs:0,c:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0},log:[]},r=S.rates,n=new Date(y,m+1,0).getDate();
+  for(let i=1;i<=n;i++){const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];if(!d)continue;
+    if(d.s)o.cnt[d.s]=(o.cnt[d.s]||0)+1;
+    const c={he:num(d.he)*r.he,hn:num(d.hn)*r.hn,hf:num(d.hf)*r.hf,pn:d.s==='N'?r.pn:0,pr:d.s==='R'?r.pr:0,meal:num(d.meals)*r.meal,km:num(d.km)*r.km};
+    for(const q in c)o.c[q]+=c[q];
+    const h=num(d.he)+num(d.hn)+num(d.hf),ex=c.he+c.hn+c.hf+c.pn+c.pr,al=c.meal+c.km;
+    o.hrs+=h;o.ex+=ex;o.al+=al;
+    if(h||d.meals||d.km||d.note)o.log.push({k,d,h,t:ex+al});
+  }return o}
+
+function render(){
+  const y=cur.getFullYear(),m=cur.getMonth(),s=summary(y,m),today=ymd(new Date());
+  $('monthLabel').textContent=cur.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
+  $('stMoney').textContent=eur(s.ex);$('stHours').textContent=s.hrs+' h';$('stAl').textContent=eur(s.al);$('stTotal').textContent=eur(s.ex+s.al);
+  let h='<div></div>'.repeat((new Date(y,m,1).getDay()+6)/1%7);
+  for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
+    const dt=new Date(y,m,i),k=ymd(dt),d=S.days[k],sh=d&&SH[d.s],has=d&&(num(d.he)+num(d.hn)+num(d.hf)||d.meals||d.km||d.note);
+    h+=`<button data-k="${k}" aria-label="${dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})}${sh?', '+sh.n:''}" class="relative aspect-square rounded-lg border flex flex-col items-center justify-center ${sh?sh.c:'bg-slate-950 border-slate-800 text-slate-300'} ${k===today?'ring-2 ring-emerald-400':''}"><span class="text-[11px] font-semibold ${isHol(dt)?'text-rose-400':''}">${i}</span><span class="font-extrabold text-sm leading-none">${sh?d.s:''}</span>${has?'<i class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400"></i>':''}</button>`;
+  }
+  $('calendarGrid').innerHTML=h;
+  if(!$('view-details').classList.contains('hidden'))renderDetails();
+}
+function renderDetails(){
+  const y=cur.getFullYear(),s=summary(y,cur.getMonth()),tot=Object.values(s.cnt).reduce((a,b)=>a+b,0)||1;
+  const LB={he:'H. extra normales',hn:'H. extra nocturnas',hf:'H. extra festivas',pn:'Plus noche',pr:'Plus retén',meal:'Dietas',km:'Kilometraje'};
+  let yr=0;for(let m=0;m<12;m++){const q=summary(y,m);yr+=q.ex+q.al}
+  const bars=Object.keys(SH).filter(k=>s.cnt[k]).map(k=>`<div class="flex items-center gap-2"><span class="w-14 text-slate-400">${SH[k].n}</span><div class="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:${s.cnt[k]/tot*100}%"></div></div><b class="w-6 text-right">${s.cnt[k]}</b></div>`).join('');
+  const rows=Object.keys(LB).filter(k=>s.c[k]>0).map(k=>`<div class="flex justify-between"><span class="text-slate-400">${LB[k]}</span><b>${eur(s.c[k])}</b></div>`).join('');
+  $('breakdown').innerHTML=(bars||'<p class="text-slate-500">Aún no hay turnos este mes.</p>')+(rows?`<div class="border-t border-slate-800 pt-2 space-y-1.5">${rows}</div>`:'')+`<div class="border-t border-slate-800 pt-2 flex justify-between text-sm"><span>Total mes</span><b class="text-emerald-400">${eur(s.ex+s.al)}</b></div><div class="flex justify-between text-slate-400"><span>Acumulado ${y}</span><b class="text-slate-200">${eur(yr)}</b></div>`;
+  $('logList').innerHTML=s.log.length?s.log.map(({k,d,h,t})=>`<button data-k="${k}" class="w-full text-left bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between gap-2"><span><b>${k.slice(8)}/${k.slice(5,7)}</b> <span class="text-slate-400">${d.s?SH[d.s]?.n||'':''}${h?' · '+h+' h extra':''}${d.meals?' · '+d.meals+' dietas':''}${d.km?' · '+d.km+' km':''}</span>${d.note?`<span class="block text-[11px] text-slate-500">${esc(d.note)}</span>`:''}</span><b class="text-emerald-400 shrink-0">${eur(t)}</b></button>`).join(''):'<p class="text-slate-500 text-xs">Sin extras registrados este mes.</p>';
+}
+function renderPaint(){
+  $('paintSelector').innerHTML=[['','Detalle'],...Object.keys(SH).map(k=>[k,k+' · '+SH[k].n])].map(([k,l])=>`<button data-p="${k}" class="shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold ${(paint||'')===k?'ring-2 ring-emerald-400 ':''}${k?SH[k].c:'bg-slate-950 border-slate-800 text-slate-300'}">${l}</button>`).join('');
+  $('paintHint').textContent=paint?`Pintando ${SH[paint].n}`:'Abrir detalle del día';
+}
+function renderCycle(){
+  $('presets').innerHTML=PRESETS.map(([l],i)=>`<button data-pre="${i}" class="bg-slate-950 border border-slate-800 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">${l}</button>`).join('');
+  $('cycleAdderBtns').innerHTML=Object.keys(SH).map(k=>`<button data-add="${k}" aria-label="Añadir ${SH[k].n}" class="py-2 rounded-lg border font-extrabold text-sm ${SH[k].c}">${k}</button>`).join('');
+  $('cycleSequencePreview').innerHTML=S.cycle.length?S.cycle.map((k,i)=>`<button data-rm="${i}" aria-label="Quitar día ${i+1}" class="w-8 h-8 rounded-lg border text-xs font-extrabold ${SH[k].c}">${k}</button>`).join(''):'<span class="text-[11px] text-slate-500">Añade días con los botones de arriba</span>';
+  $('cycleLen').textContent=S.cycle.length;
+}
+function applyCycle(scope){
+  const L=S.cycle.length,sd=$('cycleStart').value;
+  if(!L)return toast('Primero crea un patrón');
+  if(!sd)return toast('Elige el día 1 del patrón');
+  const y=cur.getFullYear(),m=cur.getMonth(),from=scope==='year'?new Date(y,0,1):new Date(y,m,1),to=scope==='year'?new Date(y,11,31):new Date(y,m+1,0);
+  if(scope==='year'&&!confirm(`¿Rellenar todo ${y} con tu patrón?`))return;
+  const start=new Date(sd+'T00:00:00'),keep=$('cycleMode').value==='keep';let n=0;snap();
+  for(const d=new Date(from);d<=to;d.setDate(d.getDate()+1)){
+    const k=ymd(d),diff=Math.round((d-start)/864e5);
+    if(keep&&S.days[k]?.s)continue;
+    S.days[k]={...S.days[k],s:S.cycle[((diff%L)+L)%L]};n++;
+  }
+  save();render();undoable(`${n} días rellenados`);
+}
+function openDay(k){
+  mk=k;const d=S.days[k]||{};ms=d.s||null;
+  $('mTitle').textContent=new Date(k+'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  $('mFields').innerHTML=DF.map(([f,l])=>`<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800"><label class="text-[10px] text-slate-400 block mb-1" for="d_${f}">${l}</label><input type="number" inputmode="decimal" step="0.5" min="0" id="d_${f}" value="${d[f]??''}" placeholder="0" class="w-full bg-transparent text-base font-bold text-white outline-none"></div>`).join('');
+  $('d_note').value=d.note||'';drawShifts();
+  $('copyPrev').disabled=!S.days[prevKey(k)];
+  const mo=$('dayModal');mo.classList.remove('hidden');mo.classList.add('flex');
+}
+function drawShifts(){$('mShifts').innerHTML=Object.keys(SH).map(k=>`<button data-ms="${k}" class="py-2.5 rounded-xl border text-xs font-bold ${SH[k].c} ${ms===k?'ring-2 ring-emerald-400':''}">${k} · ${SH[k].n}</button>`).join('')}
+function prevKey(k){const p=new Date(k+'T00:00:00');p.setDate(p.getDate()-1);return ymd(p)}
+function copyPrev(){
+  const pk=prevKey(mk),d=S.days[pk];
+  if(!d)return toast('El día anterior está vacío');
+  ms=d.s||null;
+  DF.forEach(([f])=>{$('d_'+f).value=d[f]??''});
+  $('d_note').value=d.note||'';
+  drawShifts();toast(`Copiado del ${+pk.slice(8)}/${pk.slice(5,7)} · revisa y guarda`);
+}
+function closeDay(){const mo=$('dayModal');mo.classList.add('hidden');mo.classList.remove('flex')}
+function saveDay(){
+  const d={};if(ms)d.s=ms;
+  DF.forEach(([f])=>{const v=$('d_'+f).value;if(v!=='')d[f]=Math.max(0,num(v))});
+  const t=$('d_note').value.trim();if(t)d.note=t.slice(0,200);
+  snap();if(Object.keys(d).length)S.days[mk]=d;else delete S.days[mk];
+  save();closeDay();render();undoable('Guardado');
+}
+function clearDay(){snap();delete S.days[mk];save();closeDay();render();undoable('Día borrado')}
+function changeMonth(d){cur.setMonth(cur.getMonth()+d);render()}
+function goToday(){cur=new Date();cur.setDate(1);tab('calendar');render()}
+function tab(t){['calendar','cycles','details','rates'].forEach(x=>{$('view-'+x).classList.toggle('hidden',x!==t);$('tab-'+x).className=TB+(x===t?'bg-slate-800 text-white shadow':'text-slate-400');$('tab-'+x).setAttribute('aria-selected',x===t)});if(t==='details')renderDetails()}
+function saveRates(){RATES.forEach(([k])=>S.rates[k]=Math.max(0,num($('r_'+k).value)));save();render();toast('Tarifas guardadas')}
+function dl(name,type,txt){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportCSV(){
+  const y=cur.getFullYear(),m=cur.getMonth(),r=S.rates,f=n=>n.toFixed(2).replace('.',','),q=t=>{t=String(t||'');return '"'+(/^[=+\-@]/.test(t)?"'"+t:t).replace(/"/g,'""')+'"'};
+  const rows=[['Fecha','Turno','H.extra normal','H.extra noche','H.extra festiva','Dietas','Km','Extra €','Dietas/Km €','Nota'].join(';')];
+  for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];if(!d)continue;
+    const ex=num(d.he)*r.he+num(d.hn)*r.hn+num(d.hf)*r.hf+(d.s==='N'?r.pn:0)+(d.s==='R'?r.pr:0),al=num(d.meals)*r.meal+num(d.km)*r.km;
+    rows.push([k,d.s||'',d.he||0,d.hn||0,d.hf||0,d.meals||0,d.km||0,f(ex),f(al),q(d.note)].join(';'))}
+  dl(`cuadrante-${y}-${p2(m+1)}.csv`,'text/csv;charset=utf-8','\ufeff'+rows.join('\r\n'));toast('CSV descargado');
+}
+let undoSnap=null;
+function snap(){undoSnap=JSON.stringify(S.days)}
+function undo(){if(!undoSnap)return;S.days=JSON.parse(undoSnap);undoSnap=null;save();render();toast('Cambios deshechos')}
+function undoable(m){toast(m,'Deshacer',undo)}
+function checkBackup(){
+  const age=S.lastBackup?(Date.now()-S.lastBackup)/864e5:Infinity,show=Object.keys(S.days).length>=7&&age>30;
+  $('backupBanner').classList.toggle('hidden',!show);
+  if(show)$('backupMsg').textContent=S.lastBackup?`Hace ${Math.floor(age)} días de tu última copia de seguridad.`:'Aún no has hecho copia de seguridad de tus datos.';
+}
+function downloadBackup(){S.lastBackup=Date.now();save();dl(`cuadrante-backup-${ymd(new Date())}.json`,'application/json',JSON.stringify(S));checkBackup();toast('Copia guardada')}
+function exportICS(){
+  const rows=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mi Cuadrante//ES','CALSCALE:GREGORIAN'],st=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  Object.keys(S.days).sort().forEach(k=>{const d=S.days[k];if(!SH[d.s]||d.s==='L')return;
+    const e=new Date(k+'T00:00:00');e.setDate(e.getDate()+1);
+    rows.push('BEGIN:VEVENT',`UID:${k}@micuadrante`,`DTSTAMP:${st}`,`DTSTART;VALUE=DATE:${k.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${ymd(e).replace(/-/g,'')}`,`SUMMARY:${SH[d.s].n}`,...(d.note?['DESCRIPTION:'+String(d.note).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')]:[]),'END:VEVENT')});
+  rows.push('END:VCALENDAR');
+  dl('cuadrante.ics','text/calendar;charset=utf-8',rows.join('\r\n'));toast('Archivo .ics descargado: ábrelo para añadirlo a tu calendario');
+}
+function restoreBackup(e){
+  const fl=e.target.files[0];e.target.value='';if(!fl)return;
+  const rd=new FileReader();
+  rd.onload=()=>{try{const j=JSON.parse(rd.result);if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
+    if(!confirm('Esto reemplazará tus datos actuales. ¿Continuar?'))return;
+    S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:+j.lastBackup||0};
+    save();initForms();render();checkBackup();toast('Datos restaurados')}catch(err){toast('Archivo no válido')}};
+  rd.readAsText(fl);
+}
+function initForms(){
+  $('rateFields').innerHTML=RATES.map(([k,l,u],i)=>`<div class="${i===6?'col-span-2':''}"><label class="lbl" for="r_${k}">${l} (${u})</label><input type="number" inputmode="decimal" step="0.01" min="0" id="r_${k}" class="inp" value="${S.rates[k]}"></div>`).join('');
+  renderPaint();renderCycle();
+}
+
+/* Eventos */
+$('calendarGrid').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;
+  if(paint){S.days[b.dataset.k]={...S.days[b.dataset.k],s:paint};save();render()}else openDay(b.dataset.k)});
+$('logList').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b)openDay(b.dataset.k)});
+$('paintSelector').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;paint=b.dataset.p||null;renderPaint()});
+$('mShifts').addEventListener('click',e=>{const b=e.target.closest('[data-ms]');if(!b)return;ms=ms===b.dataset.ms?null:b.dataset.ms;drawShifts()});
+$('presets').addEventListener('click',e=>{const b=e.target.closest('[data-pre]');if(!b)return;S.cycle=[...PRESETS[b.dataset.pre][1]];save();renderCycle()});
+$('cycleAdderBtns').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;S.cycle.push(b.dataset.add);save();renderCycle()});
+$('cycleSequencePreview').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;S.cycle.splice(+b.dataset.rm,1);save();renderCycle()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDay()});
+let x0=null;
+$('calendarGrid').addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+$('calendarGrid').addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>70)changeMonth(dx<0?1:-1)},{passive:true});
+
+load();initForms();$('cycleStart').value=ymd(cur);tab('calendar');render();checkBackup();
+try{navigator.storage?.persist?.()}catch(e){}
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
