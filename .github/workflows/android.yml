@@ -28,9 +28,16 @@ jobs:
           mkdir -p www
           cp index.html manifest.json sw.js icon.svg www/
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/admob@6
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/admob@6 @capacitor/assets
           npx cap init "Mi Cuadrante" "com.k4nt3r0.micuadrante" --web-dir www
           npx cap add android
+
+      - name: Generar Iconos Oficiales y Splash Screen desde icon.svg
+        run: |
+          mkdir -p assets
+          cp icon.svg assets/icon.svg
+          cp icon.svg assets/splash.svg
+          npx capacitor-assets generate --android --iconBackgroundColor '#10b981' --splashBackgroundColor '#020617' --splashBackgroundColorDark '#020617'
 
       - name: Inyectar ID de App de AdMob en AndroidManifest
         run: |
