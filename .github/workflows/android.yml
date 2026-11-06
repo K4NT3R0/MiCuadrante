@@ -39,17 +39,42 @@ jobs:
           cp icon.svg assets/splash.svg
           npx capacitor-assets generate --android --iconBackgroundColor '#10b981' --splashBackgroundColor '#020617' --splashBackgroundColorDark '#020617'
 
-      - name: Inyectar ID de App de AdMob en AndroidManifest
+      - name: Inyectar ID de App de AdMob y Version en Android
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
           sed -i 's|</application>|<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-6672720525194990~3491583985"/><meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="false"/></application>|g' "$MANIFEST"
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/g" android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.0.${{ github.run_number }}"/g' android/app/build.gradle
           npx cap sync android
 
-      - name: Compilar APK de prueba e Instalador AAB para Google Play
+      - name: Preparar o Generar Llave Digital (Keystore)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          PASS="${KEY_PASSWORD:-MiCuadrante2026!}"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Usando llave oficial guardada en GitHub Secrets..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+          else
+            echo "Generando llave digital nueva por primera vez..."
+            keytool -genkeypair -v -keystore android/app/release.keystore -alias micuadrante -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=K4NT3R0, OU=Apps, O=K4NT3R0, L=Cádiz, S=Andalucia, C=ES"
+            base64 -w 0 android/app/release.keystore > LLAVE_PARA_GITHUB_SECRETS.txt
+            cp android/app/release.keystore COPIA_SEGURIDAD_KEYSTORE.jks
+          fi
+
+      - name: Compilar APK y Firmar AAB Oficial para Google Play
+        env:
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          PASS="${KEY_PASSWORD:-MiCuadrante2026!}"
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug bundleRelease
+          ./gradlew assembleDebug bundleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+            -Pandroid.injected.signing.store.password="$PASS" \
+            -Pandroid.injected.signing.key.alias=micuadrante \
+            -Pandroid.injected.signing.key.password="$PASS"
 
       - name: Subir APK listo para instalar en el movil
         uses: actions/upload-artifact@v4
@@ -57,8 +82,17 @@ jobs:
           name: MiCuadrante-APK-Instalable
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Subir AAB para Google Play Store
+      - name: Subir AAB FIRMADO para Google Play Store
         uses: actions/upload-artifact@v4
         with:
-          name: MiCuadrante-GooglePlay-AAB
-          path: android/app/build/outputs/bundle/release/app-release-unsigned.aab
+          name: MiCuadrante-GooglePlay-AAB-FIRMADO
+          path: android/app/build/outputs/bundle/release/app-release.aab
+
+      - name: Subir Llave Nueva (Solo sale la primera vez)
+        if: ${{ env.KEYSTORE_BASE64 == '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: GUARDA-ESTA-LLAVE-EN-SECRETS
+          path: |
+            LLAVE_PARA_GITHUB_SECRETS.txt
+            COPIA_SEGURIDAD_KEYSTORE.jks
