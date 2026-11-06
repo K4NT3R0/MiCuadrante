@@ -329,6 +329,62 @@ $('calendarGrid').addEventListener('touchend',e=>{if(x0===null)return;const dx=e
 load();initForms();$('cycleStart').value=ymd(cur);tab('calendar');render();checkBackup();
 try{navigator.storage?.persist?.()}catch(e){}
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+/* === CONEXIÓN AUTOMÁTICA GOOGLE ADMOB === */
+(function initAdMob() {
+  const AdMob = window.Capacitor?.Plugins?.AdMob;
+  if (!AdMob) return; // En navegador normal no hace nada; en la App Android activa anuncios
+
+  const BANNER_ID = 'ca-app-pub-6672720525194990/8552338976';
+  const INTERSTITIAL_ID = 'ca-app-pub-6672720525194990/6095510680';
+  let interstitialReady = false;
+
+  async function preloadInterstitial() {
+    try {
+      await AdMob.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: false });
+      interstitialReady = true;
+    } catch (e) { interstitialReady = false; }
+  }
+
+  async function showInterstitialThen(callback) {
+    try {
+      if (interstitialReady) {
+        await AdMob.showInterstitial();
+        interstitialReady = false;
+        preloadInterstitial();
+      }
+    } catch (e) {}
+    callback();
+  }
+
+  window.addEventListener('load', async () => {
+    try {
+      await AdMob.initialize({});
+      await AdMob.showBanner({
+        adId: BANNER_ID,
+        adSize: 'ADAPTIVE_BANNER',
+        position: 'BOTTOM_CENTER',
+        margin: 0,
+        isTesting: false
+      });
+      await preloadInterstitial();
+    } catch (e) {}
+  });
+
+  // Mostrar anuncio a pantalla completa al exportar Excel o rellenar el año entero
+  const origExportCSV = window.exportCSV;
+  window.exportCSV = function() {
+    showInterstitialThen(() => origExportCSV());
+  };
+
+  const origApplyCycle = window.applyCycle;
+  window.applyCycle = function(scope) {
+    if (scope === 'year') {
+      showInterstitialThen(() => origApplyCycle(scope));
+    } else {
+      origApplyCycle(scope);
+    }
+  };
+})();
 </script>
 </body>
 </html>
