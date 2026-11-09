@@ -23,10 +23,24 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Sincronizar proyecto Capacitor y configurar SDK 36
+      - name: Preparar assets web, Capacitor y SDK 36
         run: |
           npm init -y
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 sharp
+
+          # Crear carpeta www y asegurar que index.html y recursos esten dentro
+          mkdir -p www
+          if [ -f "index.html" ]; then
+            cp index.html www/
+          fi
+          # Copiar otros archivos comunes si existen en la raiz
+          for f in manifest.json sw.js icon*.png splash*.png *.js *.css; do
+            if [ -f "$f" ]; then cp "$f" www/ || true; fi
+          done
+          if [ ! -f "www/index.html" ]; then
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Mi Cuadrante</title></head><body><h1>Mi Cuadrante</h1></body></html>' > www/index.html
+          fi
+
           npx cap init "Mi Cuadrante" "com.k4nt3r0.micuadrante" --web-dir www
           npx cap add android
 
