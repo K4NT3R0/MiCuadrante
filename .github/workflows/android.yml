@@ -1,4 +1,4 @@
-name: Fabricar App Android
+name: Fabricar App Mi Cuadrante
 
 on:
   push:
@@ -23,55 +23,45 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Preparar carpeta web y Capacitor con AdMob
+      - name: Sincronizar proyecto Capacitor y configurar SDK 36
         run: |
-          mkdir -p www
-          cp index.html manifest.json sw.js icon.svg www/
           npm init -y
-          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor-community/admob@6 @capacitor/assets
+          npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 sharp
           npx cap init "Mi Cuadrante" "com.k4nt3r0.micuadrante" --web-dir www
           npx cap add android
 
-      - name: Generar Iconos Oficiales y Splash Screen desde icon.svg
-        run: |
-          mkdir -p assets
-          cp icon.svg assets/icon.svg
-          cp icon.svg assets/splash.svg
-          npx capacitor-assets generate --android --iconBackgroundColor '#10b981' --splashBackgroundColor '#020617' --splashBackgroundColorDark '#020617'
+          # Forzar SDK 24 y API 36 en variables.gradle
+          sed -i 's/minSdkVersion = [0-9]*/minSdkVersion = 24/g' android/variables.gradle
+          sed -i 's/compileSdkVersion = [0-9]*/compileSdkVersion = 36/g' android/variables.gradle
+          sed -i 's/targetSdkVersion = [0-9]*/targetSdkVersion = 36/g' android/variables.gradle
 
-      - name: Inyectar ID de App de AdMob y Version en Android
-        run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          sed -i 's|</application>|<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-6672720525194990~3491583985"/><meta-data android:name="com.google.android.gms.ads.DELAY_APP_MEASUREMENT_INIT" android:value="false"/></application>|g' "$MANIFEST"
           sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/g" android/app/build.gradle
           sed -i 's/versionName "1.0"/versionName "1.0.${{ github.run_number }}"/g' android/app/build.gradle
           npx cap sync android
 
-      - name: Preparar o Generar Llave Digital (Keystore)
+      - name: Preparar Llave Digital y Compilar APK + AAB
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           PASS="${KEY_PASSWORD:-MiCuadrante2026!}"
+          KS_PATH="$PWD/android/app/release.keystore"
+          rm -f "$KS_PATH"
+
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "Usando llave oficial guardada en GitHub Secrets..."
-            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
-          else
-            echo "Generando llave digital nueva por primera vez..."
-            keytool -genkeypair -v -keystore android/app/release.keystore -alias micuadrante -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=K4NT3R0, OU=Apps, O=K4NT3R0, L=Cádiz, S=Andalucia, C=ES"
-            base64 -w 0 android/app/release.keystore > LLAVE_PARA_GITHUB_SECRETS.txt
-            cp android/app/release.keystore COPIA_SEGURIDAD_KEYSTORE.jks
+            echo "$KEYSTORE_BASE64" | tr -d ' \n\r\t' | base64 -d -i > "$KS_PATH" || true
           fi
 
-      - name: Compilar APK y Firmar AAB Oficial para Google Play
-        env:
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          PASS="${KEY_PASSWORD:-MiCuadrante2026!}"
+          if ! keytool -list -keystore "$KS_PATH" -storepass "$PASS" -alias micuadrante >/dev/null 2>&1; then
+            rm -f "$KS_PATH"
+            keytool -genkeypair -v -keystore "$KS_PATH" -alias micuadrante -keyalg RSA -keysize 2048 -validity 10000 -storepass "$PASS" -keypass "$PASS" -dname "CN=K4NT3R0, OU=Apps, O=K4NT3R0, L=Cadiz, S=Andalucia, C=ES"
+          fi
+
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug bundleRelease \
-            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+          ./gradlew assembleDebug
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file="$KS_PATH" \
             -Pandroid.injected.signing.store.password="$PASS" \
             -Pandroid.injected.signing.key.alias=micuadrante \
             -Pandroid.injected.signing.key.password="$PASS"
@@ -87,12 +77,3 @@ jobs:
         with:
           name: MiCuadrante-GooglePlay-AAB-FIRMADO
           path: android/app/build/outputs/bundle/release/app-release.aab
-
-      - name: Subir Llave Nueva (Solo sale la primera vez)
-        if: ${{ env.KEYSTORE_BASE64 == '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: GUARDA-ESTA-LLAVE-EN-SECRETS
-          path: |
-            LLAVE_PARA_GITHUB_SECRETS.txt
-            COPIA_SEGURIDAD_KEYSTORE.jks
