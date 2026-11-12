@@ -59,6 +59,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
       <span>Días trab.: <b id="stWorkDays" class="text-slate-200">0</b> · Libres: <b id="stFreeDays" class="text-slate-200">0</b></span>
       <span>Extra mes: <b id="stTotal" class="text-emerald-400 font-extrabold">0 €</b></span>
     </div>
+    <p id="nextShift" class="text-xs text-emerald-300 mt-1.5 px-1"></p>
   </section>
 
   <div role="tablist" class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
@@ -159,6 +160,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     </div>
 
     <div class="card space-y-3">
+      <div><h3 class="font-bold text-sm text-white">Horarios, avisos y festivos</h3><p class="text-[11px] text-slate-400">Inicio y fin de cada turno: se usan en los avisos de descanso y en el calendario. Se guardan con el botón de abajo.</p></div>
+      <div id="timeFields" class="space-y-2"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="lbl" for="r_alarm">Aviso antes del turno (min, 0 = ninguno)</label><input type="number" inputmode="numeric" min="0" max="1440" id="r_alarm" class="inp"></div>
+        <div><label class="lbl" for="r_hol">Festivos locales (dd/mm, con comas)</label><input type="text" id="r_hol" maxlength="200" placeholder="15/08, 23/04" class="inp"></div>
+      </div>
+    </div>
+
+    <div class="card space-y-3">
       <div><h3 class="font-bold text-sm text-white">Tus tarifas (€ brutos)</h3><p class="text-[11px] text-slate-400">Importes por hora extra, pluses de turno/parada, dietas y km.</p></div>
       <div id="rateFields" class="grid grid-cols-2 gap-3 pt-1"></div>
       <button onclick="saveRates()" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-floppy-disk mr-1"></i>Guardar configuración y tarifas</button>
@@ -172,6 +182,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <label class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs text-center cursor-pointer active:scale-95 transition"><i class="fa-solid fa-upload text-sky-400 mr-1"></i>Restaurar archivo<input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
         <button onclick="copyBackupClipboard()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-regular fa-copy text-teal-400 mr-1"></i>Copiar datos (Texto)</button>
         <button onclick="pasteBackupClipboard()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-solid fa-paste text-purple-400 mr-1"></i>Pegar copia</button>
+        <a href="privacidad.html" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs text-center active:scale-95 transition"><i class="fa-solid fa-shield-halved text-sky-400 mr-1"></i>Política de privacidad</a>
+        <button id="adsPriv" onclick="openAdsPrivacy()" class="hidden bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-solid fa-sliders text-amber-400 mr-1"></i>Privacidad de anuncios</button>
         <button onclick="exportICS()" class="col-span-2 bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-regular fa-calendar-plus text-amber-400 mr-1"></i>Exportar turnos a Google Calendar (.ics)</button>
       </div>
     </div>
@@ -242,7 +254,8 @@ const RATES=[
   ['pn','Plus turno noche','€/día'],
   ['pr','Plus retén / parada','€/día'],
   ['meal','Valor 1 dieta','€'],
-  ['km','Kilometraje','€/km']
+  ['km','Kilometraje','€/km'],
+  ['ret','Retención estimada s/ extras y pluses','%']
 ];
 
 const DF=[
@@ -255,7 +268,7 @@ const DF=[
 ];
 
 const KEY='miCuadrante.v2', TB='py-2 text-[11px] font-semibold rounded-lg transition ';
-let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26,hOrd:7.6,h12:12,targetYear:1696,vacDays:22},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
+let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26,hOrd:7.6,h12:12,targetYear:1696,vacDays:22,ret:0,alarm:60,hol:'',times:{M:['06:00','14:00'],T:['14:00','22:00'],N:['22:00','06:00'],D12:['07:00','19:00'],N12:['19:00','07:00']}},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
 cur.setDate(1);
 
 function load(){
@@ -302,6 +315,7 @@ function isHol(d){
     const s=new Set(['01-01','01-06','02-28','05-01','08-15','10-12','11-01','12-06','12-08','12-25']);
     const v=easter(y);v.setDate(v.getDate()-2);s.add(p2(v.getMonth()+1)+'-'+p2(v.getDate()));
     const j=easter(y);j.setDate(j.getDate()-3);s.add(p2(j.getMonth()+1)+'-'+p2(j.getDate()));
+    String(S.rates.hol||'').split(',').forEach(x=>{const m=x.trim().match(/^(\d{1,2})\/(\d{1,2})$/);if(m)s.add(p2(+m[2])+'-'+p2(+m[1]))});
     HC[y]=s;
   }
   return HC[y].has(p2(d.getMonth()+1)+'-'+p2(d.getDate()));
@@ -358,6 +372,7 @@ function render(){
   $('stWorkDays').textContent=s.workDays;
   $('stFreeDays').textContent=s.freeDays;
   $('stTotal').textContent=eur(s.ex+s.al);
+  {const f=c=>{if(!c||!SH[c])return 'sin turno';const t=shiftHrs(c);return SH[c].n+(t?` ${hhmm(t[0])}–${hhmm(t[1])}`:'')};$('nextShift').textContent=`Hoy: ${f(S.days[today]?.s)} · Mañana: ${f(S.days[ymd(new Date(Date.now()+864e5))]?.s)}`}
   let h='<div></div>'.repeat((new Date(y,m,1).getDay()+6)%7);
   for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
     const dt=new Date(y,m,i),k=ymd(dt),d=S.days[k],sh=d&&SH[d.s];
@@ -375,14 +390,36 @@ function render(){
   if(!$('view-details').classList.contains('hidden'))renderDetails();
 }
 
+/* Avisos legales (ET): 12 h entre jornadas (art. 34.3; en cambio de turno puede bajar a 7 h si se compensa) y máx. 80 h extra/año (art. 35.2). Horarios supuestos: M 6-14, T 14-22, N 22-6, 12h 7-19 / 19-7 */
+const T2H=t=>{const [h,m]=String(t||'0:0').split(':');return (+h||0)+(+m||0)/60},hhmm=h=>p2(Math.floor(h)%24)+':'+p2(Math.round((h%1)*60));
+function shiftHrs(c){const t=c&&S.rates.times&&S.rates.times[c];if(!Array.isArray(t))return null;const a=T2H(t[0]);let b=T2H(t[1]);if(b<=a)b+=24;return [a,b]}
+function restAlerts(y,m){
+  const bad=[],chg=[];
+  for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
+    const k=`${y}-${p2(m+1)}-${p2(i)}`,a=shiftHrs(S.days[prevKey(k)]?.s),b=shiftHrs(S.days[k]?.s);
+    if(!a||!b)continue;
+    const r=24+b[0]-a[1];
+    if(r<7)bad.push(i);else if(r<12)chg.push(i);
+  }
+  return {bad,chg};
+}
+function legalWarnings(y,exHrs){
+  const w=[],ra=restAlerts(y,cur.getMonth()),R='bg-rose-500/10 border-rose-500/30 text-rose-200',A='bg-amber-500/10 border-amber-500/30 text-amber-200',box=(t,c)=>`<div class="${c} border rounded-lg p-2 text-[11px] leading-snug">${t}</div>`;
+  if(exHrs>80)w.push(box(`Llevas ${exHrs.toLocaleString('es-ES')} h extra en ${y}: superas el máximo legal de 80 h/año (art. 35.2 ET). No cuentan las compensadas con descanso en 4 meses ni las de fuerza mayor.`,R));
+  else if(exHrs>=64)w.push(box(`Llevas ${exHrs.toLocaleString('es-ES')} de 80 h extra anuales permitidas en ${y}.`,A));
+  if(ra.bad.length)w.push(box(`Descanso inferior a 7 h entre jornadas (días ${ra.bad.join(', ')}).`,R));
+  if(ra.chg.length)w.push(box(`Descanso de 7 a 12 h (días ${ra.chg.join(', ')}). Solo es válido en cambio de turno y si se compensa después. Calculado con los horarios que configuraste en Ajustes.`,A));
+  return w.length?`<div class="space-y-1.5 pt-1">${w.join('')}</div>`:'';
+}
+
 function renderDetails(){
   const y=cur.getFullYear(),s=summary(y,cur.getMonth()),tot=Object.values(s.cnt).reduce((a,b)=>a+b,0)||1;
   $('balanceYearBadge').textContent=`Año ${y}`;
   const LB={he:'H. extra normales',hn:'H. extra nocturnas',hf:'H. extra festivas',pn:'Plus nocturnidad',pr:'Plus retén / parada',meal:'Dietas',km:'Kilometraje'};
-  let yrMoney=0,yrOrd=0,yrExHrs=0,yrVac=0;
+  let yrMoney=0,yrOrd=0,yrExHrs=0,yrVac=0,yrEx=0,yrAl=0;
   for(let m=0;m<12;m++){
     const q=summary(y,m);
-    yrMoney+=q.ex+q.al;
+    yrMoney+=q.ex+q.al;yrEx+=q.ex;yrAl+=q.al;
     yrOrd+=q.ordHrs;
     yrExHrs+=q.hrs;
     yrVac+=(q.cnt.V||0);
@@ -394,6 +431,7 @@ function renderDetails(){
   const bars=Object.keys(SH).filter(k=>s.cnt[k]).map(k=>`<div class="flex items-center gap-2"><span class="w-16 text-slate-400 font-medium">${SH[k].n}</span><div class="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:${s.cnt[k]/tot*100}%"></div></div><b class="w-7 text-right">${s.cnt[k]}d</b></div>`).join('');
   const rows=Object.keys(LB).filter(k=>s.c[k]>0).map(k=>`<div class="flex justify-between"><span class="text-slate-400">${LB[k]}</span><b>${eur(s.c[k])}</b></div>`).join('');
 
+  const ret=Math.min(60,Math.max(0,num(S.rates.ret)))/100;
   const annualBox=`
     <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 mt-2">
       <div class="flex justify-between items-center"><span class="text-slate-400">Jornada anual realizada (${y})</span><b>${yrOrd.toLocaleString('es-ES')} / ${targetY} h (${pctY}%)</b></div>
@@ -404,17 +442,19 @@ function renderDetails(){
         <div class="bg-slate-900 rounded-lg p-1.5"><span class="text-[10px] text-slate-400 block">Vacaciones</span><b class="text-amber-400">${yrVac} / ${vacTot} d</b></div>
       </div>
       <div class="flex justify-between pt-1 border-t border-slate-800"><span class="text-slate-400">Acumulado extra ${y}</span><b class="text-emerald-400">${eur(yrMoney)}</b></div>
+      ${ret?`<div class="flex justify-between"><span class="text-slate-400">Neto estimado ${y}</span><b class="text-emerald-300">${eur(yrEx*(1-ret)+yrAl)}</b></div>`:''}${legalWarnings(y,Math.round(yrExHrs*100)/100)}
     </div>`;
 
   $('breakdown').innerHTML=(bars||'<p class="text-slate-500">Aún no hay turnos asignados este mes.</p>')+
     `<div class="border-t border-slate-800 pt-2 flex justify-between"><span class="text-slate-400">Horas totales mes (Ord. + Extra)</span><b>${(s.ordHrs+s.hrs).toLocaleString('es-ES')} h</b></div>`+
     (rows?`<div class="border-t border-slate-800 pt-2 space-y-1.5">${rows}</div>`:'')+
     `<div class="border-t border-slate-800 pt-2 flex justify-between text-sm"><span>Total extra del mes</span><b class="text-emerald-400">${eur(s.ex+s.al)}</b></div>`+
+    (ret?`<div class="flex justify-between text-xs"><span class="text-slate-400">Neto estimado (dietas y km sin retención)</span><b class="text-emerald-300">${eur(s.ex*(1-ret)+s.al)}</b></div>`:'')+
     annualBox;
 
   const q=($('logSearch')?.value||'').toLowerCase().trim();
   const filtered=s.log.filter(({k,d})=>!q || (d.note&&d.note.toLowerCase().includes(q)) || (d.s&&SH[d.s]?.n.toLowerCase().includes(q)) || k.includes(q));
-  $('logList').innerHTML=filtered.length?filtered.map(({k,d,h,ord,t})=>`<button data-k="${k}" class="w-full text-left bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between gap-2"><span><b>${k.slice(8)}/${k.slice(5,7)}</b> <span class="text-slate-300 font-semibold">${d.s?SH[d.s]?.n||'':''}</span> <span class="text-slate-400">(${ord}h${h?' + '+h+'h extra':''}${d.meals?' · '+d.meals+' dieta':''}${d.km?' · '+d.km+' km':''})</span>${d.note?`<span class="block text-[11px] text-amber-300/90 mt-0.5"><i class="fa-regular fa-comment-dots mr-1"></i>${esc(d.note)}</span>`:''}</span><b class="text-emerald-400 shrink-0">${eur(t)}</b></button>`).join(''):'<p class="text-slate-500 text-xs">Sin registros que coincidan en este mes.</p>';
+  $('logList').innerHTML=filtered.length?filtered.map(({k,d,h,ord,t})=>`<button data-k="${k}" class="w-full text-left bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between gap-2"><span><b>${k.slice(8)}/${k.slice(5,7)}</b> <span class="text-slate-300 font-semibold">${d.s?SH[d.s]?.n||'':''}</span> <span class="text-slate-400">(${ord}h${h?' + '+h+'h extra':''}${d.meals?' · '+esc(d.meals)+' dieta':''}${d.km?' · '+esc(d.km)+' km':''})</span>${d.note?`<span class="block text-[11px] text-amber-300/90 mt-0.5"><i class="fa-regular fa-comment-dots mr-1"></i>${esc(d.note)}</span>`:''}</span><b class="text-emerald-400 shrink-0">${eur(t)}</b></button>`).join(''):'<p class="text-slate-500 text-xs">Sin registros que coincidan en este mes.</p>';
 }
 
 function renderPaint(){
@@ -539,10 +579,19 @@ function saveRates(){
   S.rates.h12=Math.max(0,num($('r_h12').value))||12;
   S.rates.targetYear=Math.max(0,num($('r_targetYear').value))||1696;
   S.rates.vacDays=Math.max(0,num($('r_vacDays').value))||22;
+  Object.keys(S.rates.times).forEach(k=>{const a=$('t_'+k+'_a').value,b=$('t_'+k+'_b').value;if(a&&b)S.rates.times[k]=[a,b]});
+  S.rates.alarm=Math.min(1440,Math.max(0,num($('r_alarm').value)));S.rates.hol=$('r_hol').value.slice(0,200);
+  Object.keys(HC).forEach(y=>delete HC[y]);
   save();render();toast('Configuración y tarifas guardadas');
 }
 
 async function dl(name,type,txt){
+  const C=window.Capacitor,P=C?.Plugins;
+  if(C?.isNativePlatform?.()&&P?.Filesystem&&P?.Share){
+    try{const r=await P.Filesystem.writeFile({path:name,data:txt,directory:'CACHE',encoding:'utf8'});await P.Share.share({title:name,files:[r.uri]})}
+    catch(e){if(!/cancel/i.test(e?.message||''))toast('No se pudo exportar el archivo')}
+    return;
+  }
   try{
     const file=new File([txt],name,{type});
     if(navigator.canShare && navigator.canShare({files:[file]})){
@@ -578,7 +627,7 @@ function undo(){if(!undoSnap)return;S.days=JSON.parse(undoSnap);undoSnap=null;sa
 function undoable(m){toast(m,'Deshacer',undo)}
 
 function checkBackup(){
-  const age=S.lastBackup?(Date.now()-S.lastBackup)/864e5:Infinity,show=Object.keys(S.days).length>=7&&age>30;
+  const age=S.lastBackup?(Date.now()-S.lastBackup)/864e5:Infinity,show=Object.keys(S.days).length>=7&&age>14;
   $('backupBanner').classList.toggle('hidden',!show);
   if(show)$('backupMsg').textContent=S.lastBackup?`Hace ${Math.floor(age)} días de tu última copia de seguridad.`:'Guarda una copia de seguridad de tu cuadrante.';
 }
@@ -612,8 +661,8 @@ function exportICS(){
   const rows=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mi Cuadrante//ES','CALSCALE:GREGORIAN'],st=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
   Object.keys(S.days).sort().forEach(k=>{
     const d=S.days[k];if(!SH[d.s]||d.s==='L')return;
-    const e=new Date(k+'T00:00:00');e.setDate(e.getDate()+1);
-    rows.push('BEGIN:VEVENT',`UID:${k}@micuadrante`,`DTSTAMP:${st}`,`DTSTART;VALUE=DATE:${k.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${ymd(e).replace(/-/g,'')}`,`SUMMARY:${SH[d.s].n} (${dayOrdHours(d)}h)`,...(d.note?['DESCRIPTION:'+String(d.note).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')]:[]),'END:VEVENT');
+    const e=new Date(k+'T00:00:00');e.setDate(e.getDate()+1);const tm=shiftHrs(d.s),kk=k.replace(/-/g,''),nn=ymd(e).replace(/-/g,''),hm=h=>hhmm(h).replace(':','')+'00',when=tm?[`DTSTART:${kk}T${hm(tm[0])}`,`DTEND:${tm[1]>=24?nn:kk}T${hm(tm[1])}`]:[`DTSTART;VALUE=DATE:${kk}`,`DTEND;VALUE=DATE:${nn}`],al=tm&&S.rates.alarm>0?['BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:Turno',`TRIGGER:-PT${Math.round(S.rates.alarm)}M`,'END:VALARM']:[];
+    rows.push('BEGIN:VEVENT',`UID:${k}@micuadrante`,`DTSTAMP:${st}`,...when,`SUMMARY:${SH[d.s].n} (${dayOrdHours(d)}h)`,...(d.note?['DESCRIPTION:'+String(d.note).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')]:[]),...al,'END:VEVENT');
   });
   rows.push('END:VCALENDAR');
   dl('cuadrante.ics','text/calendar;charset=utf-8',rows.join('\r\n'));
@@ -641,6 +690,9 @@ function initForms(){
   $('r_h12').value=S.rates.h12??12;
   $('r_targetYear').value=S.rates.targetYear??1696;
   $('r_vacDays').value=S.rates.vacDays??22;
+  $('timeFields').innerHTML=Object.keys(S.rates.times).map(k=>`<div class="flex items-center gap-2"><span class="w-20 text-[11px] text-slate-300 font-semibold">${SH[k].n}</span><input type="time" id="t_${k}_a" class="inp" value="${esc(S.rates.times[k][0])}" aria-label="Inicio ${SH[k].n}"><input type="time" id="t_${k}_b" class="inp" value="${esc(S.rates.times[k][1])}" aria-label="Fin ${SH[k].n}"></div>`).join('');
+  $('r_alarm').value=S.rates.alarm??60;$('r_hol').value=S.rates.hol||'';
+  Object.keys(HC).forEach(y=>delete HC[y]);
   renderPaint();renderCycle();
 }
 
@@ -679,13 +731,14 @@ if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWork
   const AdMob = window.Capacitor?.Plugins?.AdMob;
   if (!AdMob) return;
 
-  const BANNER_ID = 'ca-app-pub-6672720525194990/8552338976';
-  const INTERSTITIAL_ID = 'ca-app-pub-6672720525194990/6095510680';
+  const ADS_TEST = false; // true = anuncios de prueba de Google: úsalo siempre que pruebes en tu móvil
+  const BANNER_ID = ADS_TEST ? 'ca-app-pub-3940256099942544/6300978111' : 'ca-app-pub-6672720525194990/8552338976';
+  const INTERSTITIAL_ID = ADS_TEST ? 'ca-app-pub-3940256099942544/1033173712' : 'ca-app-pub-6672720525194990/6095510680';
   let interstitialReady = false;
 
   async function preloadInterstitial() {
     try {
-      await AdMob.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: false });
+      await AdMob.prepareInterstitial({ adId: INTERSTITIAL_ID, isTesting: ADS_TEST });
       interstitialReady = true;
     } catch (e) { interstitialReady = false; }
   }
@@ -703,18 +756,23 @@ if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWork
 
   window.addEventListener('load', async () => {
     try {
+      let ci = await AdMob.requestConsentInfo();
+      if (ci.isConsentFormAvailable && ci.status === 'REQUIRED') ci = await AdMob.showConsentForm();
+      if (ci.canRequestAds === false) return;
       await AdMob.initialize({});
+      $('adsPriv').classList.remove('hidden');
       await AdMob.showBanner({
         adId: BANNER_ID,
         adSize: 'ADAPTIVE_BANNER',
         position: 'BOTTOM_CENTER',
         margin: 0,
-        isTesting: false
+        isTesting: ADS_TEST
       });
       await preloadInterstitial();
     } catch (e) {}
   });
 
+  window.openAdsPrivacy = () => AdMob.showPrivacyOptionsForm().catch(() => toast('Opciones no disponibles ahora'));
   const origExportCSV = window.exportCSV;
   window.exportCSV = function() {
     showInterstitialThen(() => origExportCSV());
