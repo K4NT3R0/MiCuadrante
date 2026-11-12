@@ -86,6 +86,7 @@ jobs:
               with open(root_gradle, "r", encoding="utf-8") as f:
                   r_g = f.read()
               if "sourceCompatibility" not in r_g:
+                  # Inject java 17 compatibility into allprojects subprojects
                   sub_comp = '''
                   subprojects {
                       afterEvaluate { project ->
@@ -113,6 +114,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           cd android
+          chmod +x gradlew
           ./gradlew clean
           if [ -n "$KEYSTORE_BASE64" ]; then
             echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
