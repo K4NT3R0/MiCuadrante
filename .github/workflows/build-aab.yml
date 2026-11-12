@@ -39,22 +39,6 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Generar iconos de la App (si existe icon.svg o icon.png)
-        run: |
-          if [ -f icon.svg ] || [ -f icon.png ]; then
-            mkdir -p assets
-            if [ -f icon.png ]; then
-              cp icon.png assets/icon.png
-              cp icon.png assets/splash.png
-            elif [ -f icon.svg ]; then
-              npx --yes sharp-cli -i icon.svg -o assets/icon.png resize 1024 1024 || true
-              npx --yes sharp-cli -i icon.svg -o assets/splash.png resize 2732 2732 || true
-            fi
-            if [ -f assets/icon.png ]; then
-              npx --yes @capacitor/assets generate --android || true
-            fi
-          fi
-
       - name: Configurar AndroidManifest (Permiso AD_ID + AdMob) y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
@@ -89,12 +73,36 @@ jobs:
               gradle = f.read()
 
           run_num = int(os.environ.get("RUN_NUMBER", "1"))
-          new_vc = 20 + run_num
+          new_vc = 30 + run_num
           gradle = re.sub(r"versionCode\s+\d+", f"versionCode {new_vc}", gradle)
           gradle = re.sub(r'versionName\s+"[^"]+"', f'versionName "1.1.{run_num}"', gradle)
 
           with open(gradle_path, "w", encoding="utf-8") as f:
               f.write(gradle)
+              
+          # 4. Asegurar compatibilidad Java 17 en el build.gradle raíz de android si existe
+          root_gradle = "android/build.gradle"
+          if os.path.exists(root_gradle):
+              with open(root_gradle, "r", encoding="utf-8") as f:
+                  r_g = f.read()
+              if "sourceCompatibility" not in r_g:
+                  sub_comp = '''
+                  subprojects {
+                      afterEvaluate { project ->
+                          if (project.hasProperty("android")) {
+                              project.android {
+                                  compileOptions {
+                                      sourceCompatibility JavaVersion.VERSION_17
+                                      targetCompatibility JavaVersion.VERSION_17
+                                  }
+                              }
+                          }
+                      }
+                  }
+                  '''
+                  r_g += sub_comp
+                  with open(root_gradle, "w", encoding="utf-8") as f:
+                      f.write(r_g)
           EOF
 
       - name: Firmar y compilar Android App Bundle (AAB)
@@ -104,16 +112,16 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          cd android
+          ./gradlew clean
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
-            cd android
+            echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
             ./gradlew bundleRelease \
               -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
               -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
               -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
               -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
           else
-            cd android
             ./gradlew bundleRelease
           fi
 
