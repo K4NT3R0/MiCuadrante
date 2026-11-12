@@ -1,0 +1,136 @@
+name: Fabricar App Mi Cuadrante
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Preparar archivos Web y Capacitor con AdMob
+        run: |
+          mkdir -p www
+          cp index.html manifest.json sw.js privacidad.html www/
+          cp icon.svg icon-192.png icon-512.png icon-maskable-512.png www/ 2>/dev/null || true
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+          npm install @capacitor/core@8 @capacitor/cli@8 @capacitor/android@8 @capacitor/filesystem@8 @capacitor/share@8 @capacitor-community/admob@8
+          echo '{"appId":"com.k4nt3r0.micuadrante","appName":"Mi Cuadrante","webDir":"www"}' > capacitor.config.json
+          if [ ! -d android ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+          grep -Eq 'targetSdkVersion *= *(3[6-9]|[4-9][0-9])' android/variables.gradle || echo "::warning::Revisa targetSdk: Play exige API 36 o superior"
+
+      - name: Configurar AndroidManifest (Permiso AD_ID + AdMob) y VersionCode
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 - << 'EOF'
+          import os, re
+
+          manifest_path = "android/app/src/main/AndroidManifest.xml"
+          with open(manifest_path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          # 1. Asegurar permiso AD_ID para Android 13+ en Google Play Console
+          ad_id_perm = '<uses-permission android:name="com.google.android.gms.permission.AD_ID" />'
+          if "com.google.android.gms.permission.AD_ID" not in content:
+              content = content.replace("</manifest>", f"    {ad_id_perm}\n</manifest>")
+
+          # 2. Asegurar meta-data APPLICATION_ID de Google AdMob
+          app_id = os.environ.get("ADMOB_APP_ID", "").strip()
+          if not app_id or "~" not in app_id:
+              app_id = "ca-app-pub-6672720525194990~3347511713"
+          meta_tag = f'<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="{app_id}"/>'
+          if "com.google.android.gms.ads.APPLICATION_ID" not in content:
+              content = content.replace("</application>", f"        {meta_tag}\n    </application>")
+
+          with open(manifest_path, "w", encoding="utf-8") as f:
+              f.write(content)
+
+          # 3. Incrementar versionCode y versionName en build.gradle
+          gradle_path = "android/app/build.gradle"
+          with open(gradle_path, "r", encoding="utf-8") as f:
+              gradle = f.read()
+
+          run_num = int(os.environ.get("RUN_NUMBER", "1"))
+          new_vc = 30 + run_num
+          gradle = re.sub(r"versionCode\s+\d+", f"versionCode {new_vc}", gradle)
+          gradle = re.sub(r'versionName\s+"[^"]+"', f'versionName "1.1.{run_num}"', gradle)
+
+          with open(gradle_path, "w", encoding="utf-8") as f:
+              f.write(gradle)
+              
+          # 4. Asegurar compatibilidad Java 17 en el build.gradle raíz de android si existe
+          root_gradle = "android/build.gradle"
+          if os.path.exists(root_gradle):
+              with open(root_gradle, "r", encoding="utf-8") as f:
+                  r_g = f.read()
+              if "sourceCompatibility" not in r_g:
+                  # Inject java 17 compatibility into allprojects subprojects
+                  sub_comp = '''
+                  subprojects {
+                      afterEvaluate { project ->
+                          if (project.hasProperty("android")) {
+                              project.android {
+                                  compileOptions {
+                                      sourceCompatibility JavaVersion.VERSION_21
+                                      targetCompatibility JavaVersion.VERSION_21
+                                  }
+                              }
+                          }
+                      }
+                  }
+                  '''
+                  r_g += sub_comp
+                  with open(root_gradle, "w", encoding="utf-8") as f:
+                      f.write(r_g)
+          EOF
+
+      - name: Firmar y compilar Android App Bundle (AAB)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew clean
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > app/release.keystore
+            ./gradlew bundleRelease \
+              -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+              -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+          else
+            echo "::error::Falta el secreto KEYSTORE_BASE64: Play rechaza un AAB sin firmar"
+            exit 1
+          fi
+
+      - name: Subir archivo AAB listo para Google Play
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiCuadrante-AAB
+          path: android/app/build/outputs/bundle/release/*.aab
