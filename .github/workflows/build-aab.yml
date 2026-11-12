@@ -1,4 +1,4 @@
-name: Build Signed Android AAB (Mi Cuadrante)
+name: Fabricar App Mi Cuadrante
 
 on:
   push:
@@ -8,73 +8,117 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Descargar codigo del repositorio
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Setup Java 17
+      - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Prepare web assets & Capacitor with AdMob
+      - name: Preparar archivos Web y Capacitor con AdMob
         run: |
           mkdir -p www
           cp index.html manifest.json sw.js www/ 2>/dev/null || true
-          cp icon.svg www/ 2>/dev/null || true
+          cp icon.svg icon.png www/ 2>/dev/null || true
           if [ ! -f package.json ]; then
             npm init -y
           fi
           npm install @capacitor/core @capacitor/cli @capacitor/android @capacitor-community/admob@6
-          if [ ! -f capacitor.config.json ]; then
-            echo '{"appId":"com.k4nt3r0.micuadrante","appName":"Mi Cuadrante","webDir":"www"}' > capacitor.config.json
-          fi
+          echo '{"appId":"com.k4nt3r0.micuadrante","appName":"Mi Cuadrante","webDir":"www"}' > capacitor.config.json
           if [ ! -d android ]; then
             npx cap add android
           fi
           npx cap sync android
 
-      - name: Configure AndroidManifest (AD_ID + AdMob) & VersionCode
+      - name: Generar iconos de la App (si existe icon.svg o icon.png)
         run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          # Añadir permiso AD_ID obligatorio para Android 13+ en Play Console
-          if ! grep -q "com.google.android.gms.permission.AD_ID" "$MANIFEST"; then
-            sed -i 's|<uses-permission android:name="android.permission.INTERNET" />|<uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />|' "$MANIFEST"
-          fi
-          # Añadir APPLICATION_ID de AdMob dentro de <application>
-          if ! grep -q "com.google.android.gms.ads.APPLICATION_ID" "$MANIFEST"; then
-            ADMOB_APP_ID="${{ secrets.ADMOB_APP_ID }}"
-            if [ -z "$ADMOB_APP_ID" ]; then
-              ADMOB_APP_ID="ca-app-pub-6672720525194990~3347511713"
+          if [ -f icon.svg ] || [ -f icon.png ]; then
+            mkdir -p assets
+            if [ -f icon.png ]; then
+              cp icon.png assets/icon.png
+              cp icon.png assets/splash.png
+            elif [ -f icon.svg ]; then
+              npx --yes sharp-cli -i icon.svg -o assets/icon.png resize 1024 1024 || true
+              npx --yes sharp-cli -i icon.svg -o assets/splash.png resize 2732 2732 || true
             fi
-            sed -i "s|</application>|    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="$ADMOB_APP_ID"/>
-    </application>|" "$MANIFEST"
+            if [ -f assets/icon.png ]; then
+              npx --yes @capacitor/assets generate --android || true
+            fi
           fi
-          # Incrementar versionCode automáticamente con el número de ejecución de GitHub
-          VC=$((10 + ${{ github.run_number }}))
-          sed -i "s/versionCode [0-9]*/versionCode $VC/" android/app/build.gradle
-          sed -i 's/versionName ".*"/versionName "1.1.'${{ github.run_number }}'"/' android/app/build.gradle
 
-      - name: Decode Keystore & Sign Release AAB
+      - name: Configurar AndroidManifest (Permiso AD_ID + AdMob) y VersionCode
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          python3 - << 'EOF'
+          import os, re
+
+          manifest_path = "android/app/src/main/AndroidManifest.xml"
+          with open(manifest_path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          # 1. Asegurar permiso AD_ID para Android 13+ en Google Play Console
+          ad_id_perm = '<uses-permission android:name="com.google.android.gms.permission.AD_ID" />'
+          if "com.google.android.gms.permission.AD_ID" not in content:
+              content = content.replace("</manifest>", f"    {ad_id_perm}\n</manifest>")
+
+          # 2. Asegurar meta-data APPLICATION_ID de Google AdMob
+          app_id = os.environ.get("ADMOB_APP_ID", "").strip()
+          if not app_id or "~" not in app_id:
+              app_id = "ca-app-pub-6672720525194990~3347511713"
+          meta_tag = f'<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="{app_id}"/>'
+          if "com.google.android.gms.ads.APPLICATION_ID" not in content:
+              content = content.replace("</application>", f"        {meta_tag}\n    </application>")
+
+          with open(manifest_path, "w", encoding="utf-8") as f:
+              f.write(content)
+
+          # 3. Incrementar versionCode y versionName en build.gradle
+          gradle_path = "android/app/build.gradle"
+          with open(gradle_path, "r", encoding="utf-8") as f:
+              gradle = f.read()
+
+          run_num = int(os.environ.get("RUN_NUMBER", "1"))
+          new_vc = 20 + run_num
+          gradle = re.sub(r"versionCode\s+\d+", f"versionCode {new_vc}", gradle)
+          gradle = re.sub(r'versionName\s+"[^"]+"', f'versionName "1.1.{run_num}"', gradle)
+
+          with open(gradle_path, "w", encoding="utf-8") as f:
+              f.write(gradle)
+          EOF
+
+      - name: Firmar y compilar Android App Bundle (AAB)
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release-key.keystore
-          cd android
-          ./gradlew bundleRelease             -Pandroid.injected.signing.store.file=$PWD/app/release-key.keystore             -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD"             -Pandroid.injected.signing.key.alias="$KEY_ALIAS"             -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+            cd android
+            ./gradlew bundleRelease \
+              -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+              -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+              -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+              -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+          else
+            cd android
+            ./gradlew bundleRelease
+          fi
 
-      - name: Upload Signed AAB Artifact
+      - name: Subir archivo AAB listo para Google Play
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-aab
+          name: MiCuadrante-AAB
           path: android/app/build/outputs/bundle/release/*.aab
