@@ -23,13 +23,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media print{.no-print{display:none!important}*{background:#fff!important;color:#000!important;border-color:#ccc!important}}
 </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-24">
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-28">
 
 <header class="sticky top-0 z-30 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3 no-print">
   <div class="max-w-md mx-auto flex items-center justify-between">
     <div class="flex items-center gap-2.5">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/40"><i class="fa-solid fa-calendar-check text-white text-lg"></i></div>
-      <div><h1 class="font-bold text-base leading-tight">Mi Cuadrante</h1><p class="text-[11px] text-emerald-400 font-medium">Turnos y Nómina Extra</p></div>
+      <div><h1 class="font-bold text-base leading-tight">Mi Cuadrante</h1><p class="text-[11px] text-emerald-400 font-medium">Turnos, Paradas y Horas Extra</p></div>
     </div>
     <button onclick="goToday()" class="bg-slate-800 text-slate-200 font-semibold text-xs px-3 py-1.5 rounded-full flex items-center gap-1.5 active:scale-95 transition"><i class="fa-solid fa-calendar-day text-emerald-400"></i> Hoy</button>
   </div>
@@ -49,19 +49,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
         <button onclick="exportCSV()" class="bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold px-3 rounded-lg flex items-center gap-1.5 active:scale-95"><i class="fa-solid fa-file-csv"></i> Excel</button>
       </div>
     </div>
-    <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80">
-      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Extra</span><span id="stMoney" class="text-base font-extrabold text-emerald-400">0 €</span></div>
-      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Horas extra</span><span id="stHours" class="text-base font-bold text-sky-400">0 h</span></div>
-      <div class="bg-slate-950/60 rounded-xl p-2.5 border border-slate-800/60"><span class="text-[11px] text-slate-400 block">Dietas / Km</span><span id="stAl" class="text-base font-bold text-amber-400">0 €</span></div>
+    <div class="grid grid-cols-4 gap-1.5 pt-3 border-t border-slate-800/80">
+      <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800/60"><span class="text-[10px] text-slate-400 block">Jornada</span><span id="stOrdHours" class="text-sm font-bold text-slate-200">0 h</span></div>
+      <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800/60"><span class="text-[10px] text-slate-400 block">H. Extra</span><span id="stHours" class="text-sm font-bold text-sky-400">0 h</span></div>
+      <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800/60"><span class="text-[10px] text-slate-400 block">Pluses/Ex</span><span id="stMoney" class="text-sm font-extrabold text-emerald-400">0 €</span></div>
+      <div class="bg-slate-950/60 rounded-xl p-2 border border-slate-800/60"><span class="text-[10px] text-slate-400 block">Dietas/Km</span><span id="stAl" class="text-sm font-bold text-amber-400">0 €</span></div>
     </div>
-    <p class="text-xs text-slate-400 mt-2.5 text-center">Total estimado del mes: <b id="stTotal" class="text-white">0 €</b></p>
+    <div class="flex items-center justify-between text-xs text-slate-400 mt-2.5 px-1">
+      <span>Días trab.: <b id="stWorkDays" class="text-slate-200">0</b> · Libres: <b id="stFreeDays" class="text-slate-200">0</b></span>
+      <span>Extra mes: <b id="stTotal" class="text-emerald-400 font-extrabold">0 €</b></span>
+    </div>
   </section>
 
   <div role="tablist" class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 no-print">
     <button role="tab" onclick="tab('calendar')" id="tab-calendar"><i class="fa-regular fa-calendar block mb-0.5 text-xs"></i>Cuadrante</button>
     <button role="tab" onclick="tab('cycles')" id="tab-cycles"><i class="fa-solid fa-rotate block mb-0.5 text-xs"></i>Ciclos</button>
-    <button role="tab" onclick="tab('details')" id="tab-details"><i class="fa-solid fa-chart-pie block mb-0.5 text-xs"></i>Desglose</button>
-    <button role="tab" onclick="tab('rates')" id="tab-rates"><i class="fa-solid fa-sliders block mb-0.5 text-xs"></i>Tarifas</button>
+    <button role="tab" onclick="tab('details')" id="tab-details"><i class="fa-solid fa-chart-pie block mb-0.5 text-xs"></i>Balance</button>
+    <button role="tab" onclick="tab('rates')" id="tab-rates"><i class="fa-solid fa-sliders block mb-0.5 text-xs"></i>Ajustes</button>
   </div>
 
   <div id="backupBanner" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-200 rounded-xl p-3 text-xs flex items-center justify-between gap-2 no-print"><span id="backupMsg"></span><button onclick="downloadBackup()" class="shrink-0 font-bold bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg">Guardar copia</button></div>
@@ -69,84 +73,130 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   <section id="view-calendar" class="space-y-3">
     <div class="bg-slate-900 border border-slate-800 rounded-xl p-2.5 no-print">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-paintbrush text-emerald-400 mr-1"></i>Modo toque</span>
+        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"><i class="fa-solid fa-paintbrush text-emerald-400 mr-1"></i>Modo toque rápido</span>
         <span id="paintHint" class="text-[11px] text-emerald-400 font-medium"></span>
       </div>
-      <div class="flex gap-1.5 overflow-x-auto no-scrollbar" id="paintSelector"></div>
+      <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5" id="paintSelector"></div>
     </div>
     <div class="card p-3 shadow-lg">
       <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400 mb-2"><div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div><div class="text-rose-400">SÁB</div><div class="text-rose-400">DOM</div></div>
       <div id="calendarGrid" class="grid grid-cols-7 gap-1.5"></div>
-      <p class="text-[10px] text-slate-500 mt-2 text-center no-print">Desliza para cambiar de mes · Festivos nacionales en rojo</p>
+      <div class="flex items-center justify-center gap-3 text-[10px] text-slate-400 mt-2.5 no-print">
+        <span class="flex items-center gap-1"><i class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></i>Extra/Dieta</span>
+        <span class="flex items-center gap-1"><i class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></i>Nota/Cambio</span>
+        <span class="text-rose-400 font-semibold">Rojo: Festivo</span>
+      </div>
     </div>
   </section>
 
   <section id="view-cycles" class="hidden space-y-4 no-print">
     <div class="card space-y-4">
       <div><span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Automatización</span>
-        <h3 class="font-bold text-sm text-white mt-1">Generador de rueda de turnos</h3>
-        <p class="text-[11px] text-slate-400">Crea tu secuencia una vez y rellena el mes o el año.</p></div>
-      <div><label class="lbl font-semibold text-slate-300">Plantillas habituales</label>
+        <h3 class="font-bold text-sm text-white mt-1">Generador de rueda de turnos y paradas</h3>
+        <p class="text-[11px] text-slate-400">Elige una plantilla o crea tu secuencia personalizada para rellenar un rango de fechas, el mes o todo el año.</p></div>
+      <div><label class="lbl font-semibold text-slate-300">Plantillas rápidas (convenio / rotativos / paradas)</label>
         <div id="presets" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div></div>
-      <div><label class="lbl font-semibold text-slate-300">Añadir día al patrón</label>
-        <div class="grid grid-cols-6 gap-1.5" id="cycleAdderBtns"></div></div>
+      <div><label class="lbl font-semibold text-slate-300">Añadir turno a la secuencia</label>
+        <div class="grid grid-cols-4 sm:grid-cols-5 gap-1.5" id="cycleAdderBtns"></div></div>
       <div class="bg-slate-950 border border-slate-800 rounded-xl p-3">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[11px] text-slate-400">Tu patrón (<b id="cycleLen" class="text-white">0</b> días):</span>
-          <div class="flex gap-3"><button onclick="S.cycle.pop();save();renderCycle()" class="text-[11px] text-amber-400"><i class="fa-solid fa-delete-left mr-0.5"></i>Último</button>
+          <span class="text-[11px] text-slate-400">Patrón (<b id="cycleLen" class="text-white">0</b> días):</span>
+          <div class="flex gap-3"><button onclick="S.cycle.pop();save();renderCycle()" class="text-[11px] text-amber-400"><i class="fa-solid fa-delete-left mr-0.5"></i>Borrar último</button>
           <button onclick="S.cycle=[];save();renderCycle()" class="text-[11px] text-rose-400">Vaciar</button></div>
         </div>
         <div id="cycleSequencePreview" class="flex flex-wrap gap-1.5 min-h-[34px] items-center"></div>
       </div>
       <div class="grid grid-cols-2 gap-2.5">
-        <div><label class="lbl" for="cycleStart">Día 1 del patrón:</label><input type="date" id="cycleStart" class="inp text-xs"></div>
-        <div><label class="lbl" for="cycleMode">Si ya hay turno:</label><select id="cycleMode" class="inp text-xs"><option value="overwrite">Sobrescribir</option><option value="keep">Respetar existentes</option></select></div>
+        <div><label class="lbl" for="cycleStart">Inicio del patrón:</label><input type="date" id="cycleStart" class="inp text-xs"></div>
+        <div><label class="lbl" for="cycleEnd">Fin (opcional, para paradas):</label><input type="date" id="cycleEnd" class="inp text-xs"></div>
+      </div>
+      <div>
+        <label class="lbl" for="cycleMode">Si ya hay turno asignado:</label>
+        <select id="cycleMode" class="inp text-xs"><option value="overwrite">Sobrescribir todos</option><option value="keep">Respetar días ya rellenados (ej. vacaciones)</option></select>
       </div>
       <div class="space-y-2">
-        <button onclick="applyCycle('month')" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-calendar-plus mr-1"></i>Rellenar mes actual</button>
-        <button onclick="applyCycle('year')" class="btn w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"><i class="fa-solid fa-bolt text-amber-300 mr-1"></i>Rellenar año completo</button>
+        <button onclick="applyCycle('range')" class="btn w-full bg-teal-600 hover:bg-teal-500 text-white shadow-lg"><i class="fa-solid fa-calendar-week mr-1"></i>Rellenar desde Inicio hasta Fin (o mes actual)</button>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="applyCycle('month')" class="btn bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-calendar-plus mr-1"></i>Mes en vista</button>
+          <button onclick="applyCycle('year')" class="btn bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"><i class="fa-solid fa-bolt text-amber-300 mr-1"></i>Año completo</button>
+        </div>
       </div>
     </div>
   </section>
 
   <section id="view-details" class="hidden space-y-3">
-    <div class="card space-y-3"><h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Resumen del mes</h3><div id="breakdown" class="space-y-2 text-xs"></div></div>
-    <div class="card space-y-3"><h3 class="font-bold text-sm text-slate-200 border-b border-slate-800 pb-2">Registro diario con extras</h3><div id="logList" class="space-y-2 max-h-80 overflow-y-auto"></div></div>
+    <div class="card space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-sm text-slate-200">Balance de Horas y Nómina Extra</h3>
+        <span id="balanceYearBadge" class="text-[11px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full"></span>
+      </div>
+      <div id="breakdown" class="space-y-2.5 text-xs"></div>
+    </div>
+    <div class="card space-y-3">
+      <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-sm text-slate-200 shrink-0">Registro de Extras y Notas</h3>
+        <input type="search" id="logSearch" oninput="renderDetails()" placeholder="Filtrar nota, turno..." class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white outline-none focus:border-emerald-500 w-40 no-print">
+      </div>
+      <div id="logList" class="space-y-2 max-h-96 overflow-y-auto"></div>
+    </div>
   </section>
 
   <section id="view-rates" class="hidden space-y-4 no-print">
     <div class="card space-y-3">
-      <div><h3 class="font-bold text-sm text-white">Tus precios (€ brutos)</h3><p class="text-[11px] text-slate-400">Según tu convenio o empresa.</p></div>
-      <div id="rateFields" class="grid grid-cols-2 gap-3 pt-1"></div>
-      <button onclick="saveRates()" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-floppy-disk mr-1"></i>Guardar tarifas</button>
+      <div class="flex items-center justify-between">
+        <div><h3 class="font-bold text-sm text-white">Jornada y Convenio</h3><p class="text-[11px] text-slate-400">Duración de tus turnos para el cálculo exacto de horas.</p></div>
+      </div>
+      <div class="flex gap-1.5 flex-wrap">
+        <button type="button" onclick="setQuickHours(7.6,12,1696,22)" class="text-[11px] bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 px-2.5 py-1 rounded-lg font-semibold">Preset 7,6h / Parada 12h</button>
+        <button type="button" onclick="setQuickHours(8,12,1760,22)" class="text-[11px] bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-lg font-semibold">Preset 8h Estándar</button>
+      </div>
+      <div id="rateWorkFields" class="grid grid-cols-2 gap-3 pt-1">
+        <div><label class="lbl" for="r_hOrd">Horas turno M / T / N</label><input type="number" inputmode="decimal" step="0.1" min="0" id="r_hOrd" class="inp"></div>
+        <div><label class="lbl" for="r_h12">Horas turno Parada (12h)</label><input type="number" inputmode="decimal" step="0.5" min="0" id="r_h12" class="inp"></div>
+        <div><label class="lbl" for="r_targetYear">Cómputo anual objetivo (h)</label><input type="number" inputmode="numeric" step="1" min="0" id="r_targetYear" class="inp"></div>
+        <div><label class="lbl" for="r_vacDays">Días vacaciones / año</label><input type="number" inputmode="numeric" step="1" min="0" id="r_vacDays" class="inp"></div>
+      </div>
     </div>
+
+    <div class="card space-y-3">
+      <div><h3 class="font-bold text-sm text-white">Tus tarifas (€ brutos)</h3><p class="text-[11px] text-slate-400">Importes por hora extra, pluses de turno/parada, dietas y km.</p></div>
+      <div id="rateFields" class="grid grid-cols-2 gap-3 pt-1"></div>
+      <button onclick="saveRates()" class="btn w-full bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"><i class="fa-solid fa-floppy-disk mr-1"></i>Guardar configuración y tarifas</button>
+    </div>
+
     <div class="card space-y-2.5">
-      <h3 class="font-bold text-sm text-white">Copia de seguridad</h3>
-      <p class="text-[11px] text-slate-400">Tus datos viven solo en este dispositivo: sin cuentas, sin anuncios y sin pedir ubicación ni contactos. Guarda una copia de vez en cuando.</p>
+      <h3 class="font-bold text-sm text-white">Copia de seguridad y Calendario</h3>
+      <p class="text-[11px] text-slate-400">Tus cuadrantes se almacenan localmente en la memoria interna de tu dispositivo sin necesidad de cuentas ni servidores externos.</p>
       <div class="grid grid-cols-2 gap-2">
-        <button onclick="downloadBackup()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs"><i class="fa-solid fa-download text-emerald-400 mr-1"></i>Guardar datos</button>
-        <label class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs text-center cursor-pointer"><i class="fa-solid fa-upload text-sky-400 mr-1"></i>Restaurar<input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
-        <button onclick="exportICS()" class="col-span-2 bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs"><i class="fa-regular fa-calendar-plus text-amber-400 mr-1"></i>Añadir turnos a mi calendario (.ics)</button>
+        <button onclick="downloadBackup()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-solid fa-download text-emerald-400 mr-1"></i>Exportar copia (.json)</button>
+        <label class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs text-center cursor-pointer active:scale-95 transition"><i class="fa-solid fa-upload text-sky-400 mr-1"></i>Restaurar archivo<input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
+        <button onclick="copyBackupClipboard()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-regular fa-copy text-teal-400 mr-1"></i>Copiar datos (Texto)</button>
+        <button onclick="pasteBackupClipboard()" class="bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-solid fa-paste text-purple-400 mr-1"></i>Pegar copia</button>
+        <button onclick="exportICS()" class="col-span-2 bg-slate-800 text-slate-200 font-semibold py-2.5 rounded-xl text-xs active:scale-95 transition"><i class="fa-regular fa-calendar-plus text-amber-400 mr-1"></i>Exportar turnos a Google Calendar (.ics)</button>
       </div>
     </div>
   </section>
 </main>
 
 <div id="dayModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-end sm:items-center justify-center no-print" role="dialog" aria-modal="true" aria-labelledby="mTitle" onclick="if(event.target===this)closeDay()">
-  <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
-    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-      <div><span class="text-[11px] uppercase tracking-wider text-emerald-400 font-bold">Editar jornada</span><h3 id="mTitle" class="text-base font-bold text-white capitalize"></h3></div>
+  <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-md rounded-t-3xl sm:rounded-2xl p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+      <div><span id="mHolBadge" class="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">Editar jornada</span><h3 id="mTitle" class="text-base font-bold text-white capitalize"></h3></div>
       <button onclick="closeDay()" aria-label="Cerrar" class="w-9 h-9 rounded-full bg-slate-800 text-slate-400"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div>
       <div class="flex items-center justify-between mb-2">
-        <label class="text-xs font-semibold text-slate-300">Turno principal</label>
+        <label class="text-xs font-semibold text-slate-300">Turno asignado</label>
         <button id="copyPrev" onclick="copyPrev()" class="text-[11px] font-semibold text-emerald-400 flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 disabled:opacity-40"><i class="fa-regular fa-copy"></i> Copiar día anterior</button>
       </div>
-      <div id="mShifts" class="grid grid-cols-3 gap-2"></div>
+      <div id="mShifts" class="grid grid-cols-3 gap-1.5"></div>
     </div>
     <div id="mFields" class="grid grid-cols-3 gap-2"></div>
-    <input type="text" id="d_note" maxlength="200" aria-label="Nota" placeholder="Nota (ej. parada línea 2, cambio con Juan…)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
+    <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl px-3 py-2">
+      <label for="d_plusParada" class="text-xs text-slate-300 font-medium">Aplicar plus retén / parada este día</label>
+      <input type="checkbox" id="d_plusParada" class="w-4 h-4 accent-emerald-500 rounded">
+    </div>
+    <input type="text" id="d_note" maxlength="200" aria-label="Nota" placeholder="Nota (ej. Parada válvula, cambio con Carlos, Dani…)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 outline-none">
     <div class="flex gap-2 pt-1">
       <button onclick="clearDay()" class="btn w-1/3 bg-rose-950/60 border border-rose-800/60 text-rose-300">Borrar</button>
       <button onclick="saveDay()" class="btn w-2/3 bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg">Guardar cambios</button>
@@ -154,170 +204,464 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   </div>
 </div>
 
-<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 border border-slate-700 text-sm px-4 py-2 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity no-print"></div>
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 border border-slate-700 text-sm px-4 py-2 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity no-print"></div>
 
 <script>
 const $=id=>document.getElementById(id), p2=n=>String(n).padStart(2,'0'), num=v=>parseFloat(v)||0;
 const eur=n=>n.toLocaleString('es-ES',{style:'currency',currency:'EUR'});
 const ymd=d=>`${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SH={M:{n:'Mañana',c:'bg-amber-500/20 text-amber-300 border-amber-500/40'},T:{n:'Tarde',c:'bg-orange-500/20 text-orange-300 border-orange-500/40'},N:{n:'Noche',c:'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'},L:{n:'Libre',c:'bg-slate-800 text-slate-400 border-slate-700'},V:{n:'Vacac.',c:'bg-sky-500/20 text-sky-300 border-sky-500/40'},R:{n:'Retén',c:'bg-rose-500/20 text-rose-300 border-rose-500/40'}};
-const PRESETS=[['2M - 2T - 2N - 4L',['M','M','T','T','N','N','L','L','L','L']],['5x2 rotativo (M/T/N)',['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L']],['3M - 3T - 3N - 3L',['M','M','M','T','T','T','N','N','N','L','L','L']],['Guardia 24h + 3L',['M','N','L','L','L']]];
-const RATES=[['he','Hora extra normal','€/h'],['hn','Hora extra nocturna','€/h'],['hf','Hora extra festiva','€/h'],['pn','Plus turno noche','€/día'],['pr','Plus retén / parada','€/día'],['meal','Valor 1 dieta','€'],['km','Kilometraje','€/km']];
-const DF=[['he','H. extra normal'],['hn','H. extra noche'],['hf','H. extra festiva'],['meals','Nº dietas'],['km','Kilómetros']];
+
+const SH={
+  M:{n:'Mañana',c:'bg-amber-500/20 text-amber-300 border-amber-500/40',w:1},
+  T:{n:'Tarde',c:'bg-orange-500/20 text-orange-300 border-orange-500/40',w:1},
+  N:{n:'Noche',c:'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',w:1,noche:true},
+  D12:{n:'12h Día',c:'bg-teal-500/20 text-teal-300 border-teal-500/40',w:1,is12:true,parada:true},
+  N12:{n:'12h Noche',c:'bg-purple-500/20 text-purple-300 border-purple-500/40',w:1,is12:true,noche:true,parada:true},
+  R:{n:'Retén',c:'bg-rose-500/20 text-rose-300 border-rose-500/40',w:1,parada:true},
+  L:{n:'Libre',c:'bg-slate-800 text-slate-400 border-slate-700',w:0},
+  V:{n:'Vacac.',c:'bg-sky-500/20 text-sky-300 border-sky-500/40',w:0},
+  P:{n:'Permiso',c:'bg-pink-500/20 text-pink-300 border-pink-500/40',w:0}
+};
+
+const PRESETS=[
+  ['L-V Mañana (5M-2L)',['M','M','M','M','M','L','L']],
+  ['Parada 12h Día (6D-1L)',['D12','D12','D12','D12','D12','D12','L']],
+  ['Parada 12h Noche (6N-1L)',['N12','N12','N12','N12','N12','N12','L']],
+  ['Parada Rotativa 12h (4D-2L-4N-2L)',['D12','D12','D12','D12','L','L','N12','N12','N12','N12','L','L']],
+  ['2M - 2T - 2N - 4L',['M','M','T','T','N','N','L','L','L','L']],
+  ['5x2 rotativo (M/T/N)',['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L']],
+  ['3M - 3T - 3N - 3L',['M','M','M','T','T','T','N','N','N','L','L','L']],
+  ['Guardia 24h + 3L',['M','N','L','L','L']]
+];
+
+const RATES=[
+  ['he','Hora extra normal','€/h'],
+  ['hn','Hora extra nocturna','€/h'],
+  ['hf','Hora extra festiva','€/h'],
+  ['pn','Plus turno noche','€/día'],
+  ['pr','Plus retén / parada','€/día'],
+  ['meal','Valor 1 dieta','€'],
+  ['km','Kilometraje','€/km']
+];
+
+const DF=[
+  ['he','H. extra normal',1],
+  ['hn','H. extra noche',1],
+  ['hf','H. extra festiva',1],
+  ['meals','Nº dietas',1],
+  ['km','Kilómetros',10],
+  ['hCustom','H. jornada día',0.5]
+];
+
 const KEY='miCuadrante.v2', TB='py-2 text-[11px] font-semibold rounded-lg transition ';
-let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
+let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26,hOrd:7.6,h12:12,targetYear:1696,vacDays:22},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
 cur.setDate(1);
 
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.days)S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:+j.lastBackup||0}}catch(e){}}
+function load(){
+  try{
+    const j=JSON.parse(localStorage.getItem(KEY));
+    if(j&&j.days){
+      S={
+        days:j.days,
+        rates:{...S.rates,...j.rates},
+        cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],
+        lastBackup:+j.lastBackup||0
+      };
+    }
+  }catch(e){}
+}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('No se pudo guardar en este dispositivo')}}
-let tt;function toast(m,act,fn){
+
+let tt;
+function toast(m,act,fn){
   const t=$('toast'),hide=()=>t.classList.add('opacity-0','pointer-events-none');
   t.replaceChildren(m);
-  if(act){const b=document.createElement('button');b.textContent=act;b.className='ml-3 text-emerald-400 font-bold underline';b.onclick=()=>{fn();hide()};t.append(b);t.classList.remove('pointer-events-none')}
-  else t.classList.add('pointer-events-none');
-  t.classList.remove('opacity-0');clearTimeout(tt);tt=setTimeout(hide,act?6000:2200);
+  if(act){
+    const b=document.createElement('button');
+    b.textContent=act;
+    b.className='ml-3 text-emerald-400 font-bold underline';
+    b.onclick=()=>{fn();hide()};
+    t.append(b);
+    t.classList.remove('pointer-events-none');
+  }else t.classList.add('pointer-events-none');
+  t.classList.remove('opacity-0');
+  clearTimeout(tt);
+  tt=setTimeout(hide,act?6000:2200);
 }
 
-/* Festivos nacionales de España (fijos + Viernes Santo) */
-function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),t=h+l-7*m+114;return new Date(y,Math.floor(t/31)-1,t%31+1)}
+/* Festivos nacionales de España + Andalucía (28F) + Jueves/Viernes Santo */
+function easter(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),t=h+l-7*m+114;
+  return new Date(y,Math.floor(t/31)-1,t%31+1);
+}
 const HC={};
-function isHol(d){const y=d.getFullYear();if(!HC[y]){const s=new Set(['01-01','01-06','05-01','08-15','10-12','11-01','12-06','12-08','12-25']),e=easter(y);e.setDate(e.getDate()-2);s.add(p2(e.getMonth()+1)+'-'+p2(e.getDate()));HC[y]=s}return HC[y].has(p2(d.getMonth()+1)+'-'+p2(d.getDate()))}
+function isHol(d){
+  const y=d.getFullYear();
+  if(!HC[y]){
+    const s=new Set(['01-01','01-06','02-28','05-01','08-15','10-12','11-01','12-06','12-08','12-25']);
+    const v=easter(y);v.setDate(v.getDate()-2);s.add(p2(v.getMonth()+1)+'-'+p2(v.getDate()));
+    const j=easter(y);j.setDate(j.getDate()-3);s.add(p2(j.getMonth()+1)+'-'+p2(j.getDate()));
+    HC[y]=s;
+  }
+  return HC[y].has(p2(d.getMonth()+1)+'-'+p2(d.getDate()));
+}
+
+function dayOrdHours(d){
+  if(!d)return 0;
+  if(d.hCustom!==undefined&&d.hCustom!=='')return num(d.hCustom);
+  const sh=SH[d.s];
+  if(!sh||!sh.w)return 0;
+  return sh.is12?(num(S.rates.h12)||12):(num(S.rates.hOrd)||7.6);
+}
 
 function summary(y,m){
-  const o={cnt:{},ex:0,al:0,hrs:0,c:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0},log:[]},r=S.rates,n=new Date(y,m+1,0).getDate();
-  for(let i=1;i<=n;i++){const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];if(!d)continue;
-    if(d.s)o.cnt[d.s]=(o.cnt[d.s]||0)+1;
-    const c={he:num(d.he)*r.he,hn:num(d.hn)*r.hn,hf:num(d.hf)*r.hf,pn:d.s==='N'?r.pn:0,pr:d.s==='R'?r.pr:0,meal:num(d.meals)*r.meal,km:num(d.km)*r.km};
+  const o={cnt:{},ex:0,al:0,hrs:0,ordHrs:0,workDays:0,freeDays:0,c:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0},log:[]},r=S.rates,n=new Date(y,m+1,0).getDate();
+  for(let i=1;i<=n;i++){
+    const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];
+    if(!d)continue;
+    const sh=SH[d.s];
+    if(d.s){
+      o.cnt[d.s]=(o.cnt[d.s]||0)+1;
+      if(sh?.w)o.workDays++;else o.freeDays++;
+    }
+    const ord=dayOrdHours(d);
+    o.ordHrs+=ord;
+    const hasNoche=sh?.noche;
+    const hasParada=d.plusParada!==undefined?!!d.plusParada:!!sh?.parada;
+    const c={
+      he:num(d.he)*r.he,
+      hn:num(d.hn)*r.hn,
+      hf:num(d.hf)*r.hf,
+      pn:hasNoche?r.pn:0,
+      pr:hasParada?r.pr:0,
+      meal:num(d.meals)*r.meal,
+      km:num(d.km)*r.km
+    };
     for(const q in c)o.c[q]+=c[q];
     const h=num(d.he)+num(d.hn)+num(d.hf),ex=c.he+c.hn+c.hf+c.pn+c.pr,al=c.meal+c.km;
     o.hrs+=h;o.ex+=ex;o.al+=al;
-    if(h||d.meals||d.km||d.note)o.log.push({k,d,h,t:ex+al});
-  }return o}
+    if(h||d.meals||d.km||d.note||c.pn||c.pr)o.log.push({k,d,h,ord,t:ex+al});
+  }
+  o.ordHrs=Math.round(o.ordHrs*100)/100;
+  o.hrs=Math.round(o.hrs*100)/100;
+  return o;
+}
 
 function render(){
   const y=cur.getFullYear(),m=cur.getMonth(),s=summary(y,m),today=ymd(new Date());
   $('monthLabel').textContent=cur.toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-  $('stMoney').textContent=eur(s.ex);$('stHours').textContent=s.hrs+' h';$('stAl').textContent=eur(s.al);$('stTotal').textContent=eur(s.ex+s.al);
-  let h='<div></div>'.repeat((new Date(y,m,1).getDay()+6)/1%7);
+  $('stOrdHours').textContent=s.ordHrs.toLocaleString('es-ES')+' h';
+  $('stHours').textContent=s.hrs.toLocaleString('es-ES')+' h';
+  $('stMoney').textContent=eur(s.ex);
+  $('stAl').textContent=eur(s.al);
+  $('stWorkDays').textContent=s.workDays;
+  $('stFreeDays').textContent=s.freeDays;
+  $('stTotal').textContent=eur(s.ex+s.al);
+  let h='<div></div>'.repeat((new Date(y,m,1).getDay()+6)%7);
   for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
-    const dt=new Date(y,m,i),k=ymd(dt),d=S.days[k],sh=d&&SH[d.s],has=d&&(num(d.he)+num(d.hn)+num(d.hf)||d.meals||d.km||d.note);
-    h+=`<button data-k="${k}" aria-label="${dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})}${sh?', '+sh.n:''}" class="relative aspect-square rounded-lg border flex flex-col items-center justify-center ${sh?sh.c:'bg-slate-950 border-slate-800 text-slate-300'} ${k===today?'ring-2 ring-emerald-400':''}"><span class="text-[11px] font-semibold ${isHol(dt)?'text-rose-400':''}">${i}</span><span class="font-extrabold text-sm leading-none">${sh?d.s:''}</span>${has?'<i class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400"></i>':''}</button>`;
+    const dt=new Date(y,m,i),k=ymd(dt),d=S.days[k],sh=d&&SH[d.s];
+    const hasEx=d&&(num(d.he)+num(d.hn)+num(d.hf)||d.meals||d.km);
+    const hasNote=d&&d.note;
+    const hol=isHol(dt) || dt.getDay()===0;
+    h+=`<button data-k="${k}" aria-label="${dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'})}${sh?', '+sh.n:''}" class="relative aspect-square rounded-lg border flex flex-col items-center justify-center ${sh?sh.c:'bg-slate-950 border-slate-800 text-slate-300'} ${k===today?'ring-2 ring-emerald-400':''}">
+      <span class="text-[10px] font-semibold ${hol?'text-rose-400':''}">${i}</span>
+      <span class="font-extrabold ${d?.s?.length>2?'text-[11px]':'text-xs'} leading-none mt-0.5">${sh?d.s:''}</span>
+      ${hasEx?'<i class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-400"></i>':''}
+      ${hasNote?'<i class="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-amber-400"></i>':''}
+    </button>`;
   }
   $('calendarGrid').innerHTML=h;
   if(!$('view-details').classList.contains('hidden'))renderDetails();
 }
+
 function renderDetails(){
   const y=cur.getFullYear(),s=summary(y,cur.getMonth()),tot=Object.values(s.cnt).reduce((a,b)=>a+b,0)||1;
-  const LB={he:'H. extra normales',hn:'H. extra nocturnas',hf:'H. extra festivas',pn:'Plus noche',pr:'Plus retén',meal:'Dietas',km:'Kilometraje'};
-  let yr=0;for(let m=0;m<12;m++){const q=summary(y,m);yr+=q.ex+q.al}
-  const bars=Object.keys(SH).filter(k=>s.cnt[k]).map(k=>`<div class="flex items-center gap-2"><span class="w-14 text-slate-400">${SH[k].n}</span><div class="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:${s.cnt[k]/tot*100}%"></div></div><b class="w-6 text-right">${s.cnt[k]}</b></div>`).join('');
+  $('balanceYearBadge').textContent=`Año ${y}`;
+  const LB={he:'H. extra normales',hn:'H. extra nocturnas',hf:'H. extra festivas',pn:'Plus nocturnidad',pr:'Plus retén / parada',meal:'Dietas',km:'Kilometraje'};
+  let yrMoney=0,yrOrd=0,yrExHrs=0,yrVac=0;
+  for(let m=0;m<12;m++){
+    const q=summary(y,m);
+    yrMoney+=q.ex+q.al;
+    yrOrd+=q.ordHrs;
+    yrExHrs+=q.hrs;
+    yrVac+=(q.cnt.V||0);
+  }
+  yrOrd=Math.round(yrOrd*10)/10;
+  const targetY=num(S.rates.targetYear)||1696, vacTot=num(S.rates.vacDays)||22;
+  const pctY=Math.min(100,Math.round((yrOrd/targetY)*100));
+
+  const bars=Object.keys(SH).filter(k=>s.cnt[k]).map(k=>`<div class="flex items-center gap-2"><span class="w-16 text-slate-400 font-medium">${SH[k].n}</span><div class="flex-1 h-2 bg-slate-950 rounded-full overflow-hidden"><div class="h-full bg-emerald-500" style="width:${s.cnt[k]/tot*100}%"></div></div><b class="w-7 text-right">${s.cnt[k]}d</b></div>`).join('');
   const rows=Object.keys(LB).filter(k=>s.c[k]>0).map(k=>`<div class="flex justify-between"><span class="text-slate-400">${LB[k]}</span><b>${eur(s.c[k])}</b></div>`).join('');
-  $('breakdown').innerHTML=(bars||'<p class="text-slate-500">Aún no hay turnos este mes.</p>')+(rows?`<div class="border-t border-slate-800 pt-2 space-y-1.5">${rows}</div>`:'')+`<div class="border-t border-slate-800 pt-2 flex justify-between text-sm"><span>Total mes</span><b class="text-emerald-400">${eur(s.ex+s.al)}</b></div><div class="flex justify-between text-slate-400"><span>Acumulado ${y}</span><b class="text-slate-200">${eur(yr)}</b></div>`;
-  $('logList').innerHTML=s.log.length?s.log.map(({k,d,h,t})=>`<button data-k="${k}" class="w-full text-left bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between gap-2"><span><b>${k.slice(8)}/${k.slice(5,7)}</b> <span class="text-slate-400">${d.s?SH[d.s]?.n||'':''}${h?' · '+h+' h extra':''}${d.meals?' · '+d.meals+' dietas':''}${d.km?' · '+d.km+' km':''}</span>${d.note?`<span class="block text-[11px] text-slate-500">${esc(d.note)}</span>`:''}</span><b class="text-emerald-400 shrink-0">${eur(t)}</b></button>`).join(''):'<p class="text-slate-500 text-xs">Sin extras registrados este mes.</p>';
+
+  const annualBox=`
+    <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 mt-2">
+      <div class="flex justify-between items-center"><span class="text-slate-400">Jornada anual realizada (${y})</span><b>${yrOrd.toLocaleString('es-ES')} / ${targetY} h (${pctY}%)</b></div>
+      <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden"><div class="h-full bg-teal-500" style="width:${pctY}%"></div></div>
+      <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+        <div class="bg-slate-900 rounded-lg p-1.5"><span class="text-[10px] text-slate-400 block">Restante año</span><b class="text-slate-200">${Math.max(0,Math.round((targetY-yrOrd)*10)/10).toLocaleString('es-ES')} h</b></div>
+        <div class="bg-slate-900 rounded-lg p-1.5"><span class="text-[10px] text-slate-400 block">H. Extra ${y}</span><b class="text-sky-400">${yrExHrs.toLocaleString('es-ES')} h</b></div>
+        <div class="bg-slate-900 rounded-lg p-1.5"><span class="text-[10px] text-slate-400 block">Vacaciones</span><b class="text-amber-400">${yrVac} / ${vacTot} d</b></div>
+      </div>
+      <div class="flex justify-between pt-1 border-t border-slate-800"><span class="text-slate-400">Acumulado extra ${y}</span><b class="text-emerald-400">${eur(yrMoney)}</b></div>
+    </div>`;
+
+  $('breakdown').innerHTML=(bars||'<p class="text-slate-500">Aún no hay turnos asignados este mes.</p>')+
+    `<div class="border-t border-slate-800 pt-2 flex justify-between"><span class="text-slate-400">Horas totales mes (Ord. + Extra)</span><b>${(s.ordHrs+s.hrs).toLocaleString('es-ES')} h</b></div>`+
+    (rows?`<div class="border-t border-slate-800 pt-2 space-y-1.5">${rows}</div>`:'')+
+    `<div class="border-t border-slate-800 pt-2 flex justify-between text-sm"><span>Total extra del mes</span><b class="text-emerald-400">${eur(s.ex+s.al)}</b></div>`+
+    annualBox;
+
+  const q=($('logSearch')?.value||'').toLowerCase().trim();
+  const filtered=s.log.filter(({k,d})=>!q || (d.note&&d.note.toLowerCase().includes(q)) || (d.s&&SH[d.s]?.n.toLowerCase().includes(q)) || k.includes(q));
+  $('logList').innerHTML=filtered.length?filtered.map(({k,d,h,ord,t})=>`<button data-k="${k}" class="w-full text-left bg-slate-950 border border-slate-800 rounded-xl p-2.5 flex justify-between gap-2"><span><b>${k.slice(8)}/${k.slice(5,7)}</b> <span class="text-slate-300 font-semibold">${d.s?SH[d.s]?.n||'':''}</span> <span class="text-slate-400">(${ord}h${h?' + '+h+'h extra':''}${d.meals?' · '+d.meals+' dieta':''}${d.km?' · '+d.km+' km':''})</span>${d.note?`<span class="block text-[11px] text-amber-300/90 mt-0.5"><i class="fa-regular fa-comment-dots mr-1"></i>${esc(d.note)}</span>`:''}</span><b class="text-emerald-400 shrink-0">${eur(t)}</b></button>`).join(''):'<p class="text-slate-500 text-xs">Sin registros que coincidan en este mes.</p>';
 }
+
 function renderPaint(){
   $('paintSelector').innerHTML=[['','Detalle'],...Object.keys(SH).map(k=>[k,k+' · '+SH[k].n])].map(([k,l])=>`<button data-p="${k}" class="shrink-0 px-2.5 py-1.5 rounded-lg border text-[11px] font-semibold ${(paint||'')===k?'ring-2 ring-emerald-400 ':''}${k?SH[k].c:'bg-slate-950 border-slate-800 text-slate-300'}">${l}</button>`).join('');
-  $('paintHint').textContent=paint?`Pintando ${SH[paint].n}`:'Abrir detalle del día';
+  $('paintHint').textContent=paint?`Toque rápido: ${SH[paint].n}`:'Toca un día para editar';
 }
+
 function renderCycle(){
-  $('presets').innerHTML=PRESETS.map(([l],i)=>`<button data-pre="${i}" class="bg-slate-950 border border-slate-800 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300">${l}</button>`).join('');
-  $('cycleAdderBtns').innerHTML=Object.keys(SH).map(k=>`<button data-add="${k}" aria-label="Añadir ${SH[k].n}" class="py-2 rounded-lg border font-extrabold text-sm ${SH[k].c}">${k}</button>`).join('');
-  $('cycleSequencePreview').innerHTML=S.cycle.length?S.cycle.map((k,i)=>`<button data-rm="${i}" aria-label="Quitar día ${i+1}" class="w-8 h-8 rounded-lg border text-xs font-extrabold ${SH[k].c}">${k}</button>`).join(''):'<span class="text-[11px] text-slate-500">Añade días con los botones de arriba</span>';
+  $('presets').innerHTML=PRESETS.map(([l],i)=>`<button data-pre="${i}" class="bg-slate-950 border border-slate-800 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg shrink-0 text-slate-300 active:scale-95">${l}</button>`).join('');
+  $('cycleAdderBtns').innerHTML=Object.keys(SH).map(k=>`<button data-add="${k}" aria-label="Añadir ${SH[k].n}" class="py-2 rounded-lg border font-extrabold text-xs ${SH[k].c}">${k} <span class="block text-[9px] font-normal opacity-80">${SH[k].n}</span></button>`).join('');
+  $('cycleSequencePreview').innerHTML=S.cycle.length?S.cycle.map((k,i)=>`<button data-rm="${i}" aria-label="Quitar día ${i+1}" class="px-2 h-8 rounded-lg border text-xs font-extrabold ${SH[k].c}">${k}</button>`).join(''):'<span class="text-[11px] text-slate-500">Toca los botones de arriba para crear tu ciclo</span>';
   $('cycleLen').textContent=S.cycle.length;
 }
+
 function applyCycle(scope){
-  const L=S.cycle.length,sd=$('cycleStart').value;
-  if(!L)return toast('Primero crea un patrón');
-  if(!sd)return toast('Elige el día 1 del patrón');
-  const y=cur.getFullYear(),m=cur.getMonth(),from=scope==='year'?new Date(y,0,1):new Date(y,m,1),to=scope==='year'?new Date(y,11,31):new Date(y,m+1,0);
-  if(scope==='year'&&!confirm(`¿Rellenar todo ${y} con tu patrón?`))return;
-  const start=new Date(sd+'T00:00:00'),keep=$('cycleMode').value==='keep';let n=0;snap();
+  const L=S.cycle.length,sd=$('cycleStart').value,ed=$('cycleEnd').value;
+  if(!L)return toast('Primero crea o elige un patrón');
+  if(!sd)return toast('Elige la fecha de inicio del patrón');
+  const y=cur.getFullYear(),m=cur.getMonth();
+  let from,to;
+  if(scope==='year'){
+    from=new Date(y,0,1);to=new Date(y,11,31);
+    if(!confirm(`¿Rellenar todo el año ${y} con este patrón?`))return;
+  }else if(scope==='range'){
+    from=new Date(sd+'T00:00:00');
+    to=ed?new Date(ed+'T00:00:00'):new Date(from.getFullYear(),from.getMonth()+1,0);
+    if(to<from)return toast('La fecha fin debe ser posterior al inicio');
+  }else{
+    from=new Date(y,m,1);to=new Date(y,m+1,0);
+  }
+  const start=new Date(sd+'T00:00:00'),keep=$('cycleMode').value==='keep';
+  let n=0;snap();
   for(const d=new Date(from);d<=to;d.setDate(d.getDate()+1)){
     const k=ymd(d),diff=Math.round((d-start)/864e5);
     if(keep&&S.days[k]?.s)continue;
-    S.days[k]={...S.days[k],s:S.cycle[((diff%L)+L)%L]};n++;
+    S.days[k]={...S.days[k],s:S.cycle[((diff%L)+L)%L]};
+    n++;
   }
-  save();render();undoable(`${n} días rellenados`);
+  save();render();undoable(`${n} días actualizados`);
 }
+
+function stepField(id,delta){
+  const el=$(id);
+  if(!el)return;
+  const v=Math.max(0,Math.round((num(el.value)+delta)*100)/100);
+  el.value=v|| '';
+}
+
 function openDay(k){
-  mk=k;const d=S.days[k]||{};ms=d.s||null;
-  $('mTitle').textContent=new Date(k+'T00:00:00').toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
-  $('mFields').innerHTML=DF.map(([f,l])=>`<div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800"><label class="text-[10px] text-slate-400 block mb-1" for="d_${f}">${l}</label><input type="number" inputmode="decimal" step="0.5" min="0" id="d_${f}" value="${d[f]??''}" placeholder="0" class="w-full bg-transparent text-base font-bold text-white outline-none"></div>`).join('');
-  $('d_note').value=d.note||'';drawShifts();
+  mk=k;const d=S.days[k]||{}, dt=new Date(k+'T00:00:00');ms=d.s||null;
+  $('mTitle').textContent=dt.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  $('mHolBadge').textContent=isHol(dt)?'Día Festivo · Editar jornada':'Editar jornada';
+  $('mHolBadge').className=`text-[10px] uppercase tracking-wider font-bold ${isHol(dt)?'text-rose-400':'text-emerald-400'}`;
+  $('mFields').innerHTML=DF.map(([f,l,st])=>`
+    <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+      <label class="text-[10px] text-slate-400 block mb-1 truncate" for="d_${f}">${l}</label>
+      <div class="flex items-center gap-1">
+        <input type="number" inputmode="decimal" step="0.5" min="0" id="d_${f}" value="${d[f]??''}" placeholder="0" class="w-full bg-transparent text-sm font-bold text-white outline-none">
+        <button type="button" onclick="stepField('d_${f}',${st})" class="w-6 h-6 rounded bg-slate-800 text-emerald-400 text-xs font-bold shrink-0">+</button>
+      </div>
+    </div>`).join('');
+  $('d_plusParada').checked=d.plusParada!==undefined?!!d.plusParada:!!(ms&&SH[ms]?.parada);
+  $('d_note').value=d.note||'';
+  drawShifts();
   $('copyPrev').disabled=!S.days[prevKey(k)];
   const mo=$('dayModal');mo.classList.remove('hidden');mo.classList.add('flex');
 }
-function drawShifts(){$('mShifts').innerHTML=Object.keys(SH).map(k=>`<button data-ms="${k}" class="py-2.5 rounded-xl border text-xs font-bold ${SH[k].c} ${ms===k?'ring-2 ring-emerald-400':''}">${k} · ${SH[k].n}</button>`).join('')}
+
+function drawShifts(){
+  $('mShifts').innerHTML=Object.keys(SH).map(k=>`<button type="button" data-ms="${k}" class="py-2 px-1.5 rounded-xl border text-[11px] font-bold truncate ${SH[k].c} ${ms===k?'ring-2 ring-emerald-400':''}">${k} · ${SH[k].n}</button>`).join('');
+}
+
 function prevKey(k){const p=new Date(k+'T00:00:00');p.setDate(p.getDate()-1);return ymd(p)}
+
 function copyPrev(){
   const pk=prevKey(mk),d=S.days[pk];
   if(!d)return toast('El día anterior está vacío');
   ms=d.s||null;
   DF.forEach(([f])=>{$('d_'+f).value=d[f]??''});
+  $('d_plusParada').checked=d.plusParada!==undefined?!!d.plusParada:!!(ms&&SH[ms]?.parada);
   $('d_note').value=d.note||'';
-  drawShifts();toast(`Copiado del ${+pk.slice(8)}/${pk.slice(5,7)} · revisa y guarda`);
+  drawShifts();
+  toast(`Copiado del ${+pk.slice(8)}/${pk.slice(5,7)}`);
 }
+
 function closeDay(){const mo=$('dayModal');mo.classList.add('hidden');mo.classList.remove('flex')}
+
 function saveDay(){
   const d={};if(ms)d.s=ms;
   DF.forEach(([f])=>{const v=$('d_'+f).value;if(v!=='')d[f]=Math.max(0,num(v))});
+  const defParada=!!(ms&&SH[ms]?.parada);
+  if($('d_plusParada').checked!==defParada)d.plusParada=$('d_plusParada').checked;
   const t=$('d_note').value.trim();if(t)d.note=t.slice(0,200);
-  snap();if(Object.keys(d).length)S.days[mk]=d;else delete S.days[mk];
-  save();closeDay();render();undoable('Guardado');
+  snap();
+  if(Object.keys(d).length)S.days[mk]=d;else delete S.days[mk];
+  save();closeDay();render();undoable('Jornada guardada');
 }
+
 function clearDay(){snap();delete S.days[mk];save();closeDay();render();undoable('Día borrado')}
 function changeMonth(d){cur.setMonth(cur.getMonth()+d);render()}
 function goToday(){cur=new Date();cur.setDate(1);tab('calendar');render()}
-function tab(t){['calendar','cycles','details','rates'].forEach(x=>{$('view-'+x).classList.toggle('hidden',x!==t);$('tab-'+x).className=TB+(x===t?'bg-slate-800 text-white shadow':'text-slate-400');$('tab-'+x).setAttribute('aria-selected',x===t)});if(t==='details')renderDetails()}
-function saveRates(){RATES.forEach(([k])=>S.rates[k]=Math.max(0,num($('r_'+k).value)));save();render();toast('Tarifas guardadas')}
-function dl(name,type,txt){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function tab(t){
+  ['calendar','cycles','details','rates'].forEach(x=>{
+    $('view-'+x).classList.toggle('hidden',x!==t);
+    $('tab-'+x).className=TB+(x===t?'bg-slate-800 text-white shadow':'text-slate-400');
+    $('tab-'+x).setAttribute('aria-selected',x===t);
+  });
+  if(t==='details')renderDetails();
+}
+
+function setQuickHours(hOrd,h12,targetYear,vacDays){
+  $('r_hOrd').value=hOrd;
+  $('r_h12').value=h12;
+  $('r_targetYear').value=targetYear;
+  $('r_vacDays').value=vacDays;
+  toast('Valores cargados: pulsa Guardar configuración');
+}
+
+function saveRates(){
+  RATES.forEach(([k])=>S.rates[k]=Math.max(0,num($('r_'+k).value)));
+  S.rates.hOrd=Math.max(0,num($('r_hOrd').value))||7.6;
+  S.rates.h12=Math.max(0,num($('r_h12').value))||12;
+  S.rates.targetYear=Math.max(0,num($('r_targetYear').value))||1696;
+  S.rates.vacDays=Math.max(0,num($('r_vacDays').value))||22;
+  save();render();toast('Configuración y tarifas guardadas');
+}
+
+async function dl(name,type,txt){
+  try{
+    const file=new File([txt],name,{type});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:name});
+      return;
+    }
+  }catch(e){}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type}));
+  a.download=name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+
 function exportCSV(){
   const y=cur.getFullYear(),m=cur.getMonth(),r=S.rates,f=n=>n.toFixed(2).replace('.',','),q=t=>{t=String(t||'');return '"'+(/^[=+\-@]/.test(t)?"'"+t:t).replace(/"/g,'""')+'"'};
-  const rows=[['Fecha','Turno','H.extra normal','H.extra noche','H.extra festiva','Dietas','Km','Extra €','Dietas/Km €','Nota'].join(';')];
-  for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];if(!d)continue;
-    const ex=num(d.he)*r.he+num(d.hn)*r.hn+num(d.hf)*r.hf+(d.s==='N'?r.pn:0)+(d.s==='R'?r.pr:0),al=num(d.meals)*r.meal+num(d.km)*r.km;
-    rows.push([k,d.s||'',d.he||0,d.hn||0,d.hf||0,d.meals||0,d.km||0,f(ex),f(al),q(d.note)].join(';'))}
-  dl(`cuadrante-${y}-${p2(m+1)}.csv`,'text/csv;charset=utf-8','\ufeff'+rows.join('\r\n'));toast('CSV descargado');
+  const rows=[['Fecha','Turno','H.Ordinarias','H.extra normal','H.extra noche','H.extra festiva','Dietas','Km','Extra €','Dietas/Km €','Nota'].join(';')];
+  for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
+    const k=`${y}-${p2(m+1)}-${p2(i)}`,d=S.days[k];if(!d)continue;
+    const sh=SH[d.s],hasNoche=sh?.noche,hasParada=d.plusParada!==undefined?!!d.plusParada:!!sh?.parada;
+    const ex=num(d.he)*r.he+num(d.hn)*r.hn+num(d.hf)*r.hf+(hasNoche?r.pn:0)+(hasParada?r.pr:0),al=num(d.meals)*r.meal+num(d.km)*r.km;
+    rows.push([k,d.s||'',f(dayOrdHours(d)),d.he||0,d.hn||0,d.hf||0,d.meals||0,d.km||0,f(ex),f(al),q(d.note)].join(';'));
+  }
+  dl(`cuadrante-${y}-${p2(m+1)}.csv`,'text/csv;charset=utf-8','\ufeff'+rows.join('\r\n'));
+  toast('CSV listo');
 }
+
 let undoSnap=null;
 function snap(){undoSnap=JSON.stringify(S.days)}
 function undo(){if(!undoSnap)return;S.days=JSON.parse(undoSnap);undoSnap=null;save();render();toast('Cambios deshechos')}
 function undoable(m){toast(m,'Deshacer',undo)}
+
 function checkBackup(){
   const age=S.lastBackup?(Date.now()-S.lastBackup)/864e5:Infinity,show=Object.keys(S.days).length>=7&&age>30;
   $('backupBanner').classList.toggle('hidden',!show);
-  if(show)$('backupMsg').textContent=S.lastBackup?`Hace ${Math.floor(age)} días de tu última copia de seguridad.`:'Aún no has hecho copia de seguridad de tus datos.';
+  if(show)$('backupMsg').textContent=S.lastBackup?`Hace ${Math.floor(age)} días de tu última copia de seguridad.`:'Guarda una copia de seguridad de tu cuadrante.';
 }
-function downloadBackup(){S.lastBackup=Date.now();save();dl(`cuadrante-backup-${ymd(new Date())}.json`,'application/json',JSON.stringify(S));checkBackup();toast('Copia guardada')}
+
+function downloadBackup(){
+  S.lastBackup=Date.now();save();
+  dl(`cuadrante-backup-${ymd(new Date())}.json`,'application/json',JSON.stringify(S));
+  checkBackup();toast('Copia generada');
+}
+
+async function copyBackupClipboard(){
+  try{
+    await navigator.clipboard.writeText(JSON.stringify(S));
+    S.lastBackup=Date.now();save();checkBackup();
+    toast('Copia copiada al portapapeles');
+  }catch(e){toast('No se pudo copiar al portapapeles')}
+}
+
+function pasteBackupClipboard(){
+  const raw=prompt('Pega aquí el texto JSON de tu copia de seguridad:');
+  if(!raw)return;
+  try{
+    const j=JSON.parse(raw);
+    if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
+    S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
+    save();initForms();render();checkBackup();toast('Copia restaurada con éxito');
+  }catch(e){toast('El texto pegado no es válido')}
+}
+
 function exportICS(){
   const rows=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mi Cuadrante//ES','CALSCALE:GREGORIAN'],st=new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
-  Object.keys(S.days).sort().forEach(k=>{const d=S.days[k];if(!SH[d.s]||d.s==='L')return;
+  Object.keys(S.days).sort().forEach(k=>{
+    const d=S.days[k];if(!SH[d.s]||d.s==='L')return;
     const e=new Date(k+'T00:00:00');e.setDate(e.getDate()+1);
-    rows.push('BEGIN:VEVENT',`UID:${k}@micuadrante`,`DTSTAMP:${st}`,`DTSTART;VALUE=DATE:${k.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${ymd(e).replace(/-/g,'')}`,`SUMMARY:${SH[d.s].n}`,...(d.note?['DESCRIPTION:'+String(d.note).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')]:[]),'END:VEVENT')});
+    rows.push('BEGIN:VEVENT',`UID:${k}@micuadrante`,`DTSTAMP:${st}`,`DTSTART;VALUE=DATE:${k.replace(/-/g,'')}`,`DTEND;VALUE=DATE:${ymd(e).replace(/-/g,'')}`,`SUMMARY:${SH[d.s].n} (${dayOrdHours(d)}h)`,...(d.note?['DESCRIPTION:'+String(d.note).replace(/[\\;,]/g,'\\$&').replace(/\n/g,'\\n')]:[]),'END:VEVENT');
+  });
   rows.push('END:VCALENDAR');
-  dl('cuadrante.ics','text/calendar;charset=utf-8',rows.join('\r\n'));toast('Archivo .ics descargado: ábrelo para añadirlo a tu calendario');
+  dl('cuadrante.ics','text/calendar;charset=utf-8',rows.join('\r\n'));
+  toast('Archivo .ics generado');
 }
+
 function restoreBackup(e){
   const fl=e.target.files[0];e.target.value='';if(!fl)return;
   const rd=new FileReader();
-  rd.onload=()=>{try{const j=JSON.parse(rd.result);if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
-    if(!confirm('Esto reemplazará tus datos actuales. ¿Continuar?'))return;
-    S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:+j.lastBackup||0};
-    save();initForms();render();checkBackup();toast('Datos restaurados')}catch(err){toast('Archivo no válido')}};
+  rd.onload=()=>{
+    try{
+      const j=JSON.parse(rd.result);
+      if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
+      if(!confirm('¿Restaurar esta copia? Reemplazará los datos actuales.'))return;
+      S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
+      save();initForms();render();checkBackup();toast('Datos restaurados');
+    }catch(err){toast('Archivo de copia no válido')}
+  };
   rd.readAsText(fl);
 }
+
 function initForms(){
   $('rateFields').innerHTML=RATES.map(([k,l,u],i)=>`<div class="${i===6?'col-span-2':''}"><label class="lbl" for="r_${k}">${l} (${u})</label><input type="number" inputmode="decimal" step="0.01" min="0" id="r_${k}" class="inp" value="${S.rates[k]}"></div>`).join('');
+  $('r_hOrd').value=S.rates.hOrd??7.6;
+  $('r_h12').value=S.rates.h12??12;
+  $('r_targetYear').value=S.rates.targetYear??1696;
+  $('r_vacDays').value=S.rates.vacDays??22;
   renderPaint();renderCycle();
 }
 
 /* Eventos */
-$('calendarGrid').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(!b)return;
-  if(paint){S.days[b.dataset.k]={...S.days[b.dataset.k],s:paint};save();render()}else openDay(b.dataset.k)});
+$('calendarGrid').addEventListener('click',e=>{
+  const b=e.target.closest('[data-k]');if(!b)return;
+  if(paint){
+    snap();
+    if(S.days[b.dataset.k]?.s===paint){delete S.days[b.dataset.k].s;if(!Object.keys(S.days[b.dataset.k]).length)delete S.days[b.dataset.k]}
+    else S.days[b.dataset.k]={...S.days[b.dataset.k],s:paint};
+    save();render();
+  }else openDay(b.dataset.k);
+});
 $('logList').addEventListener('click',e=>{const b=e.target.closest('[data-k]');if(b)openDay(b.dataset.k)});
 $('paintSelector').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;paint=b.dataset.p||null;renderPaint()});
-$('mShifts').addEventListener('click',e=>{const b=e.target.closest('[data-ms]');if(!b)return;ms=ms===b.dataset.ms?null:b.dataset.ms;drawShifts()});
+$('mShifts').addEventListener('click',e=>{
+  const b=e.target.closest('[data-ms]');if(!b)return;
+  ms=ms===b.dataset.ms?null:b.dataset.ms;
+  $('d_plusParada').checked=!!(ms&&SH[ms]?.parada);
+  drawShifts();
+});
 $('presets').addEventListener('click',e=>{const b=e.target.closest('[data-pre]');if(!b)return;S.cycle=[...PRESETS[b.dataset.pre][1]];save();renderCycle()});
 $('cycleAdderBtns').addEventListener('click',e=>{const b=e.target.closest('[data-add]');if(!b)return;S.cycle.push(b.dataset.add);save();renderCycle()});
 $('cycleSequencePreview').addEventListener('click',e=>{const b=e.target.closest('[data-rm]');if(!b)return;S.cycle.splice(+b.dataset.rm,1);save();renderCycle()});
@@ -329,10 +673,11 @@ $('calendarGrid').addEventListener('touchend',e=>{if(x0===null)return;const dx=e
 load();initForms();$('cycleStart').value=ymd(cur);tab('calendar');render();checkBackup();
 try{navigator.storage?.persist?.()}catch(e){}
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
 /* === CONEXIÓN AUTOMÁTICA GOOGLE ADMOB === */
 (function initAdMob() {
   const AdMob = window.Capacitor?.Plugins?.AdMob;
-  if (!AdMob) return; // En navegador normal no hace nada; en la App Android activa anuncios
+  if (!AdMob) return;
 
   const BANNER_ID = 'ca-app-pub-6672720525194990/8552338976';
   const INTERSTITIAL_ID = 'ca-app-pub-6672720525194990/6095510680';
@@ -370,7 +715,6 @@ if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWork
     } catch (e) {}
   });
 
-  // Mostrar anuncio a pantalla completa al exportar Excel o rellenar el año entero
   const origExportCSV = window.exportCSV;
   window.exportCSV = function() {
     showInterstitialThen(() => origExportCSV());
