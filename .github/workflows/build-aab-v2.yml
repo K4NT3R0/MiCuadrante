@@ -41,7 +41,7 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Inyectar AdMob, Permiso AD_ID, SDK 34 y VersionCode
+      - name: Inyectar AdMob, Permiso AD_ID, minSdkVersion 24 y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           RUN_NUMBER: ${{ github.run_number }}
@@ -69,20 +69,34 @@ jobs:
               with open(manifest_path, "w", encoding="utf-8") as f:
                   f.write(content)
 
-          # 2. android/app/build.gradle (SDK 34 + VersionCode automático)
+          # 2. android/variables.gradle (Donde Capacitor define minSdkVersion = 22)
+          vars_path = "android/variables.gradle"
+          if os.path.exists(vars_path):
+              with open(vars_path, "r", encoding="utf-8") as f:
+                  vars_content = f.read()
+
+              vars_content = re.sub(r"minSdkVersion\s*=\s*\d+", "minSdkVersion = 24", vars_content)
+              vars_content = re.sub(r"compileSdkVersion\s*=\s*\d+", "compileSdkVersion = 34", vars_content)
+              vars_content = re.sub(r"targetSdkVersion\s*=\s*\d+", "targetSdkVersion = 34", vars_content)
+
+              with open(vars_path, "w", encoding="utf-8") as f:
+                  f.write(vars_content)
+
+          # 3. android/app/build.gradle (Forzar minSdkVersion 24, SDK 34 y VersionCode)
           gradle_path = "android/app/build.gradle"
           if os.path.exists(gradle_path):
               with open(gradle_path, "r", encoding="utf-8") as f:
                   gradle = f.read()
 
-              # Forzar compileSdk y targetSdk a 34 para cumplir política de Google Play
-              gradle = re.sub(r"compileSdkVersion\s+\d+", "compileSdkVersion 34", gradle)
-              gradle = re.sub(r"compileSdk\s+\d+", "compileSdk 34", gradle)
-              gradle = re.sub(r"targetSdkVersion\s+\d+", "targetSdkVersion 34", gradle)
-              gradle = re.sub(r"targetSdk\s+\d+", "targetSdk 34", gradle)
+              gradle = re.sub(r"minSdkVersion\s+[^\r\n]+", "minSdkVersion 24", gradle)
+              gradle = re.sub(r"minSdk\s+[^\r\n]+", "minSdk 24", gradle)
+              gradle = re.sub(r"compileSdkVersion\s+[^\r\n]+", "compileSdkVersion 34", gradle)
+              gradle = re.sub(r"compileSdk\s+[^\r\n]+", "compileSdk 34", gradle)
+              gradle = re.sub(r"targetSdkVersion\s+[^\r\n]+", "targetSdkVersion 34", gradle)
+              gradle = re.sub(r"targetSdk\s+[^\r\n]+", "targetSdk 34", gradle)
 
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 50 + run_num
+              new_vc = 60 + run_num
               gradle = re.sub(r"versionCode\s+\d+", f"versionCode {new_vc}", gradle)
               gradle = re.sub(r'versionName\s+"[^"]+"', f'versionName "1.1.{run_num}"', gradle)
 
