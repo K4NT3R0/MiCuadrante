@@ -48,7 +48,7 @@ jobs:
           python3 - << 'EOF'
           import os, re
 
-          # 1. AndroidManifest.xml (Permiso AD_ID antes de <application> + Meta-data AdMob)
+          # 1. AndroidManifest.xml (Permiso AD_ID antes de <application> + Meta-data AdMob con tu App ID exacto)
           manifest_path = "android/app/src/main/AndroidManifest.xml"
           if os.path.exists(manifest_path):
               with open(manifest_path, "r", encoding="utf-8") as f:
@@ -60,7 +60,7 @@ jobs:
 
               app_id = os.environ.get("ADMOB_APP_ID", "").strip()
               if not app_id or "~" not in app_id:
-                  app_id = "ca-app-pub-6672720525194990~3347511713"
+                  app_id = "ca-app-pub-6672720525194990~3491583985"
 
               meta_tag = f'<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="{app_id}"/>'
               if "com.google.android.gms.ads.APPLICATION_ID" not in content:
@@ -89,7 +89,7 @@ jobs:
                   gradle = f.read()
 
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 90 + run_num
+              new_vc = 110 + run_num
 
               gradle = re.sub(r"(?m)^([ \t]*minSdk(?:Version)?[ \t]+).+$", r"\g<1>24", gradle)
               gradle = re.sub(r"(?m)^([ \t]*compileSdk(?:Version)?[ \t]+).+$", r"\g<1>36", gradle)
