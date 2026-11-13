@@ -162,6 +162,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <div class="card space-y-3">
       <div><h3 class="font-bold text-sm text-white">Horarios, avisos y festivos</h3><p class="text-[11px] text-slate-400">Inicio y fin de cada turno: se usan en los avisos de descanso y en el calendario. Se guardan con el botón de abajo.</p></div>
       <div id="timeFields" class="space-y-2"></div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 space-y-2">
+        <p class="text-[11px] text-slate-400"><b class="text-slate-300">Partida:</b> las horas ordinarias son salida − entrada − pausa de comida. <b class="text-slate-300">Intensiva/continuada:</b> si trabajas más de 6 h seguidas tienes derecho a 15 min de pausa; cuenta como tiempo trabajado solo si tu convenio o contrato lo dice. Si en tu caso no cuenta, indícalo abajo para descontarla.</p>
+        <div class="flex items-center gap-2"><span class="w-20 text-[11px] text-slate-300 font-semibold">Pausa comida</span><input type="time" id="t_brk_a" class="inp" aria-label="Inicio pausa comida"><input type="time" id="t_brk_b" class="inp" aria-label="Fin pausa comida"></div>
+        <div><label class="lbl" for="r_pI">Pausa intensiva no computada (min)</label><input type="number" inputmode="numeric" min="0" max="120" id="r_pI" class="inp"></div>
+      </div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="lbl" for="r_alarm">Aviso antes del turno (min, 0 = ninguno)</label><input type="number" inputmode="numeric" min="0" max="1440" id="r_alarm" class="inp"></div>
         <div><label class="lbl" for="r_hol">Festivos locales (dd/mm, con comas)</label><input type="text" id="r_hol" maxlength="200" placeholder="15/08, 23/04" class="inp"></div>
@@ -230,6 +235,8 @@ const SH={
   N:{n:'Noche',c:'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',w:1,noche:true},
   D12:{n:'12h Día',c:'bg-teal-500/20 text-teal-300 border-teal-500/40',w:1,is12:true,parada:true},
   N12:{n:'12h Noche',c:'bg-purple-500/20 text-purple-300 border-purple-500/40',w:1,is12:true,noche:true,parada:true},
+  I:{n:'Intensiva',c:'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',w:1,cont:true},
+  JP:{n:'Partida',c:'bg-lime-500/20 text-lime-300 border-lime-500/40',w:1,split:true},
   R:{n:'Retén',c:'bg-rose-500/20 text-rose-300 border-rose-500/40',w:1,parada:true},
   L:{n:'Libre',c:'bg-slate-800 text-slate-400 border-slate-700',w:0},
   V:{n:'Vacac.',c:'bg-sky-500/20 text-sky-300 border-sky-500/40',w:0},
@@ -237,6 +244,9 @@ const SH={
 };
 
 const PRESETS=[
+  ['Intensiva L-V (5I-2L)',['I','I','I','I','I','L','L']],
+  ['Partida L-V (5JP-2L)',['JP','JP','JP','JP','JP','L','L']],
+  ['Partida L-J + Intensiva V',['JP','JP','JP','JP','I','L','L']],
   ['L-V Mañana (5M-2L)',['M','M','M','M','M','L','L']],
   ['Parada 12h Día (6D-1L)',['D12','D12','D12','D12','D12','D12','L']],
   ['Parada 12h Noche (6N-1L)',['N12','N12','N12','N12','N12','N12','L']],
@@ -268,16 +278,17 @@ const DF=[
 ];
 
 const KEY='miCuadrante.v2', TB='py-2 text-[11px] font-semibold rounded-lg transition ';
-let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26,hOrd:7.6,h12:12,targetYear:1696,vacDays:22,ret:0,alarm:60,hol:'',times:{M:['06:00','14:00'],T:['14:00','22:00'],N:['22:00','06:00'],D12:['07:00','19:00'],N12:['19:00','07:00']}},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
+let S={days:{},rates:{he:0,hn:0,hf:0,pn:0,pr:0,meal:0,km:0.26,hOrd:7.6,h12:12,targetYear:1696,vacDays:22,ret:0,alarm:60,hol:'',times:{M:['06:00','14:00'],T:['14:00','22:00'],N:['22:00','06:00'],D12:['07:00','19:00'],N12:['19:00','07:00'],I:['08:00','15:00'],JP:['09:00','18:00']},brk:['14:00','16:00'],pI:0},cycle:[],lastBackup:0}, cur=new Date(), paint=null, mk=null, ms=null;
 cur.setDate(1);
 
+const mergeR=r=>({...S.rates,...r,times:{...S.rates.times,...(r&&r.times)}});
 function load(){
   try{
     const j=JSON.parse(localStorage.getItem(KEY));
     if(j&&j.days){
       S={
         days:j.days,
-        rates:{...S.rates,...j.rates},
+        rates:mergeR(j.rates),
         cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],
         lastBackup:+j.lastBackup||0
       };
@@ -326,6 +337,15 @@ function dayOrdHours(d){
   if(d.hCustom!==undefined&&d.hCustom!=='')return num(d.hCustom);
   const sh=SH[d.s];
   if(!sh||!sh.w)return 0;
+  if(sh.cont||sh.split){
+    const t=shiftHrs(d.s);
+    if(t){
+      let h=t[1]-t[0];
+      if(sh.split){const b=S.rates.brk||['14:00','16:00'],a=T2H(b[0]);let e=T2H(b[1]);if(e<=a)e+=24;h-=e-a}
+      else h-=num(S.rates.pI)/60;
+      return Math.max(0,Math.round(h*100)/100);
+    }
+  }
   return sh.is12?(num(S.rates.h12)||12):(num(S.rates.hOrd)||7.6);
 }
 
@@ -372,7 +392,7 @@ function render(){
   $('stWorkDays').textContent=s.workDays;
   $('stFreeDays').textContent=s.freeDays;
   $('stTotal').textContent=eur(s.ex+s.al);
-  {const f=c=>{if(!c||!SH[c])return 'sin turno';const t=shiftHrs(c);return SH[c].n+(t?` ${hhmm(t[0])}–${hhmm(t[1])}`:'')};$('nextShift').textContent=`Hoy: ${f(S.days[today]?.s)} · Mañana: ${f(S.days[ymd(new Date(Date.now()+864e5))]?.s)}`}
+  {const f=c=>{if(!c||!SH[c])return 'sin turno';const t=shiftHrs(c);return SH[c].n+(t?(c==='JP'?` ${hhmm(t[0])}–${S.rates.brk[0]} y ${S.rates.brk[1]}–${hhmm(t[1])}`:` ${hhmm(t[0])}–${hhmm(t[1])}`):'')};$('nextShift').textContent=`Hoy: ${f(S.days[today]?.s)} · Mañana: ${f(S.days[ymd(new Date(Date.now()+864e5))]?.s)}`}
   let h='<div></div>'.repeat((new Date(y,m,1).getDay()+6)%7);
   for(let i=1,n=new Date(y,m+1,0).getDate();i<=n;i++){
     const dt=new Date(y,m,i),k=ymd(dt),d=S.days[k],sh=d&&SH[d.s];
@@ -407,6 +427,7 @@ function legalWarnings(y,exHrs){
   const w=[],ra=restAlerts(y,cur.getMonth()),R='bg-rose-500/10 border-rose-500/30 text-rose-200',A='bg-amber-500/10 border-amber-500/30 text-amber-200',box=(t,c)=>`<div class="${c} border rounded-lg p-2 text-[11px] leading-snug">${t}</div>`;
   if(exHrs>80)w.push(box(`Llevas ${exHrs.toLocaleString('es-ES')} h extra en ${y}: superas el máximo legal de 80 h/año (art. 35.2 ET). No cuentan las compensadas con descanso en 4 meses ni las de fuerza mayor.`,R));
   else if(exHrs>=64)w.push(box(`Llevas ${exHrs.toLocaleString('es-ES')} de 80 h extra anuales permitidas en ${y}.`,A));
+  {const mo=cur.getMonth(),lg=[];for(let i=1,n=new Date(y,mo+1,0).getDate();i<=n;i++){const d=S.days[`${y}-${p2(mo+1)}-${p2(i)}`],q=d&&SH[d.s];if(q&&!q.is12&&dayOrdHours(d)>9)lg.push(i)}if(lg.length)w.push(box(`Jornada ordinaria de más de 9 h (días ${lg.join(', ')}). Solo es válida si tu convenio o un acuerdo de empresa lo permite (art. 34.3 ET).`,A))}
   if(ra.bad.length)w.push(box(`Descanso inferior a 7 h entre jornadas (días ${ra.bad.join(', ')}).`,R));
   if(ra.chg.length)w.push(box(`Descanso de 7 a 12 h (días ${ra.chg.join(', ')}). Solo es válido en cambio de turno y si se compensa después. Calculado con los horarios que configuraste en Ajustes.`,A));
   return w.length?`<div class="space-y-1.5 pt-1">${w.join('')}</div>`:'';
@@ -580,7 +601,7 @@ function saveRates(){
   S.rates.targetYear=Math.max(0,num($('r_targetYear').value))||1696;
   S.rates.vacDays=Math.max(0,num($('r_vacDays').value))||22;
   Object.keys(S.rates.times).forEach(k=>{const a=$('t_'+k+'_a').value,b=$('t_'+k+'_b').value;if(a&&b)S.rates.times[k]=[a,b]});
-  S.rates.alarm=Math.min(1440,Math.max(0,num($('r_alarm').value)));S.rates.hol=$('r_hol').value.slice(0,200);
+  {const a=$('t_brk_a').value,b=$('t_brk_b').value;if(a&&b)S.rates.brk=[a,b]}S.rates.pI=Math.min(120,Math.max(0,num($('r_pI').value)));S.rates.alarm=Math.min(1440,Math.max(0,num($('r_alarm').value)));S.rates.hol=$('r_hol').value.slice(0,200);
   Object.keys(HC).forEach(y=>delete HC[y]);
   save();render();toast('Configuración y tarifas guardadas');
 }
@@ -652,7 +673,7 @@ function pasteBackupClipboard(){
   try{
     const j=JSON.parse(raw);
     if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
-    S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
+    S={days:j.days,rates:mergeR(j.rates),cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
     save();initForms();render();checkBackup();toast('Copia restaurada con éxito');
   }catch(e){toast('El texto pegado no es válido')}
 }
@@ -677,7 +698,7 @@ function restoreBackup(e){
       const j=JSON.parse(rd.result);
       if(!j||typeof j.days!=='object'||typeof j.rates!=='object')throw 0;
       if(!confirm('¿Restaurar esta copia? Reemplazará los datos actuales.'))return;
-      S={days:j.days,rates:{...S.rates,...j.rates},cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
+      S={days:j.days,rates:mergeR(j.rates),cycle:Array.isArray(j.cycle)?j.cycle.filter(k=>SH[k]):[],lastBackup:Date.now()};
       save();initForms();render();checkBackup();toast('Datos restaurados');
     }catch(err){toast('Archivo de copia no válido')}
   };
@@ -691,7 +712,7 @@ function initForms(){
   $('r_targetYear').value=S.rates.targetYear??1696;
   $('r_vacDays').value=S.rates.vacDays??22;
   $('timeFields').innerHTML=Object.keys(S.rates.times).map(k=>`<div class="flex items-center gap-2"><span class="w-20 text-[11px] text-slate-300 font-semibold">${SH[k].n}</span><input type="time" id="t_${k}_a" class="inp" value="${esc(S.rates.times[k][0])}" aria-label="Inicio ${SH[k].n}"><input type="time" id="t_${k}_b" class="inp" value="${esc(S.rates.times[k][1])}" aria-label="Fin ${SH[k].n}"></div>`).join('');
-  $('r_alarm').value=S.rates.alarm??60;$('r_hol').value=S.rates.hol||'';
+  $('t_brk_a').value=S.rates.brk[0];$('t_brk_b').value=S.rates.brk[1];$('r_pI').value=S.rates.pI||0;$('r_alarm').value=S.rates.alarm??60;$('r_hol').value=S.rates.hol||'';
   Object.keys(HC).forEach(y=>delete HC[y]);
   renderPaint();renderCycle();
 }
