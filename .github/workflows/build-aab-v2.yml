@@ -41,7 +41,7 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Inyectar AdMob, Permiso AD_ID y VersionCode
+      - name: Inyectar AdMob, Permiso AD_ID, SDK 34 y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           RUN_NUMBER: ${{ github.run_number }}
@@ -69,14 +69,20 @@ jobs:
               with open(manifest_path, "w", encoding="utf-8") as f:
                   f.write(content)
 
-          # 2. Incrementar versionCode y versionName en android/app/build.gradle
+          # 2. android/app/build.gradle (SDK 34 + VersionCode automático)
           gradle_path = "android/app/build.gradle"
           if os.path.exists(gradle_path):
               with open(gradle_path, "r", encoding="utf-8") as f:
                   gradle = f.read()
 
+              # Forzar compileSdk y targetSdk a 34 para cumplir política de Google Play
+              gradle = re.sub(r"compileSdkVersion\s+\d+", "compileSdkVersion 34", gradle)
+              gradle = re.sub(r"compileSdk\s+\d+", "compileSdk 34", gradle)
+              gradle = re.sub(r"targetSdkVersion\s+\d+", "targetSdkVersion 34", gradle)
+              gradle = re.sub(r"targetSdk\s+\d+", "targetSdk 34", gradle)
+
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 40 + run_num
+              new_vc = 50 + run_num
               gradle = re.sub(r"versionCode\s+\d+", f"versionCode {new_vc}", gradle)
               gradle = re.sub(r'versionName\s+"[^"]+"', f'versionName "1.1.{run_num}"', gradle)
 
@@ -94,7 +100,6 @@ jobs:
           cd android
           chmod +x gradlew
 
-          # Valores por defecto si no estan definidos en GitHub Secrets
           KS_PASS="${KEYSTORE_PASSWORD:-MiCuadrante2026!}"
           K_ALIAS="${KEY_ALIAS:-micuadrante}"
           K_PASS="${KEY_PASSWORD:-MiCuadrante2026!}"
