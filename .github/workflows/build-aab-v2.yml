@@ -40,7 +40,7 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Inyectar AdMob, Permiso AD_ID, minSdkVersion 24 y VersionCode
+      - name: Inyectar AdMob, Permiso AD_ID, minSdk 24, targetSdk 35 y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           RUN_NUMBER: ${{ github.run_number }}
@@ -48,14 +48,15 @@ jobs:
           python3 - << 'EOF'
           import os, re
 
-          # 1. AndroidManifest.xml (Permiso AD_ID + Meta-data AdMob)
+          # 1. AndroidManifest.xml (Permiso AD_ID antes de <application> + Meta-data AdMob)
           manifest_path = "android/app/src/main/AndroidManifest.xml"
           if os.path.exists(manifest_path):
               with open(manifest_path, "r", encoding="utf-8") as f:
                   content = f.read()
 
+              ad_perm = '<uses-permission android:name="com.google.android.gms.permission.AD_ID" />'
               if "com.google.android.gms.permission.AD_ID" not in content:
-                  content = content.replace("</manifest>", '    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />\n</manifest>')
+                  content = content.replace("<application", f"{ad_perm}\n\n    <application", 1)
 
               app_id = os.environ.get("ADMOB_APP_ID", "").strip()
               if not app_id or "~" not in app_id:
@@ -63,41 +64,47 @@ jobs:
 
               meta_tag = f'<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="{app_id}"/>'
               if "com.google.android.gms.ads.APPLICATION_ID" not in content:
-                  content = content.replace("</application>", f'        {meta_tag}\n    </application>')
+                  content = content.replace("</application>", f"        {meta_tag}\n    </application>")
 
               with open(manifest_path, "w", encoding="utf-8") as f:
                   f.write(content)
 
-          # 2. android/variables.gradle (Actualizar minSdkVersion = 24 y SDK = 34)
+          # 2. android/variables.gradle (minSdkVersion = 24 y SDK = 35)
           vars_path = "android/variables.gradle"
           if os.path.exists(vars_path):
               with open(vars_path, "r", encoding="utf-8") as f:
                   vars_content = f.read()
 
               vars_content = re.sub(r"minSdkVersion[ \t]*=[ \t]*\d+", "minSdkVersion = 24", vars_content)
-              vars_content = re.sub(r"compileSdkVersion[ \t]*=[ \t]*\d+", "compileSdkVersion = 34", vars_content)
-              vars_content = re.sub(r"targetSdkVersion[ \t]*=[ \t]*\d+", "targetSdkVersion = 34", vars_content)
+              vars_content = re.sub(r"compileSdkVersion[ \t]*=[ \t]*\d+", "compileSdkVersion = 35", vars_content)
+              vars_content = re.sub(r"targetSdkVersion[ \t]*=[ \t]*\d+", "targetSdkVersion = 35", vars_content)
 
               with open(vars_path, "w", encoding="utf-8") as f:
                   f.write(vars_content)
 
-          # 3. android/app/build.gradle (Actualizar en la misma linea sin tocar saltos de linea)
+          # 3. android/app/build.gradle (minSdk 24, compileSdk 35, targetSdk 35 y VersionCode)
           gradle_path = "android/app/build.gradle"
           if os.path.exists(gradle_path):
               with open(gradle_path, "r", encoding="utf-8") as f:
                   gradle = f.read()
 
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 60 + run_num
+              new_vc = 70 + run_num
 
               gradle = re.sub(r"(?m)^([ \t]*minSdk(?:Version)?[ \t]+).+$", r"\g<1>24", gradle)
-              gradle = re.sub(r"(?m)^([ \t]*compileSdk(?:Version)?[ \t]+).+$", r"\g<1>34", gradle)
-              gradle = re.sub(r"(?m)^([ \t]*targetSdk(?:Version)?[ \t]+).+$", r"\g<1>34", gradle)
+              gradle = re.sub(r"(?m)^([ \t]*compileSdk(?:Version)?[ \t]+).+$", r"\g<1>35", gradle)
+              gradle = re.sub(r"(?m)^([ \t]*targetSdk(?:Version)?[ \t]+).+$", r"\g<1>35", gradle)
               gradle = re.sub(r"(?m)^([ \t]*versionCode[ \t]+)\d+$", rf"\g<1>{new_vc}", gradle)
               gradle = re.sub(r'(?m)^([ \t]*versionName[ \t]+)"[^"]+"$', rf'\g<1>"1.1.{run_num}"', gradle)
 
               with open(gradle_path, "w", encoding="utf-8") as f:
                   f.write(gradle)
+
+          # 4. android/gradle.properties (Evitar avisos de AGP con SDK 35)
+          prop_path = "android/gradle.properties"
+          if os.path.exists(prop_path):
+              with open(prop_path, "a", encoding="utf-8") as f:
+                  f.write("\nandroid.suppressUnsupportedCompileSdk=35\n")
           EOF
 
       - name: Generar iconos de la App (si existe icon.svg o icon.png)
@@ -116,7 +123,7 @@ jobs:
             fi
           fi
 
-      - name: Firmar y compilar Android App Bundle (AAB)
+      - name: Firmar y compilar Android AAB y APK
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -141,7 +148,7 @@ jobs:
               -dname "CN=K4NT3R0, OU=Apps, O=K4NT3R0, L=Cadiz, ST=Andalucia, C=ES"
           fi
 
-          ./gradlew bundleRelease \
+          ./gradlew bundleRelease assembleRelease \
             -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
             -Pandroid.injected.signing.store.password="$KS_PASS" \
             -Pandroid.injected.signing.key.alias="$K_ALIAS" \
@@ -152,3 +159,9 @@ jobs:
         with:
           name: MiCuadrante-AAB
           path: android/app/build/outputs/bundle/release/*.aab
+
+      - name: Subir archivo APK listo para instalar
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiCuadrante-APK
+          path: android/app/build/outputs/apk/release/*.apk
