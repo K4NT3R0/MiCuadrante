@@ -40,7 +40,7 @@ jobs:
           npx cap add android
           npx cap sync android
 
-      - name: Inyectar AdMob, Permiso AD_ID, minSdk 24, targetSdk 35 y VersionCode
+      - name: Inyectar AdMob, Permiso AD_ID, minSdk 24, targetSdk 36 y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           RUN_NUMBER: ${{ github.run_number }}
@@ -69,42 +69,42 @@ jobs:
               with open(manifest_path, "w", encoding="utf-8") as f:
                   f.write(content)
 
-          # 2. android/variables.gradle (minSdkVersion = 24 y SDK = 35)
+          # 2. android/variables.gradle (minSdkVersion = 24 y SDK = 36)
           vars_path = "android/variables.gradle"
           if os.path.exists(vars_path):
               with open(vars_path, "r", encoding="utf-8") as f:
                   vars_content = f.read()
 
               vars_content = re.sub(r"minSdkVersion[ \t]*=[ \t]*\d+", "minSdkVersion = 24", vars_content)
-              vars_content = re.sub(r"compileSdkVersion[ \t]*=[ \t]*\d+", "compileSdkVersion = 35", vars_content)
-              vars_content = re.sub(r"targetSdkVersion[ \t]*=[ \t]*\d+", "targetSdkVersion = 35", vars_content)
+              vars_content = re.sub(r"compileSdkVersion[ \t]*=[ \t]*\d+", "compileSdkVersion = 36", vars_content)
+              vars_content = re.sub(r"targetSdkVersion[ \t]*=[ \t]*\d+", "targetSdkVersion = 36", vars_content)
 
               with open(vars_path, "w", encoding="utf-8") as f:
                   f.write(vars_content)
 
-          # 3. android/app/build.gradle (minSdk 24, compileSdk 35, targetSdk 35 y VersionCode)
+          # 3. android/app/build.gradle (minSdk 24, compileSdk 36, targetSdk 36 y VersionCode)
           gradle_path = "android/app/build.gradle"
           if os.path.exists(gradle_path):
               with open(gradle_path, "r", encoding="utf-8") as f:
                   gradle = f.read()
 
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 70 + run_num
+              new_vc = 90 + run_num
 
               gradle = re.sub(r"(?m)^([ \t]*minSdk(?:Version)?[ \t]+).+$", r"\g<1>24", gradle)
-              gradle = re.sub(r"(?m)^([ \t]*compileSdk(?:Version)?[ \t]+).+$", r"\g<1>35", gradle)
-              gradle = re.sub(r"(?m)^([ \t]*targetSdk(?:Version)?[ \t]+).+$", r"\g<1>35", gradle)
+              gradle = re.sub(r"(?m)^([ \t]*compileSdk(?:Version)?[ \t]+).+$", r"\g<1>36", gradle)
+              gradle = re.sub(r"(?m)^([ \t]*targetSdk(?:Version)?[ \t]+).+$", r"\g<1>36", gradle)
               gradle = re.sub(r"(?m)^([ \t]*versionCode[ \t]+)\d+$", rf"\g<1>{new_vc}", gradle)
               gradle = re.sub(r'(?m)^([ \t]*versionName[ \t]+)"[^"]+"$', rf'\g<1>"1.1.{run_num}"', gradle)
 
               with open(gradle_path, "w", encoding="utf-8") as f:
                   f.write(gradle)
 
-          # 4. android/gradle.properties (Evitar avisos de AGP con SDK 35)
+          # 4. android/gradle.properties (Evitar avisos de AGP con SDK 36)
           prop_path = "android/gradle.properties"
           if os.path.exists(prop_path):
               with open(prop_path, "a", encoding="utf-8") as f:
-                  f.write("\nandroid.suppressUnsupportedCompileSdk=35\n")
+                  f.write("\nandroid.suppressUnsupportedCompileSdk=36\n")
           EOF
 
       - name: Generar iconos de la App (si existe icon.svg o icon.png)
