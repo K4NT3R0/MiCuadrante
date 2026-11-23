@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p www
           cp index.html privacidad.html manifest.json sw.js www/ 2>/dev/null || true
-          cp icon.svg icon.png www/ 2>/dev/null || true
+          cp icon.svg icon.png icon-192.png icon-512.png icon-maskable-512.png www/ 2>/dev/null || true
           if [ ! -f package.json ]; then
             npm init -y
           fi
@@ -41,23 +41,64 @@ jobs:
           fi
           npx cap sync android
 
-      - name: Generar iconos de la App (si existe icon.svg o icon.png)
+      - name: Generar e inyectar iconos Android (blindado con sharp)
         run: |
-          if [ -f icon.svg ] || [ -f icon.png ]; then
-            mkdir -p assets
-            if [ -f icon.png ]; then
-              cp icon.png assets/icon.png
-              cp icon.png assets/splash.png
-            elif [ -f icon.svg ]; then
-              npx --yes sharp-cli -i icon.svg -o assets/icon.png resize 1024 1024 || true
-              npx --yes sharp-cli -i icon.svg -o assets/splash.png resize 2732 2732 || true
-            fi
-            if [ -f assets/icon.png ]; then
-              npx --yes @capacitor/assets generate --android || true
-            fi
-          fi
+          npm install sharp
+          cat << 'EOF' > inject-icons.js
+          const fs = require('fs');
+          const path = require('path');
+          const sharp = require('sharp');
 
-      - name: Inyectar AdMob, Permiso AD_ID, SDK 24-36 y VersionCode
+          async function run() {
+            const src = ['icon.png', 'icon.jpg', 'icon.svg'].find(f => fs.existsSync(f));
+            if (!src) return;
+
+            const master = await sharp(src).resize(1024, 1024, { fit: 'cover' }).png().toBuffer();
+            const resDir = 'android/app/src/main/res';
+
+            for (const d of ['drawable-anydpi-v24', 'mipmap-anydpi-v26']) {
+              const p = path.join(resDir, d);
+              if (fs.existsSync(p)) fs.rmSync(p, { recursive: true, force: true });
+            }
+
+            const anyDpi = path.join(resDir, 'mipmap-anydpi-v26');
+            fs.mkdirSync(anyDpi, { recursive: true });
+            const adaptiveXml = '<?xml version="1.0" encoding="utf-8"?><adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/ic_launcher_background"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>';
+            fs.writeFileSync(path.join(anyDpi, 'ic_launcher.xml'), adaptiveXml);
+            fs.writeFileSync(path.join(anyDpi, 'ic_launcher_round.xml'), adaptiveXml);
+
+            const valuesDir = path.join(resDir, 'values');
+            fs.mkdirSync(valuesDir, { recursive: true });
+            fs.writeFileSync(path.join(valuesDir, 'ic_launcher_background.xml'),
+              '<?xml version="1.0" encoding="utf-8"?><resources><color name="ic_launcher_background">#040B25</color></resources>'
+            );
+
+            const mipmaps = [
+              { folder: 'mipmap-mdpi', size: 48, fg: 108 },
+              { folder: 'mipmap-hdpi', size: 72, fg: 162 },
+              { folder: 'mipmap-xhdpi', size: 96, fg: 216 },
+              { folder: 'mipmap-xxhdpi', size: 144, fg: 324 },
+              { folder: 'mipmap-xxxhdpi', size: 192, fg: 432 }
+            ];
+
+            for (const m of mipmaps) {
+              const dir = path.join(resDir, m.folder);
+              fs.mkdirSync(dir, { recursive: true });
+              await sharp(master).resize(m.size, m.size).png().toFile(path.join(dir, 'ic_launcher.png'));
+              await sharp(master).resize(m.size, m.size).png().toFile(path.join(dir, 'ic_launcher_round.png'));
+              const inner = Math.round(m.fg * 0.72);
+              const innerBuf = await sharp(master).resize(inner, inner).png().toBuffer();
+              await sharp({ create: { width: m.fg, height: m.fg, channels: 4, background: { r: 4, g: 11, b: 37, alpha: 1 } } })
+                .composite([{ input: innerBuf, gravity: 'center' }])
+                .png()
+                .toFile(path.join(dir, 'ic_launcher_foreground.png'));
+            }
+          }
+          run().catch(e => { console.error(e); process.exit(1); });
+          EOF
+          node inject-icons.js
+
+      - name: Inyectar AdMob, Permiso AD_ID, SDK 24-36, R8 DEX y VersionCode
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
           RUN_NUMBER: ${{ github.run_number }}
@@ -65,6 +106,7 @@ jobs:
           python3 - << 'EOF'
           import os, re
 
+          # 1. AndroidManifest.xml (Permiso AD_ID + Meta-data AdMob)
           manifest_path = "android/app/src/main/AndroidManifest.xml"
           if os.path.exists(manifest_path):
               with open(manifest_path, "r", encoding="utf-8") as f:
@@ -84,6 +126,7 @@ jobs:
               with open(manifest_path, "w", encoding="utf-8") as f:
                   f.write(content)
 
+          # 2. android/variables.gradle (SDK 24-36)
           vars_path = "android/variables.gradle"
           if os.path.exists(vars_path):
               with open(vars_path, "r", encoding="utf-8") as f:
@@ -94,6 +137,7 @@ jobs:
               with open(vars_path, "w", encoding="utf-8") as f:
                   f.write(v)
 
+          # 3. android/gradle.properties
           prop_path = "android/gradle.properties"
           if os.path.exists(prop_path):
               with open(prop_path, "r", encoding="utf-8") as f:
@@ -102,16 +146,53 @@ jobs:
                   with open(prop_path, "a", encoding="utf-8") as f:
                       f.write("\nandroid.suppressUnsupportedCompileSdk=36\n")
 
+          # 4. android/app/build.gradle (VersionCode + activar R8/ofuscacion DEX)
           gradle_path = "android/app/build.gradle"
           if os.path.exists(gradle_path):
               with open(gradle_path, "r", encoding="utf-8") as f:
                   g = f.read()
               run_num = int(os.environ.get("RUN_NUMBER", "1"))
-              new_vc = 130 + run_num
+              new_vc = 140 + run_num
               g = re.sub(r"versionCode[ \t]+\d+", f"versionCode {new_vc}", g)
-              g = re.sub(r'versionName[ \t]+"[^"]+"', f'versionName "2.0.{run_num}"', g)
+              g = re.sub(r'versionName[ \t]+"[^"]+"', f'versionName "2.1.{run_num}"', g)
+              g = g.replace(
+                  "minifyEnabled false",
+                  "minifyEnabled true\n            shrinkResources true"
+              )
+              g = g.replace(
+                  "getDefaultProguardFile('proguard-android.txt')",
+                  "getDefaultProguardFile('proguard-android-optimize.txt')"
+              )
               with open(gradle_path, "w", encoding="utf-8") as f:
                   f.write(g)
+
+          # 5. android/app/proguard-rules.pro (Proteger Capacitor 6 + AdMob mientras R8 ofusca el resto)
+          proguard_path = "android/app/proguard-rules.pro"
+          rules = """
+          # Reglas R8 para Capacitor 6 y AdMob
+          -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+          -keep class com.getcapacitor.annotation.** { *; }
+          -keep @com.getcapacitor.annotation.CapacitorPlugin class * {
+              <init>(...);
+              @com.getcapacitor.annotation.PluginMethod <methods>;
+              @com.getcapacitor.annotation.PermissionCallback <methods>;
+              @com.getcapacitor.annotation.ActivityCallback <methods>;
+          }
+          -keep class * extends com.getcapacitor.Plugin {
+              <init>(...);
+              @com.getcapacitor.annotation.PluginMethod <methods>;
+              @com.getcapacitor.annotation.PermissionCallback <methods>;
+              @com.getcapacitor.annotation.ActivityCallback <methods>;
+          }
+          -keepclassmembers class * {
+              @android.webkit.JavascriptInterface <methods>;
+          }
+          -keep class com.k4nt3r0.micuadrante.MainActivity { *; }
+          -keep class com.getcapacitor.BridgeActivity { *; }
+          -keep class com.getcapacitor.community.admob.** { *; }
+          """
+          with open(proguard_path, "a", encoding="utf-8") as f:
+              f.write("\n" + "\n".join(line.strip() for line in rules.splitlines()) + "\n")
           EOF
 
       - name: Firmar y compilar AAB y APK
