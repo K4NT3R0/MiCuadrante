@@ -235,6 +235,17 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
 .btn-danger{background:rgba(244,63,94,.14);border:1.5px solid rgba(244,63,94,.38);color:var(--rose)}
 .btn-sm{padding:8px 11px;font-size:11.5px;border-radius:10px}
 
+/* Language buttons */
+.lang-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  background:var(--inp);border:1.5px solid var(--line);border-radius:13px;
+  padding:10px 8px;font-size:12.5px;font-weight:800;color:var(--ink);
+  transition:transform .1s,border-color .15s,background .15s;
+}
+.lang-btn:active{transform:scale(.96)}
+.lang-btn.active{border-color:var(--accent-bright);background:var(--accent-soft);color:var(--accent-bright)}
+.lang-flag{font-size:17px;line-height:1}
+
 /* Progress & Stats */
 .prog-wrap{height:9px;background:var(--inp);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
 .prog-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#10b981,#38bdf8);transition:width .35s ease}
@@ -272,7 +283,7 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
 /* Modals / Bottom Sheets (siempre por encima del banner AdMob) */
 .overlay{
   position:fixed;inset:0;z-index:60;
-  background:rgba(2,6,23,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  background:rgba(2,6,23,.82);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
   display:flex;align-items:flex-end;justify-content:center;
   padding:calc(env(safe-area-inset-top,0px) + 12px) 10px calc(var(--ad-offset) + env(safe-area-inset-bottom,0px) + 14px);
 }
@@ -372,17 +383,17 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
       </div>
       <div>
-        <h1>Mi Cuadrante</h1>
-        <p id="profileSubtitle">Turnos, Jornadas y Nómina</p>
+        <h1 data-i18n="appName">Mi Cuadrante</h1>
+        <p id="profileSubtitle" data-i18n="subtitleDefault">Turnos, Jornadas y Nómina</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="icon-btn" onclick="shareMonthText()" title="Compartir resumen del mes" aria-label="Compartir resumen del mes">
+      <button class="icon-btn" onclick="shareMonthText()" data-i18n-title="shareMonthTitle" data-i18n-aria="shareMonthTitle">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       </button>
       <button class="pill-btn" onclick="goToday()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-bright)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Hoy
+        <span data-i18n="today">Hoy</span>
       </button>
     </div>
   </div>
@@ -393,44 +404,42 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <section class="card hero">
     <div class="hero-top">
       <div class="month-nav">
-        <button class="icon-btn no-print" onclick="changeMonth(-1)" aria-label="Mes anterior">
+        <button class="icon-btn no-print" onclick="changeMonth(-1)" data-i18n-aria="prevMonth">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <button class="month-btn" onclick="openMonthPicker()" aria-live="polite">
           <span id="monthLabel"></span>
           <svg class="no-print" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--mute)" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg>
         </button>
-        <button class="icon-btn no-print" onclick="changeMonth(1)" aria-label="Mes siguiente">
+        <button class="icon-btn no-print" onclick="changeMonth(1)" data-i18n-aria="nextMonth">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
       <div class="header-actions no-print">
-        <button class="icon-btn" onclick="window.print()" aria-label="Imprimir o guardar PDF" title="Imprimir / PDF">
+        <button class="icon-btn" onclick="window.print()" data-i18n-aria="printPdf" data-i18n-title="printPdf">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         </button>
-        <button class="pill-btn" onclick="triggerExportCSV()" style="border-color:rgba(16,185,129,.4);color:var(--accent-bright);background:var(--accent-soft)">
-          Excel
-        </button>
+        <button class="pill-btn" onclick="triggerExportCSV()" style="border-color:rgba(16,185,129,.4);color:var(--accent-bright);background:var(--accent-soft)" data-i18n="excel">Excel</button>
       </div>
     </div>
 
     <div class="kpi-grid num">
-      <div class="kpi"><span>Jornada</span><b id="stOrd">0 h</b></div>
-      <div class="kpi sk"><span>H. Extra</span><b id="stHours">0 h</b></div>
-      <div class="kpi em"><span>Pluses/Ex.</span><b id="stMoney">0 €</b></div>
-      <div class="kpi am"><span>Dietas/Km</span><b id="stAl">0 €</b></div>
+      <div class="kpi"><span data-i18n="kpiOrd">Jornada</span><b id="stOrd">0 h</b></div>
+      <div class="kpi sk"><span data-i18n="kpiExtra">H. Extra</span><b id="stHours">0 h</b></div>
+      <div class="kpi em"><span data-i18n="kpiPluses">Pluses/Ex.</span><b id="stMoney">0 €</b></div>
+      <div class="kpi am"><span data-i18n="kpiDietas">Dietas/Km</span><b id="stAl">0 €</b></div>
     </div>
 
     <div class="hero-foot num">
       <span id="stDays">0 trab. · 0 lib.</span>
-      <span>Total mes: <b id="stTotal">0 €</b></span>
+      <span><span data-i18n="totalMonth">Total mes:</span> <b id="stTotal">0 €</b></span>
     </div>
   </section>
 
   <!-- BACKUP REMINDER -->
   <div id="backupBanner" class="banner hidden no-print">
     <span id="backupMsg"></span>
-    <button onclick="downloadBackup()">Guardar copia</button>
+    <button onclick="downloadBackup()" data-i18n="saveBackupBtn">Guardar copia</button>
   </div>
 
   <!-- VIEW 1: CALENDARIO -->
@@ -439,27 +448,24 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
       <div class="paint-head">
         <span class="paint-title">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-bright)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18.37 2.63 3 3L7 20l-4 1 1-4Z"/></svg>
-          Modo toque rápido
+          <span data-i18n="quickTouch">Modo toque rápido</span>
         </span>
-        <span id="paintHint" class="paint-hint">Toca un día para editar</span>
+        <span id="paintHint" class="paint-hint" data-i18n="tapToEdit">Toca un día para editar</span>
       </div>
       <div class="chips-row no-scrollbar" id="paintSelector"></div>
     </div>
 
     <div class="card cal-card">
-      <div class="weekdays">
-        <div>LUN</div><div>MAR</div><div>MIÉ</div><div>JUE</div><div>VIE</div>
-        <div class="wknd">SÁB</div><div class="wknd">DOM</div>
-      </div>
+      <div class="weekdays" id="weekdaysRow"></div>
       <div id="calendarGrid" class="cal-grid"></div>
       <div class="cal-foot no-print">
         <div class="legend">
-          <span><i class="dot ex"></i>Extras</span>
-          <span><i class="dot nt"></i>Nota</span>
-          <span><i class="dot hc"></i>Bolsa</span>
-          <span style="color:var(--rose)">● Festivo</span>
+          <span><i class="dot ex"></i><span data-i18n="legExtras">Extras</span></span>
+          <span><i class="dot nt"></i><span data-i18n="legNote">Nota</span></span>
+          <span><i class="dot hc"></i><span data-i18n="legBank">Bolsa</span></span>
+          <span style="color:var(--rose)" data-i18n="legHoliday">● Festivo</span>
         </div>
-        <span>Desliza ◀ ▶</span>
+        <span data-i18n="swipeHint">Desliza ◀ ▶</span>
       </div>
     </div>
   </section>
@@ -468,27 +474,27 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <section id="view-cycles" class="hidden no-print" style="display:flex;flex-direction:column;gap:12px">
     <div class="card" style="display:flex;flex-direction:column;gap:12px">
       <div>
-        <span class="badge">Automatización</span>
-        <h3 class="section-title" style="margin-top:6px">Generador de cuadrantes y ciclos</h3>
-        <p class="section-sub">Sirve para semanas fijas de oficina, jornada partida, turnos rotativos o paradas puntuales por fechas.</p>
+        <span class="badge" data-i18n="badgeAuto">Automatización</span>
+        <h3 class="section-title" style="margin-top:6px" data-i18n="cyclesTitle">Generador de cuadrantes y ciclos</h3>
+        <p class="section-sub" data-i18n="cyclesSub">Sirve para semanas fijas de oficina, jornada partida, turnos rotativos o paradas puntuales por fechas.</p>
       </div>
 
       <div>
-        <label class="lbl">Plantillas listas para usar</label>
+        <label class="lbl" data-i18n="presetsLbl">Plantillas listas para usar</label>
         <div id="presets" class="chips-row no-scrollbar"></div>
       </div>
 
       <div>
-        <label class="lbl">Construir secuencia día a día</label>
+        <label class="lbl" data-i18n="buildSeqLbl">Construir secuencia día a día</label>
         <div id="cycleAdderBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
       </div>
 
       <div style="background:var(--inp);border:1px solid var(--line);border-radius:14px;padding:10px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:11.5px;color:var(--mute)">Tu patrón (<b id="cycleLen" style="color:var(--ink)">0</b> días):</span>
+          <span id="cycleLenText" style="font-size:11.5px;color:var(--mute)"></span>
           <div style="display:flex;gap:12px;font-size:11.5px;font-weight:700">
-            <button onclick="popCycle()" style="color:var(--amber)">Borrar último</button>
-            <button onclick="clearCycle()" style="color:var(--rose)">Vaciar</button>
+            <button onclick="popCycle()" style="color:var(--amber)" data-i18n="delLast">Borrar último</button>
+            <button onclick="clearCycle()" style="color:var(--rose)" data-i18n="clearAll">Vaciar</button>
           </div>
         </div>
         <div id="cycleSequencePreview" style="display:flex;flex-wrap:wrap;gap:6px;min-height:34px;align-items:center"></div>
@@ -496,28 +502,28 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
 
       <div class="grid-2">
         <div>
-          <label class="lbl" for="cycleStart">Fecha inicio (Día 1)</label>
+          <label class="lbl" for="cycleStart" data-i18n="startDateLbl">Fecha inicio (Día 1)</label>
           <input type="date" id="cycleStart" class="inp">
         </div>
         <div>
-          <label class="lbl" for="cycleEnd">Fecha fin (opcional)</label>
+          <label class="lbl" for="cycleEnd" data-i18n="endDateLbl">Fecha fin (opcional)</label>
           <input type="date" id="cycleEnd" class="inp">
         </div>
       </div>
 
       <div>
-        <label class="lbl" for="cycleMode">Si ya existe un turno en esas fechas</label>
+        <label class="lbl" for="cycleMode" data-i18n="ifExistsLbl">Si ya existe un turno en esas fechas</label>
         <select id="cycleMode" class="inp">
-          <option value="overwrite">Sobrescribir turnos existentes</option>
-          <option value="keep">Respetar días ya rellenos (vacaciones, cambios…)</option>
+          <option value="overwrite" data-i18n="modeOverwrite">Sobrescribir turnos existentes</option>
+          <option value="keep" data-i18n="modeKeep">Respetar días ya rellenos (vacaciones, cambios…)</option>
         </select>
       </div>
 
       <div class="grid-2">
-        <button onclick="triggerApplyCycle('month')" class="btn btn-primary">Rellenar mes</button>
-        <button onclick="triggerApplyCycle('range')" class="btn btn-soft" style="border-color:rgba(56,189,248,.4);color:var(--sky)">Aplicar rango</button>
+        <button onclick="triggerApplyCycle('month')" class="btn btn-primary" data-i18n="fillMonth">Rellenar mes</button>
+        <button onclick="triggerApplyCycle('range')" class="btn btn-soft" style="border-color:rgba(56,189,248,.4);color:var(--sky)" data-i18n="applyRange">Aplicar rango</button>
       </div>
-      <button onclick="triggerApplyCycle('year')" class="btn btn-indigo">⚡ Rellenar año completo</button>
+      <button onclick="triggerApplyCycle('year')" class="btn btn-indigo" data-i18n="fillYear">⚡ Rellenar año completo</button>
     </div>
   </section>
 
@@ -525,7 +531,7 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <section id="view-details" class="hidden" style="display:flex;flex-direction:column;gap:12px">
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div class="section-title">
-        <span>Cómputo anual <span id="yrLabel"></span></span>
+        <span><span data-i18n="annualComp">Cómputo anual</span> <span id="yrLabel"></span></span>
         <span id="yrPct" class="badge num">0 %</span>
       </div>
       <div class="prog-wrap"><div id="yrBar" class="prog-fill" style="width:0%"></div></div>
@@ -533,71 +539,80 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     </div>
 
     <div class="card" style="display:flex;flex-direction:column;gap:9px">
-      <h3 class="section-title">Resumen económico y turnos del mes</h3>
+      <h3 class="section-title" data-i18n="monthSummaryTitle">Resumen económico y turnos del mes</h3>
       <div id="breakdown" style="display:flex;flex-direction:column;gap:7px"></div>
     </div>
 
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div class="section-title">
-        <span>Registro y buscador de notas</span>
+        <span data-i18n="logTitle">Registro y buscador de notas</span>
         <select id="logScope" class="inp" style="width:auto;padding:4px 8px;font-size:11px" onchange="renderDetails()">
-          <option value="month">Este mes</option>
-          <option value="year">Todo el año</option>
+          <option value="month" data-i18n="scopeMonth">Este mes</option>
+          <option value="year" data-i18n="scopeYear">Todo el año</option>
         </select>
       </div>
-      <input type="search" id="noteSearch" class="inp" placeholder="Buscar notas, turnos, compañeros…" oninput="renderDetails()">
+      <input type="search" id="noteSearch" class="inp" data-i18n-ph="searchPh" oninput="renderDetails()">
       <div id="logList" style="display:flex;flex-direction:column;gap:7px;max-height:320px;overflow-y:auto"></div>
     </div>
   </section>
 
-  <!-- VIEW 4: AJUSTES, PERFILES Y TARIFAS -->
+  <!-- VIEW 4: AJUSTES, IDIOMA, PERFILES Y TARIFAS -->
   <section id="view-rates" class="hidden no-print" style="display:flex;flex-direction:column;gap:12px">
+    <!-- Idioma -->
+    <div class="card" style="display:flex;flex-direction:column;gap:10px">
+      <div>
+        <h3 class="section-title">🌍 <span data-i18n="langCardTitle">Idioma de la aplicación</span></h3>
+        <p class="section-sub" data-i18n="langCardSub">Cambia el idioma de los menús, turnos y fechas al instante.</p>
+      </div>
+      <div class="grid-3" id="settingsLangGrid"></div>
+    </div>
+
     <!-- Perfiles de jornada -->
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div>
-        <span class="badge">Universal</span>
-        <h3 class="section-title" style="margin-top:5px">Tipo de jornada y cómputo</h3>
-        <p class="section-sub">Elige un perfil base para adaptar los turnos visibles y horas anuales, o edita cualquier valor a tu medida.</p>
+        <span class="badge" data-i18n="badgeUniversal">Universal</span>
+        <h3 class="section-title" style="margin-top:5px" data-i18n="profileTitle">Tipo de jornada y cómputo</h3>
+        <p class="section-sub" data-i18n="profileSub">Elige un perfil base para adaptar los turnos visibles y horas anuales, o edita cualquier valor a tu medida.</p>
       </div>
       <div class="grid-2" id="profileGrid"></div>
       <div class="grid-3">
-        <div><label class="lbl" for="cfg_ann">Horas/año</label><input type="number" id="cfg_ann" class="inp num" min="0" step="1"></div>
-        <div><label class="lbl" for="cfg_vac">Vacaciones</label><input type="number" id="cfg_vac" class="inp num" min="0" step="1"></div>
-        <div><label class="lbl" for="cfg_ap">A. Propios</label><input type="number" id="cfg_ap" class="inp num" min="0" step="1"></div>
+        <div><label class="lbl" for="cfg_ann" data-i18n="cfgAnn">Horas/año</label><input type="number" id="cfg_ann" class="inp num" min="0" step="1"></div>
+        <div><label class="lbl" for="cfg_vac" data-i18n="cfgVac">Vacaciones</label><input type="number" id="cfg_vac" class="inp num" min="0" step="1"></div>
+        <div><label class="lbl" for="cfg_ap" data-i18n="cfgAp">A. Propios</label><input type="number" id="cfg_ap" class="inp num" min="0" step="1"></div>
       </div>
-      <button onclick="saveConfig()" class="btn btn-primary">Guardar configuración laboral</button>
+      <button onclick="saveConfig()" class="btn btn-primary" data-i18n="saveConfigBtn">Guardar configuración laboral</button>
     </div>
 
     <!-- Tarifas -->
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div>
-        <h3 class="section-title">Tus tarifas y pluses (€ brutos)</h3>
-        <p class="section-sub">Deja a 0 los conceptos que no apliquen a tu convenio.</p>
+        <h3 class="section-title" data-i18n="ratesTitle">Tus tarifas y pluses (€ brutos)</h3>
+        <p class="section-sub" data-i18n="ratesSub">Deja a 0 los conceptos que no apliquen a tu convenio.</p>
       </div>
       <div id="rateFields" class="grid-2"></div>
-      <button onclick="saveRates()" class="btn btn-primary">Guardar tarifas</button>
+      <button onclick="saveRates()" class="btn btn-primary" data-i18n="saveRatesBtn">Guardar tarifas</button>
     </div>
 
     <!-- Gestor de turnos -->
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div class="section-title">
-        <span>Mis turnos y horarios</span>
-        <button class="pill-btn" onclick="openShiftEditor(null)" style="color:var(--accent-bright);border-color:rgba(16,185,129,.4)">+ Nuevo turno</button>
+        <span data-i18n="shiftsMgrTitle">Mis turnos y horarios</span>
+        <button class="pill-btn" onclick="openShiftEditor(null)" style="color:var(--accent-bright);border-color:rgba(16,185,129,.4)" data-i18n="newShiftBtn">+ Nuevo turno</button>
       </div>
-      <p class="section-sub">Activa solo los que usas en tu día a día o edita sus horas (incluye doble tramo para jornada partida).</p>
+      <p class="section-sub" data-i18n="shiftsMgrSub">Activa solo los que usas en tu día a día o edita sus horas (incluye doble tramo para jornada partida).</p>
       <div id="shiftManagerList" style="display:flex;flex-direction:column;gap:6px"></div>
     </div>
 
     <!-- Apariencia -->
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
-      <h3 class="section-title">Apariencia del calendario</h3>
+      <h3 class="section-title" data-i18n="appearanceTitle">Apariencia del calendario</h3>
       <div class="grid-3">
-        <button class="btn btn-sm btn-soft" id="th-dark" onclick="setTheme('dark')">Oscuro</button>
-        <button class="btn btn-sm btn-soft" id="th-oled" onclick="setTheme('oled')">OLED</button>
-        <button class="btn btn-sm btn-soft" id="th-light" onclick="setTheme('light')">Claro</button>
+        <button class="btn btn-sm btn-soft" id="th-dark" onclick="setTheme('dark')" data-i18n="thDark">Oscuro</button>
+        <button class="btn btn-sm btn-soft" id="th-oled" onclick="setTheme('oled')" data-i18n="thOled">OLED</button>
+        <button class="btn btn-sm btn-soft" id="th-light" onclick="setTheme('light')" data-i18n="thLight">Claro</button>
       </div>
       <label class="toggle-row">
-        <span>Mostrar horas en las casillas del calendario</span>
+        <span data-i18n="showTimesLbl">Mostrar horas en las casillas del calendario</span>
         <input type="checkbox" id="cfg_times" onchange="toggleShowTimes(this.checked)">
       </label>
     </div>
@@ -605,30 +620,30 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     <!-- Copias de seguridad y exportación -->
     <div class="card" style="display:flex;flex-direction:column;gap:10px">
       <div>
-        <h3 class="section-title">Copia de seguridad y calendario</h3>
-        <p class="section-sub">Tus cuadrantes se guardan de forma privada en tu dispositivo. Haz una copia periódica para no perderlos al cambiar de móvil.</p>
+        <h3 class="section-title" data-i18n="backupTitle">Copia de seguridad y calendario</h3>
+        <p class="section-sub" data-i18n="backupSub">Tus cuadrantes se guardan de forma privada en tu dispositivo. Haz una copia periódica para no perderlos al cambiar de móvil.</p>
       </div>
       <div class="grid-2">
-        <button onclick="downloadBackup()" class="btn btn-sm btn-soft">💾 Guardar archivo</button>
-        <label class="btn btn-sm btn-soft" style="cursor:pointer">📂 Restaurar archivo<input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
-        <button onclick="copyBackupText()" class="btn btn-sm btn-soft">📋 Copiar texto</button>
-        <button onclick="openPasteModal()" class="btn btn-sm btn-soft">📥 Pegar copia</button>
+        <button onclick="downloadBackup()" class="btn btn-sm btn-soft" data-i18n="btnSaveFile">💾 Guardar archivo</button>
+        <label class="btn btn-sm btn-soft" style="cursor:pointer"><span data-i18n="btnRestoreFile">📂 Restaurar archivo</span><input type="file" accept=".json,application/json" onchange="restoreBackup(event)" class="hidden"></label>
+        <button onclick="copyBackupText()" class="btn btn-sm btn-soft" data-i18n="btnCopyText">📋 Copiar texto</button>
+        <button onclick="openPasteModal()" class="btn btn-sm btn-soft" data-i18n="btnPasteBackup">📥 Pegar copia</button>
       </div>
-      <button onclick="exportICS()" class="btn btn-sm btn-soft" style="border-color:rgba(251,191,36,.38);color:var(--amber)">📅 Exportar a Google Calendar / Apple (.ics)</button>
-      <button onclick="shareMonthText()" class="btn btn-sm btn-soft" style="border-color:rgba(16,185,129,.38);color:var(--accent-bright)">💬 Compartir cuadrante del mes (WhatsApp)</button>
+      <button onclick="exportICS()" class="btn btn-sm btn-soft" style="border-color:rgba(251,191,36,.38);color:var(--amber)" data-i18n="btnExportIcs">📅 Exportar a Google Calendar / Apple (.ics)</button>
+      <button onclick="shareMonthText()" class="btn btn-sm btn-soft" style="border-color:rgba(16,185,129,.38);color:var(--accent-bright)" data-i18n="btnShareWa">💬 Compartir cuadrante del mes (WhatsApp)</button>
     </div>
 
     <!-- Legal, Privacidad y Ediciones Cantero -->
     <div class="card" style="display:flex;flex-direction:column;gap:8px">
-      <h3 class="section-title">Información y privacidad</h3>
+      <h3 class="section-title" data-i18n="infoTitle">Información y privacidad</h3>
       <div class="grid-2">
-        <button onclick="openAdPrivacy()" class="btn btn-sm btn-soft">🛡️ Privacidad anuncios</button>
-        <button onclick="openPrivacyPolicy()" class="btn btn-sm btn-soft">📄 Política privacidad</button>
+        <button onclick="openAdPrivacy()" class="btn btn-sm btn-soft" data-i18n="btnAdPrivacy">🛡️ Privacidad anuncios</button>
+        <button onclick="openPrivacyPolicy()" class="btn btn-sm btn-soft" data-i18n="btnPrivacyPol">📄 Política privacidad</button>
       </div>
-      <a href="https://groups.google.com/g/ediciones-cantero" target="_blank" rel="noopener" class="btn btn-sm btn-indigo" style="text-decoration:none">
+      <a href="https://groups.google.com/g/ediciones-cantero" target="_blank" rel="noopener" class="btn btn-sm btn-indigo" style="text-decoration:none" data-i18n="btnMoreApps">
         🚀 Probar más apps y juegos · Ediciones Cantero
       </a>
-      <p style="margin:2px 0 0;text-align:center;font-size:10.5px;color:var(--mute)">Mi Cuadrante v4.1 · Ediciones Cantero · Almacenamiento local</p>
+      <p style="margin:2px 0 0;text-align:center;font-size:10.5px;color:var(--mute)" data-i18n="footerTxt">Mi Cuadrante v4.2 · Ediciones Cantero · Almacenamiento local</p>
     </div>
   </section>
 </main>
@@ -638,22 +653,36 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <div class="bottom-nav-inner">
     <button role="tab" class="nav-tab active" id="tab-calendar" onclick="tab('calendar')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Cuadrante
+      <span data-i18n="tabCalendar">Cuadrante</span>
     </button>
     <button role="tab" class="nav-tab" id="tab-cycles" onclick="tab('cycles')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-      Ciclos
+      <span data-i18n="tabCycles">Ciclos</span>
     </button>
     <button role="tab" class="nav-tab" id="tab-details" onclick="tab('details')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-      Balance
+      <span data-i18n="tabDetails">Balance</span>
     </button>
     <button role="tab" class="nav-tab" id="tab-rates" onclick="tab('rates')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-      Ajustes
+      <span data-i18n="tabRates">Ajustes</span>
     </button>
   </div>
 </nav>
+
+<!-- MODAL: SELECCIÓN DE IDIOMA EN PRIMER INICIO -->
+<div id="langModal" class="overlay center hidden no-print" role="dialog" aria-modal="true" aria-labelledby="langModalHeading">
+  <div class="sheet" style="text-align:center">
+    <div style="margin:2px auto 0;width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#10b981,#0d9488 60%,#0284c7);display:grid;place-items:center;font-size:24px;box-shadow:0 8px 20px rgba(16,185,129,.35)">🌍</div>
+    <div>
+      <span class="badge" data-i18n="langModalBadge">Bienvenido</span>
+      <h3 id="langModalHeading" style="margin:6px 0 0;font-size:18px;font-weight:900" data-i18n="langModalTitle">Elige tu idioma</h3>
+      <p class="section-sub" data-i18n="langModalSub">Podrás cambiarlo en cualquier momento desde Ajustes.</p>
+    </div>
+    <div class="grid-2" id="firstLangGrid"></div>
+    <button onclick="confirmFirstLang()" class="btn btn-primary" data-i18n="langContinue">Continuar</button>
+  </div>
+</div>
 
 <!-- MODAL: EDITAR JORNADA DEL DÍA -->
 <div id="dayModal" class="overlay hidden no-print" role="dialog" aria-modal="true" aria-labelledby="mTitle" onclick="if(event.target===this)closeModal('dayModal')">
@@ -661,16 +690,16 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     <div class="handle"></div>
     <div class="sheet-head">
       <div>
-        <span class="badge">Editar jornada</span>
+        <span class="badge" data-i18n="editDayBadge">Editar jornada</span>
         <h3 id="mTitle" style="margin:4px 0 0;font-size:16px;font-weight:800;text-transform:capitalize"></h3>
       </div>
-      <button class="icon-btn" onclick="closeModal('dayModal')" aria-label="Cerrar">✕</button>
+      <button class="icon-btn" onclick="closeModal('dayModal')" aria-label="✕">✕</button>
     </div>
 
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
-        <span class="lbl" style="margin:0">Turno / Tipo de jornada</span>
-        <button id="copyPrevBtn" onclick="copyPrev()" class="pill-btn" style="padding:4px 9px;font-size:11px;color:var(--accent-bright)">Copiar día anterior</button>
+        <span class="lbl" style="margin:0" data-i18n="shiftTypeLbl">Turno / Tipo de jornada</span>
+        <button id="copyPrevBtn" onclick="copyPrev()" class="pill-btn" style="padding:4px 9px;font-size:11px;color:var(--accent-bright)" data-i18n="copyPrevBtn">Copiar día anterior</button>
       </div>
       <div id="mShifts" class="grid-3"></div>
     </div>
@@ -678,22 +707,22 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     <!-- Horario real / jornada partida -->
     <div style="background:var(--inp);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:8px">
       <div style="display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:11px;font-weight:800;color:var(--ink2)">Horario real (opcional · admite partida)</span>
-        <button onclick="calcHoursFromTime()" style="font-size:11px;font-weight:800;color:var(--accent-bright)">Calcular horas</button>
+        <span style="font-size:11px;font-weight:800;color:var(--ink2)" data-i18n="realTimeTitle">Horario real (opcional · admite partida)</span>
+        <button onclick="calcHoursFromTime()" style="font-size:11px;font-weight:800;color:var(--accent-bright)" data-i18n="calcHoursBtn">Calcular horas</button>
       </div>
       <div class="grid-2">
-        <div><label class="lbl" for="d_t1s">Tramo 1 inicio</label><input type="time" id="d_t1s" class="inp" onchange="calcHoursFromTime(true)"></div>
-        <div><label class="lbl" for="d_t1e">Tramo 1 fin</label><input type="time" id="d_t1e" class="inp" onchange="calcHoursFromTime(true)"></div>
+        <div><label class="lbl" for="d_t1s" data-i18n="t1Start">Tramo 1 inicio</label><input type="time" id="d_t1s" class="inp" onchange="calcHoursFromTime(true)"></div>
+        <div><label class="lbl" for="d_t1e" data-i18n="t1End">Tramo 1 fin</label><input type="time" id="d_t1e" class="inp" onchange="calcHoursFromTime(true)"></div>
       </div>
       <div class="grid-2" id="splitWrap">
-        <div><label class="lbl" for="d_t2s">Tramo 2 inicio</label><input type="time" id="d_t2s" class="inp" onchange="calcHoursFromTime(true)"></div>
-        <div><label class="lbl" for="d_t2e">Tramo 2 fin</label><input type="time" id="d_t2e" class="inp" onchange="calcHoursFromTime(true)"></div>
+        <div><label class="lbl" for="d_t2s" data-i18n="t2Start">Tramo 2 inicio</label><input type="time" id="d_t2s" class="inp" onchange="calcHoursFromTime(true)"></div>
+        <div><label class="lbl" for="d_t2e" data-i18n="t2End">Tramo 2 fin</label><input type="time" id="d_t2e" class="inp" onchange="calcHoursFromTime(true)"></div>
       </div>
       <div id="overtimeHint" class="hidden" style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:4px;font-size:11px;color:var(--sky)">
         <span id="overtimeMsg"></span>
         <div style="display:flex;gap:5px">
-          <button onclick="applyOvertime('he')" class="pill-btn" style="padding:3px 8px;font-size:10.5px;color:var(--accent-bright)">+ Extra €</button>
-          <button onclick="applyOvertime('hc')" class="pill-btn" style="padding:3px 8px;font-size:10.5px;color:var(--violet)">+ Bolsa</button>
+          <button onclick="applyOvertime('he')" class="pill-btn" style="padding:3px 8px;font-size:10.5px;color:var(--accent-bright)" data-i18n="addExtraBtn">+ Extra €</button>
+          <button onclick="applyOvertime('hc')" class="pill-btn" style="padding:3px 8px;font-size:10.5px;color:var(--violet)" data-i18n="addBankBtn">+ Bolsa</button>
         </div>
       </div>
     </div>
@@ -701,22 +730,22 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     <div id="mFields" class="grid-3"></div>
 
     <div class="grid-2">
-      <label class="toggle-row"><span>Plus noche</span><input type="checkbox" id="d_pn" onchange="updateDayPreview()"></label>
-      <label class="toggle-row"><span>Plus retén/parada</span><input type="checkbox" id="d_pr" onchange="updateDayPreview()"></label>
-      <label class="toggle-row"><span>Plus festivo</span><input type="checkbox" id="d_pf" onchange="updateDayPreview()"></label>
-      <label class="toggle-row"><span style="color:var(--rose)">Día festivo local</span><input type="checkbox" id="d_hol" onchange="updateDayPreview()"></label>
+      <label class="toggle-row"><span data-i18n="plusNight">Plus noche</span><input type="checkbox" id="d_pn" onchange="updateDayPreview()"></label>
+      <label class="toggle-row"><span data-i18n="plusStandby">Plus retén/parada</span><input type="checkbox" id="d_pr" onchange="updateDayPreview()"></label>
+      <label class="toggle-row"><span data-i18n="plusHoliday">Plus festivo</span><input type="checkbox" id="d_pf" onchange="updateDayPreview()"></label>
+      <label class="toggle-row"><span style="color:var(--rose)" data-i18n="localHoliday">Día festivo local</span><input type="checkbox" id="d_hol" onchange="updateDayPreview()"></label>
     </div>
 
-    <input type="text" id="d_note" maxlength="200" class="inp" placeholder="Nota (ej. parada línea 2, cambio con Juan, médico…)">
+    <input type="text" id="d_note" maxlength="200" class="inp" data-i18n-ph="notePh">
 
     <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--mute);padding:0 2px">
-      <span>Estimado este día:</span>
+      <span data-i18n="dayEstLbl">Estimado este día:</span>
       <b id="dayPreview" class="num" style="color:var(--accent-bright);font-size:14px">0,00 €</b>
     </div>
 
     <div style="display:flex;gap:8px">
-      <button onclick="clearDay()" class="btn btn-danger" style="width:34%">Borrar</button>
-      <button onclick="saveDay()" class="btn btn-primary" style="width:66%">Guardar jornada</button>
+      <button onclick="clearDay()" class="btn btn-danger" style="width:34%" data-i18n="btnDelete">Borrar</button>
+      <button onclick="saveDay()" class="btn btn-primary" style="width:66%" data-i18n="btnSaveDay">Guardar jornada</button>
     </div>
   </div>
 </div>
@@ -726,41 +755,35 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <div class="sheet">
     <div class="handle"></div>
     <div class="sheet-head">
-      <h3 id="smTitle" style="margin:0;font-size:16px;font-weight:800">Editar turno</h3>
+      <h3 id="smTitle" style="margin:0;font-size:16px;font-weight:800"></h3>
       <button class="icon-btn" onclick="closeModal('shiftModal')">✕</button>
     </div>
     <div class="grid-2">
-      <div><label class="lbl" for="sm_code">Sigla (1–4 letras)</label><input id="sm_code" class="inp" maxlength="4" placeholder="Ej. M6"></div>
-      <div><label class="lbl" for="sm_name">Nombre</label><input id="sm_name" class="inp" maxlength="22" placeholder="Ej. Mañana 6h"></div>
+      <div><label class="lbl" for="sm_code" data-i18n="smCode">Sigla (1–4 letras)</label><input id="sm_code" class="inp" maxlength="4" data-i18n-ph="smCodePh"></div>
+      <div><label class="lbl" for="sm_name" data-i18n="smName">Nombre</label><input id="sm_name" class="inp" maxlength="22" data-i18n-ph="smNamePh"></div>
     </div>
     <div class="grid-2">
-      <div><label class="lbl" for="sm_h">Horas jornada</label><input type="number" id="sm_h" class="inp" step="0.1" min="0" max="24"></div>
+      <div><label class="lbl" for="sm_h" data-i18n="smHours">Horas jornada</label><input type="number" id="sm_h" class="inp" step="0.1" min="0" max="24"></div>
       <div>
-        <label class="lbl" for="sm_color">Color</label>
-        <select id="sm_color" class="inp">
-          <option value="emerald">Esmeralda</option><option value="amber">Ámbar</option><option value="orange">Naranja</option>
-          <option value="indigo">Índigo</option><option value="teal">Turquesa</option><option value="violet">Violeta</option>
-          <option value="cyan">Cian</option><option value="blue">Azul</option><option value="sky">Celeste</option>
-          <option value="fuchsia">Fucsia</option><option value="rose">Rosa</option><option value="lime">Lima</option>
-          <option value="yellow">Amarillo</option><option value="red">Rojo</option><option value="slate">Gris</option>
-        </select>
+        <label class="lbl" for="sm_color" data-i18n="smColor">Color</label>
+        <select id="sm_color" class="inp"></select>
       </div>
     </div>
     <div class="grid-2">
-      <div><label class="lbl" for="sm_t1s">Inicio tramo 1</label><input type="time" id="sm_t1s" class="inp"></div>
-      <div><label class="lbl" for="sm_t1e">Fin tramo 1</label><input type="time" id="sm_t1e" class="inp"></div>
-      <div><label class="lbl" for="sm_t2s">Inicio tramo 2 (opc.)</label><input type="time" id="sm_t2s" class="inp"></div>
-      <div><label class="lbl" for="sm_t2e">Fin tramo 2 (opc.)</label><input type="time" id="sm_t2e" class="inp"></div>
+      <div><label class="lbl" for="sm_t1s" data-i18n="smT1s">Inicio tramo 1</label><input type="time" id="sm_t1s" class="inp"></div>
+      <div><label class="lbl" for="sm_t1e" data-i18n="smT1e">Fin tramo 1</label><input type="time" id="sm_t1e" class="inp"></div>
+      <div><label class="lbl" for="sm_t2s" data-i18n="smT2s">Inicio tramo 2 (opc.)</label><input type="time" id="sm_t2s" class="inp"></div>
+      <div><label class="lbl" for="sm_t2e" data-i18n="smT2e">Fin tramo 2 (opc.)</label><input type="time" id="sm_t2e" class="inp"></div>
     </div>
     <div class="grid-2">
-      <label class="toggle-row"><span>Día trabajado</span><input type="checkbox" id="sm_work"></label>
-      <label class="toggle-row"><span>Visible en pincel</span><input type="checkbox" id="sm_vis"></label>
-      <label class="toggle-row"><span>Plus noche auto</span><input type="checkbox" id="sm_pn"></label>
-      <label class="toggle-row"><span>Plus retén auto</span><input type="checkbox" id="sm_pr"></label>
+      <label class="toggle-row"><span data-i18n="smWork">Día trabajado</span><input type="checkbox" id="sm_work"></label>
+      <label class="toggle-row"><span data-i18n="smVis">Visible en pincel</span><input type="checkbox" id="sm_vis"></label>
+      <label class="toggle-row"><span data-i18n="smPn">Plus noche auto</span><input type="checkbox" id="sm_pn"></label>
+      <label class="toggle-row"><span data-i18n="smPr">Plus retén auto</span><input type="checkbox" id="sm_pr"></label>
     </div>
     <div style="display:flex;gap:8px">
-      <button id="smDelBtn" onclick="deleteShift()" class="btn btn-danger hidden" style="width:34%">Eliminar</button>
-      <button onclick="saveShift()" class="btn btn-primary">Guardar turno</button>
+      <button id="smDelBtn" onclick="deleteShift()" class="btn btn-danger hidden" style="width:34%" data-i18n="btnRemove">Eliminar</button>
+      <button onclick="saveShift()" class="btn btn-primary" data-i18n="btnSaveShift">Guardar turno</button>
     </div>
   </div>
 </div>
@@ -783,12 +806,12 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
   <div class="sheet">
     <div class="handle"></div>
     <div class="sheet-head">
-      <h3 style="margin:0;font-size:15px;font-weight:800">Restaurar desde texto</h3>
+      <h3 style="margin:0;font-size:15px;font-weight:800" data-i18n="pasteTitle">Restaurar desde texto</h3>
       <button class="icon-btn" onclick="closeModal('pasteModal')">✕</button>
     </div>
-    <p class="section-sub">Pega aquí el texto JSON que copiaste previamente desde Mi Cuadrante.</p>
+    <p class="section-sub" data-i18n="pasteSub">Pega aquí el texto JSON que copiaste previamente desde Mi Cuadrante.</p>
     <textarea id="pasteArea" rows="6" class="inp" placeholder='{"days":{...},"rates":{...}}'></textarea>
-    <button onclick="applyPastedBackup()" class="btn btn-primary">Restaurar datos</button>
+    <button onclick="applyPastedBackup()" class="btn btn-primary" data-i18n="btnRestoreData">Restaurar datos</button>
   </div>
 </div>
 
@@ -799,8 +822,8 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
     <h3 id="cmTitle" style="margin:0;font-size:16px;font-weight:800"></h3>
     <p id="cmMsg" class="section-sub"></p>
     <div class="grid-2" style="margin-top:4px">
-      <button onclick="closeConfirm(false)" class="btn btn-soft">Cancelar</button>
-      <button onclick="closeConfirm(true)" class="btn btn-primary">Confirmar</button>
+      <button onclick="closeConfirm(false)" class="btn btn-soft" data-i18n="btnCancel">Cancelar</button>
+      <button onclick="closeConfirm(true)" class="btn btn-primary" data-i18n="btnConfirm">Confirmar</button>
     </div>
   </div>
 </div>
@@ -809,12 +832,33 @@ main{max-width:480px;margin:0 auto;padding:12px 12px 0;display:flex;flex-directi
 
 <script>
 "use strict";
+const LANGS = [
+  { code: 'es', flag: '🇪🇸', name: 'Español',   locale: 'es-ES' },
+  { code: 'en', flag: '🇬🇧', name: 'English',   locale: 'en-GB' },
+  { code: 'fr', flag: '🇫🇷', name: 'Français',  locale: 'fr-FR' },
+  { code: 'pt', flag: '🇵🇹', name: 'Português', locale: 'pt-PT' },
+  { code: 'it', flag: '🇮🇹', name: 'Italiano',  locale: 'it-IT' },
+  { code: 'de', flag: '🇩🇪', name: 'Deutsch',   locale: 'de-DE' }
+];
+const I18N = {"es":{"docTitle":"Mi Cuadrante: Turnos, Jornadas y Horas Extra","appName":"Mi Cuadrante","subtitleDefault":"Turnos, Jornadas y Nómina","today":"Hoy","shareMonthTitle":"Compartir resumen del mes","prevMonth":"Mes anterior","nextMonth":"Mes siguiente","printPdf":"Imprimir / PDF","excel":"Excel","kpiOrd":"Jornada","kpiExtra":"H. Extra","kpiPluses":"Pluses/Ex.","kpiDietas":"Dietas/Km","workedShort":"trab.","freeShort":"lib.","bankShort":"Bolsa","totalMonth":"Total mes:","saveBackupBtn":"Guardar copia","backupDaysAgo":"Hace {n} días de tu última copia.","backupFirstMsg":"Guarda una copia de seguridad de tus turnos.","quickTouch":"Modo toque rápido","tapToEdit":"Toca un día para editar","erasingDays":"Borrando días al tocar","paintingShift":"Pintando {name}","detailChip":"✏️ Detalle","eraseChip":"🧽 Borrar","weekdays":["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"],"monthsShort":["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],"legExtras":"Extras","legNote":"Nota","legBank":"Bolsa","legHoliday":"● Festivo","swipeHint":"Desliza ◀ ▶","tabCalendar":"Cuadrante","tabCycles":"Ciclos","tabDetails":"Balance","tabRates":"Ajustes","badgeAuto":"Automatización","cyclesTitle":"Generador de cuadrantes y ciclos","cyclesSub":"Sirve para semanas fijas de oficina, jornada partida, turnos rotativos o paradas puntuales por fechas.","presetsLbl":"Plantillas listas para usar","buildSeqLbl":"Construir secuencia día a día","yourPattern":"Tu patrón ({n} días):","delLast":"Borrar último","clearAll":"Vaciar","emptyCycleHint":"Elige una plantilla o pulsa turnos arriba","startDateLbl":"Fecha inicio (Día 1)","endDateLbl":"Fecha fin (opcional)","ifExistsLbl":"Si ya existe un turno en esas fechas","modeOverwrite":"Sobrescribir turnos existentes","modeKeep":"Respetar días ya rellenos (vacaciones, cambios…)","fillMonth":"Rellenar mes","applyRange":"Aplicar rango","fillYear":"⚡ Rellenar año completo","annualComp":"Cómputo anual","doneYear":"Hechas {y}","remaining":"Restantes","extrasYear":"Extras {y}","vacations":"Vacaciones","personalDays":"A. Propios","hourBank":"Bolsa horas","monthSummaryTitle":"Resumen económico y turnos del mes","noShiftsMonth":"Aún no hay turnos registrados este mes.","totalMoneyMonth":"Total económico mes","logTitle":"Registro y buscador de notas","scopeMonth":"Este mes","scopeYear":"Todo el año","searchPh":"Buscar notas, turnos, compañeros…","noRecords":"Sin registros coincidentes.","extraShort":"extra","mealsShort":"diet.","dayUnit":"d","langCardTitle":"Idioma de la aplicación","langCardSub":"Cambia el idioma de los menús, turnos y fechas al instante.","langModalBadge":"Bienvenido","langModalTitle":"Elige tu idioma","langModalSub":"Podrás cambiarlo en cualquier momento desde Ajustes.","langContinue":"Continuar","langChanged":"Idioma cambiado a Español","badgeUniversal":"Universal","profileTitle":"Tipo de jornada y cómputo","profileSub":"Elige un perfil base para adaptar los turnos visibles y horas anuales, o edita cualquier valor a tu medida.","cfgAnn":"Horas/año","cfgVac":"Vacaciones","cfgAp":"A. Propios","saveConfigBtn":"Guardar configuración laboral","ratesTitle":"Tus tarifas y pluses (€ brutos)","ratesSub":"Deja a 0 los conceptos que no apliquen a tu convenio.","saveRatesBtn":"Guardar tarifas","shiftsMgrTitle":"Mis turnos y horarios","newShiftBtn":"+ Nuevo turno","shiftsMgrSub":"Activa solo los que usas en tu día a día o edita sus horas (incluye doble tramo para jornada partida).","visibleLbl":"Visible","hiddenLbl":"Oculto","appearanceTitle":"Apariencia del calendario","thDark":"Oscuro","thOled":"OLED","thLight":"Claro","showTimesLbl":"Mostrar horas en las casillas del calendario","backupTitle":"Copia de seguridad y calendario","backupSub":"Tus cuadrantes se guardan de forma privada en tu dispositivo. Haz una copia periódica para no perderlos al cambiar de móvil.","btnSaveFile":"💾 Guardar archivo","btnRestoreFile":"📂 Restaurar archivo","btnCopyText":"📋 Copiar texto","btnPasteBackup":"📥 Pegar copia","btnExportIcs":"📅 Exportar a Google Calendar / Apple (.ics)","btnShareWa":"💬 Compartir cuadrante del mes (WhatsApp)","infoTitle":"Información y privacidad","btnAdPrivacy":"🛡️ Privacidad anuncios","btnPrivacyPol":"📄 Política privacidad","btnMoreApps":"🚀 Probar más apps y juegos · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Almacenamiento local","editDayBadge":"Editar jornada","shiftTypeLbl":"Turno / Tipo de jornada","copyPrevBtn":"Copiar día anterior","realTimeTitle":"Horario real (opcional · admite partida)","calcHoursBtn":"Calcular horas","t1Start":"Tramo 1 inicio","t1End":"Tramo 1 fin","t2Start":"Tramo 2 inicio","t2End":"Tramo 2 fin","overtimeMsg":"+{diff} sobre tu base ({base})","addExtraBtn":"+ Extra €","addBankBtn":"+ Bolsa","plusNight":"Plus noche","plusStandby":"Plus retén/parada","plusHoliday":"Plus festivo","localHoliday":"Día festivo local","notePh":"Nota (ej. parada línea 2, cambio con Juan, médico…)","dayEstLbl":"Estimado este día:","btnDelete":"Borrar","btnSaveDay":"Guardar jornada","editShiftTitle":"Editar turno {code}","createShiftTitle":"Crear turno personalizado","smCode":"Sigla (1–4 letras)","smCodePh":"Ej. M6","smName":"Nombre","smNamePh":"Ej. Mañana 6h","smHours":"Horas jornada","smColor":"Color","smT1s":"Inicio tramo 1","smT1e":"Fin tramo 1","smT2s":"Inicio tramo 2 (opc.)","smT2e":"Fin tramo 2 (opc.)","smWork":"Día trabajado","smVis":"Visible en pincel","smPn":"Plus noche auto","smPr":"Plus retén auto","btnRemove":"Eliminar","btnSaveShift":"Guardar turno","pasteTitle":"Restaurar desde texto","pasteSub":"Pega aquí el texto JSON que copiaste previamente desde Mi Cuadrante.","btnRestoreData":"Restaurar datos","btnCancel":"Cancelar","btnConfirm":"Confirmar","undo":"Deshacer","errSave":"No se pudo guardar en este dispositivo","toastEnterTimes":"Introduce al menos inicio y fin","toastCalc":"Calculado: {h}","toastMovedExtra":"+{h} pasadas a horas extra","toastMovedBank":"+{h} pasadas a bolsa","toastPrevEmpty":"El día anterior está vacío","toastCopiedPrev":"Copiado del día anterior · pulsa Guardar","toastDaySaved":"Jornada guardada","toastDayCleared":"Día borrado","toastNeedPattern":"Primero crea o elige un patrón","toastNeedStart":"Elige la fecha de inicio","toastNeedEnd":"Indica la Fecha fin para aplicar un rango","toastEndAfterStart":"La fecha fin debe ser posterior al inicio","confirmYearTitle":"Rellenar todo el año {y}","confirmYearMsg":"Se aplicará tu patrón a los 365 días del año seleccionado.","toastFilledDays":"{n} días rellenados","toastProfileOn":"Perfil \"{name}\" activado","toastCfgSaved":"Configuración laboral guardada","toastRatesSaved":"Tarifas guardadas","toastNeedCodeName":"Indica sigla y nombre del turno","toastShiftSaved":"Turno {code} guardado","toastShiftDeleted":"Turno eliminado","toastCsvOk":"Excel CSV exportado","toastExportErr":"No se pudo exportar","toastBackupOk":"Copia de seguridad guardada","toastBackupFallback":"Usa \"Copiar texto\" como respaldo","toastCopiedClip":"Copia copiada al portapapeles","toastSelectCopy":"Selecciona y copia el texto","confirmRestoreTitle":"Restaurar copia de seguridad","confirmRestoreMsg":"Se reemplazarán tus turnos y tarifas actuales por los de la copia.","toastRestored":"Datos restaurados con éxito","toastInvalidBackup":"Copia de seguridad no válida","toastIcsOk":"Calendario .ics exportado","toastNoShiftsShare":"No hay turnos en este mes para compartir","toastCopiedWa":"Resumen del mes copiado para WhatsApp","toastShareErr":"No se pudo compartir","toastUndone":"Cambios deshechos","toastAdPrivacyHint":"Puedes gestionar los anuncios desde Ajustes de Google en tu Android","toastAssigned":"{name} asignado","toastPresetLoaded":"Plantilla cargada","icsSecondSpan":"(2º tramo)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Cuadrante Excel","backupShareTitle":"Copia Mi Cuadrante","icsShareTitle":"Calendario Mi Cuadrante","csvHeaders":["Fecha","Turno","Horario","Jornada h","H.extra normal","H.extra noche","H.extra festiva","Bolsa h","Dietas","Km","Pluses/Extra €","Dietas/Km €","Total €","Nota"],"sh_M":"Mañana","sh_T":"Tarde","sh_N":"Noche","sh_D12":"12h Día","sh_N12":"12h Noche","sh_O":"Oficina","sh_JP":"J. Partida","sh_TT":"Teletrab.","sh_G24":"Guardia 24h","sh_R":"Retén","sh_L":"Libre","sh_V":"Vacaciones","sh_P":"Permiso","sh_AP":"A. Propios","sh_B":"Baja / IT","prof_parada12_n":"Industria / Parada 12h","prof_parada12_s":"7,6 h base · 1.696 h/año · 22 vac.","prof_rotativo8_n":"Turnos Rotativos 8h","prof_rotativo8_s":"M/T/N · 1.760 h/año · 22 vac.","prof_oficina_n":"Oficina / Continua","prof_oficina_s":"L-V + Teletrabajo · 1.760 h/año","prof_partida_n":"Jornada Partida / Com.","prof_partida_s":"Doble tramo · 1.780 h/año","prof_guardia24_n":"Sanidad / Guardias","prof_guardia24_s":"Turnos + 12h/24h · 1.645 h/año","prof_todos_n":"Mostrar todos","prof_todos_s":"Todos los turnos visibles","pre_0":"L-V Oficina (5O-2L)","pre_1":"L-V Partida (5JP-2L)","pre_2":"Híbrido (3O-2TT-2L)","pre_3":"2M-2T-2N-4L","pre_4":"3M-3T-3N-3L","pre_5":"5x2 Rotativo M/T/N","pre_6":"Parada 12h Día (6-1)","pre_7":"Parada 12h Noche (6-1)","pre_8":"Parada Rotativa 12h","pre_9":"Guardia 24h + 3L","pre_10":"Comercio L-S (6JP-1L)","rate_he":"Hora extra normal","rate_hn":"Hora extra nocturna","rate_hf":"Hora extra festiva","rate_pn":"Plus turno noche","rate_pr":"Plus retén / parada","rate_pf":"Plus festivo trabajado","rate_meal":"Valor 1 dieta","rate_km":"Kilometraje","unit_h":"€/h","unit_d":"€/día","unit_e":"€","unit_km":"€/km","df_h":"Jornada (h)","df_he":"Extra normal","df_hn":"Extra noche","df_hf":"Extra festiva","df_hc":"Bolsa (+/- h)","df_meals":"Nº dietas","df_km":"Kilómetros","col_emerald":"Esmeralda","col_amber":"Ámbar","col_orange":"Naranja","col_indigo":"Índigo","col_teal":"Turquesa","col_violet":"Violeta","col_cyan":"Cian","col_blue":"Azul","col_sky":"Celeste","col_fuchsia":"Fucsia","col_rose":"Rosa","col_lime":"Lima","col_yellow":"Amarillo","col_red":"Rojo","col_slate":"Gris"},"en":{"docTitle":"Mi Cuadrante: Shifts, Schedules & Overtime","appName":"Mi Cuadrante","subtitleDefault":"Shifts, Schedules & Payroll","today":"Today","shareMonthTitle":"Share monthly summary","prevMonth":"Previous month","nextMonth":"Next month","printPdf":"Print / PDF","excel":"Excel","kpiOrd":"Hours","kpiExtra":"Overtime","kpiPluses":"Bonus/OT","kpiDietas":"Meals/Km","workedShort":"work","freeShort":"off","bankShort":"Bank","totalMonth":"Month total:","saveBackupBtn":"Save backup","backupDaysAgo":"Last backup was {n} days ago.","backupFirstMsg":"Save a backup copy of your shifts.","quickTouch":"Quick paint mode","tapToEdit":"Tap a day to edit","erasingDays":"Erasing days on tap","paintingShift":"Painting {name}","detailChip":"✏️ Details","eraseChip":"🧽 Erase","weekdays":["MON","TUE","WED","THU","FRI","SAT","SUN"],"monthsShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"legExtras":"Extras","legNote":"Note","legBank":"Bank","legHoliday":"● Holiday","swipeHint":"Swipe ◀ ▶","tabCalendar":"Schedule","tabCycles":"Cycles","tabDetails":"Balance","tabRates":"Settings","badgeAuto":"Automation","cyclesTitle":"Schedule & cycle generator","cyclesSub":"Works for fixed office weeks, split shifts, rotating rosters, or temporary shutdowns by date range.","presetsLbl":"Ready-to-use templates","buildSeqLbl":"Build day-by-day sequence","yourPattern":"Your pattern ({n} days):","delLast":"Remove last","clearAll":"Clear","emptyCycleHint":"Pick a template or tap shifts above","startDateLbl":"Start date (Day 1)","endDateLbl":"End date (optional)","ifExistsLbl":"If a shift already exists on those dates","modeOverwrite":"Overwrite existing shifts","modeKeep":"Keep already filled days (vacation, swaps…)","fillMonth":"Fill month","applyRange":"Apply range","fillYear":"⚡ Fill full year","annualComp":"Annual balance","doneYear":"Worked {y}","remaining":"Remaining","extrasYear":"Extras {y}","vacations":"Vacation","personalDays":"Personal","hourBank":"Hour bank","monthSummaryTitle":"Monthly financial & shift summary","noShiftsMonth":"No shifts recorded this month yet.","totalMoneyMonth":"Monthly total earnings","logTitle":"Log & note search","scopeMonth":"This month","scopeYear":"Full year","searchPh":"Search notes, shifts, coworkers…","noRecords":"No matching records.","extraShort":"OT","mealsShort":"meals","dayUnit":"d","langCardTitle":"App language","langCardSub":"Switch menus, shifts, and dates instantly.","langModalBadge":"Welcome","langModalTitle":"Choose your language","langModalSub":"You can change it anytime in Settings.","langContinue":"Continue","langChanged":"Language set to English","badgeUniversal":"Universal","profileTitle":"Work schedule profile","profileSub":"Pick a preset to adapt visible shifts and annual hours, or customize every value.","cfgAnn":"Hours/year","cfgVac":"Vacation","cfgAp":"Personal","saveConfigBtn":"Save work settings","ratesTitle":"Your rates & bonuses (gross €)","ratesSub":"Leave at 0 any concept that does not apply to your contract.","saveRatesBtn":"Save rates","shiftsMgrTitle":"My shifts & hours","newShiftBtn":"+ New shift","shiftsMgrSub":"Enable only the shifts you use or edit their hours (supports split-shift double spans).","visibleLbl":"Visible","hiddenLbl":"Hidden","appearanceTitle":"Calendar appearance","thDark":"Dark","thOled":"OLED","thLight":"Light","showTimesLbl":"Show start time inside calendar cells","backupTitle":"Backup & calendar export","backupSub":"Your schedules are stored privately on your device. Make regular backups so you never lose data.","btnSaveFile":"💾 Save file","btnRestoreFile":"📂 Restore file","btnCopyText":"📋 Copy text","btnPasteBackup":"📥 Paste backup","btnExportIcs":"📅 Export to Google Calendar / Apple (.ics)","btnShareWa":"💬 Share monthly schedule (WhatsApp)","infoTitle":"Info & privacy","btnAdPrivacy":"🛡️ Ad privacy","btnPrivacyPol":"📄 Privacy policy","btnMoreApps":"🚀 Try more apps & games · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Local storage","editDayBadge":"Edit workday","shiftTypeLbl":"Shift / Workday type","copyPrevBtn":"Copy previous day","realTimeTitle":"Actual schedule (optional · supports split)","calcHoursBtn":"Calculate hours","t1Start":"Span 1 start","t1End":"Span 1 end","t2Start":"Span 2 start","t2End":"Span 2 end","overtimeMsg":"+{diff} over base ({base})","addExtraBtn":"+ Extra €","addBankBtn":"+ Bank","plusNight":"Night bonus","plusStandby":"On-call/shutdown","plusHoliday":"Holiday bonus","localHoliday":"Local public holiday","notePh":"Note (e.g. line 2 shutdown, swap with John, doctor…)","dayEstLbl":"Estimated for this day:","btnDelete":"Delete","btnSaveDay":"Save workday","editShiftTitle":"Edit shift {code}","createShiftTitle":"Create custom shift","smCode":"Code (1–4 chars)","smCodePh":"e.g. M6","smName":"Name","smNamePh":"e.g. Morning 6h","smHours":"Shift hours","smColor":"Color","smT1s":"Span 1 start","smT1e":"Span 1 end","smT2s":"Span 2 start (opt.)","smT2e":"Span 2 end (opt.)","smWork":"Working day","smVis":"Show in quick paint","smPn":"Auto night bonus","smPr":"Auto on-call bonus","btnRemove":"Remove","btnSaveShift":"Save shift","pasteTitle":"Restore from text","pasteSub":"Paste here the JSON text you previously copied from Mi Cuadrante.","btnRestoreData":"Restore data","btnCancel":"Cancel","btnConfirm":"Confirm","undo":"Undo","errSave":"Could not save on this device","toastEnterTimes":"Enter at least start and end time","toastCalc":"Calculated: {h}","toastMovedExtra":"+{h} added to overtime","toastMovedBank":"+{h} added to hour bank","toastPrevEmpty":"Previous day is empty","toastCopiedPrev":"Copied from previous day · tap Save","toastDaySaved":"Workday saved","toastDayCleared":"Day cleared","toastNeedPattern":"Create or select a pattern first","toastNeedStart":"Choose a start date","toastNeedEnd":"Select an end date to apply a range","toastEndAfterStart":"End date must be after start date","confirmYearTitle":"Fill entire year {y}","confirmYearMsg":"Your pattern will be applied to all 365 days of the selected year.","toastFilledDays":"{n} days filled","toastProfileOn":"Profile \"{name}\" enabled","toastCfgSaved":"Work settings saved","toastRatesSaved":"Rates saved","toastNeedCodeName":"Enter shift code and name","toastShiftSaved":"Shift {code} saved","toastShiftDeleted":"Shift removed","toastCsvOk":"Excel CSV exported","toastExportErr":"Could not export","toastBackupOk":"Backup saved","toastBackupFallback":"Use \"Copy text\" as backup","toastCopiedClip":"Backup copied to clipboard","toastSelectCopy":"Select and copy the text","confirmRestoreTitle":"Restore backup","confirmRestoreMsg":"Your current shifts and rates will be replaced by the backup.","toastRestored":"Data restored successfully","toastInvalidBackup":"Invalid backup data","toastIcsOk":".ics calendar exported","toastNoShiftsShare":"No shifts this month to share","toastCopiedWa":"Monthly summary copied for WhatsApp","toastShareErr":"Could not share","toastUndone":"Changes undone","toastAdPrivacyHint":"You can manage ad preferences in Android Google Settings","toastAssigned":"{name} assigned","toastPresetLoaded":"Template loaded","icsSecondSpan":"(2nd span)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Excel Schedule","backupShareTitle":"Mi Cuadrante Backup","icsShareTitle":"Mi Cuadrante Calendar","csvHeaders":["Date","Shift","Schedule","Regular h","Normal OT","Night OT","Holiday OT","Hour bank","Meals","Km","Bonus/OT €","Meals/Km €","Total €","Note"],"sh_M":"Morning","sh_T":"Afternoon","sh_N":"Night","sh_D12":"12h Day","sh_N12":"12h Night","sh_O":"Office","sh_JP":"Split Shift","sh_TT":"Remote","sh_G24":"24h On-Call","sh_R":"Standby","sh_L":"Day Off","sh_V":"Vacation","sh_P":"Leave","sh_AP":"Personal","sh_B":"Sick Leave","prof_parada12_n":"Industry / 12h Outage","prof_parada12_s":"7.6h base · 1,696 h/yr · 22 vac.","prof_rotativo8_n":"8h Rotating Shifts","prof_rotativo8_s":"M/A/N · 1,760 h/yr · 22 vac.","prof_oficina_n":"Office / Standard","prof_oficina_s":"Mon-Fri + Remote · 1,760 h/yr","prof_partida_n":"Split Shift / Retail","prof_partida_s":"Double span · 1,780 h/yr","prof_guardia24_n":"Healthcare / 24h","prof_guardia24_s":"Shifts + 12h/24h · 1,645 h/yr","prof_todos_n":"Show all","prof_todos_s":"All shifts visible","pre_0":"Mon-Fri Office (5O-2L)","pre_1":"Mon-Fri Split (5JP-2L)","pre_2":"Hybrid (3O-2TT-2L)","pre_3":"2M-2T-2N-4L","pre_4":"3M-3T-3N-3L","pre_5":"5x2 Rotating M/T/N","pre_6":"12h Day Outage (6-1)","pre_7":"12h Night Outage (6-1)","pre_8":"12h Rotating Outage","pre_9":"24h Duty + 3 Off","pre_10":"Retail Mon-Sat (6JP-1L)","rate_he":"Normal overtime","rate_hn":"Night overtime","rate_hf":"Holiday overtime","rate_pn":"Night shift bonus","rate_pr":"Standby / outage bonus","rate_pf":"Holiday worked bonus","rate_meal":"Meal allowance","rate_km":"Mileage","unit_h":"€/h","unit_d":"€/day","unit_e":"€","unit_km":"€/km","df_h":"Hours (h)","df_he":"Normal OT","df_hn":"Night OT","df_hf":"Holiday OT","df_hc":"Bank (+/- h)","df_meals":"Meals","df_km":"Kilometers","col_emerald":"Emerald","col_amber":"Amber","col_orange":"Orange","col_indigo":"Indigo","col_teal":"Teal","col_violet":"Violet","col_cyan":"Cyan","col_blue":"Blue","col_sky":"Sky","col_fuchsia":"Fuchsia","col_rose":"Rose","col_lime":"Lime","col_yellow":"Yellow","col_red":"Red","col_slate":"Slate"},"fr":{"docTitle":"Mi Cuadrante : Planning, Postes et Heures Sup.","appName":"Mi Cuadrante","subtitleDefault":"Planning, Postes et Paie","today":"Auj.","shareMonthTitle":"Partager le résumé du mois","prevMonth":"Mois précédent","nextMonth":"Mois suivant","printPdf":"Imprimer / PDF","excel":"Excel","kpiOrd":"Heures","kpiExtra":"H. Sup.","kpiPluses":"Primes/Sup.","kpiDietas":"Repas/Km","workedShort":"trav.","freeShort":"rep.","bankShort":"Banque","totalMonth":"Total mois :","saveBackupBtn":"Sauvegarder","backupDaysAgo":"Dernière sauvegarde il y a {n} jours.","backupFirstMsg":"Faites une sauvegarde de votre planning.","quickTouch":"Mode saisie rapide","tapToEdit":"Touchez un jour pour modifier","erasingDays":"Suppression au toucher","paintingShift":"Saisie : {name}","detailChip":"✏️ Détail","eraseChip":"🧽 Effacer","weekdays":["LUN","MAR","MER","JEU","VEN","SAM","DIM"],"monthsShort":["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"],"legExtras":"Sup.","legNote":"Note","legBank":"Banque","legHoliday":"● Férié","swipeHint":"Glisser ◀ ▶","tabCalendar":"Planning","tabCycles":"Cycles","tabDetails":"Bilan","tabRates":"Réglages","badgeAuto":"Automatisation","cyclesTitle":"Générateur de cycles et plannings","cyclesSub":"Idéal pour bureau fixe, horaires coupés, roulements ou arrêts techniques par dates.","presetsLbl":"Modèles prêts à l'emploi","buildSeqLbl":"Construire la séquence jour par jour","yourPattern":"Votre cycle ({n} jours) :","delLast":"Effacer dernier","clearAll":"Vider","emptyCycleHint":"Choisissez un modèle ou des postes ci-dessus","startDateLbl":"Date début (Jour 1)","endDateLbl":"Date fin (optionnel)","ifExistsLbl":"Si un poste existe déjà à ces dates","modeOverwrite":"Remplacer les postes existants","modeKeep":"Conserver les jours remplis (congés, échanges…)","fillMonth":"Remplir le mois","applyRange":"Appliquer période","fillYear":"⚡ Remplir toute l'année","annualComp":"Bilan annuel","doneYear":"Faites {y}","remaining":"Restantes","extrasYear":"Extras {y}","vacations":"Congés","personalDays":"RTT / Perso","hourBank":"Banque h.","monthSummaryTitle":"Résumé financier et postes du mois","noShiftsMonth":"Aucun poste enregistré ce mois-ci.","totalMoneyMonth":"Total primes / extras du mois","logTitle":"Journal et recherche de notes","scopeMonth":"Ce mois","scopeYear":"Toute l'année","searchPh":"Rechercher notes, postes, collègues…","noRecords":"Aucun résultat trouvé.","extraShort":"sup.","mealsShort":"repas","dayUnit":"j","langCardTitle":"Langue de l'application","langCardSub":"Changez instantanément la langue des menus, postes et dates.","langModalBadge":"Bienvenue","langModalTitle":"Choisissez votre langue","langModalSub":"Vous pourrez la modifier à tout moment dans les Réglages.","langContinue":"Continuer","langChanged":"Langue définie sur Français","badgeUniversal":"Universel","profileTitle":"Profil horaire et annuel","profileSub":"Choisissez un profil pour adapter les postes visibles et le quota annuel, ou personnalisez tout.","cfgAnn":"Heures/an","cfgVac":"Congés","cfgAp":"RTT / Perso","saveConfigBtn":"Enregistrer la config.","ratesTitle":"Vos tarifs et primes (€ brut)","ratesSub":"Laissez à 0 les rubriques non applicables.","saveRatesBtn":"Enregistrer les tarifs","shiftsMgrTitle":"Mes postes et horaires","newShiftBtn":"+ Nouveau poste","shiftsMgrSub":"Activez vos postes habituels ou modifiez leurs horaires (double plage pour journée coupée).","visibleLbl":"Visible","hiddenLbl":"Masqué","appearanceTitle":"Apparence du calendrier","thDark":"Sombre","thOled":"OLED","thLight":"Clair","showTimesLbl":"Afficher l'heure dans les cases du calendrier","backupTitle":"Sauvegarde et export calendrier","backupSub":"Vos plannings restent privés sur votre appareil. Faites une sauvegarde régulière.","btnSaveFile":"💾 Enregistrer fichier","btnRestoreFile":"📂 Restaurer fichier","btnCopyText":"📋 Copier texte","btnPasteBackup":"📥 Coller copie","btnExportIcs":"📅 Exporter vers Google / Apple (.ics)","btnShareWa":"💬 Partager le mois (WhatsApp)","infoTitle":"Informations et confidentialité","btnAdPrivacy":"🛡️ Confidentialité pub","btnPrivacyPol":"📄 Politique de vie privée","btnMoreApps":"🚀 Découvrir d'autres apps · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Stockage local","editDayBadge":"Modifier la journée","shiftTypeLbl":"Poste / Type de journée","copyPrevBtn":"Copier la veille","realTimeTitle":"Horaire réel (optionnel · journée coupée)","calcHoursBtn":"Calculer heures","t1Start":"Plage 1 début","t1End":"Plage 1 fin","t2Start":"Plage 2 début","t2End":"Plage 2 fin","overtimeMsg":"+{diff} au-delà de la base ({base})","addExtraBtn":"+ Sup. €","addBankBtn":"+ Banque","plusNight":"Prime nuit","plusStandby":"Prime astreinte","plusHoliday":"Prime férié","localHoliday":"Jour férié local","notePh":"Note (ex. arrêt ligne 2, échange avec Paul, médecin…)","dayEstLbl":"Estimation du jour :","btnDelete":"Effacer","btnSaveDay":"Enregistrer","editShiftTitle":"Modifier poste {code}","createShiftTitle":"Créer un poste personnalisé","smCode":"Code (1–4 car.)","smCodePh":"Ex. M6","smName":"Nom","smNamePh":"Ex. Matin 6h","smHours":"Heures du poste","smColor":"Couleur","smT1s":"Début plage 1","smT1e":"Fin plage 1","smT2s":"Début plage 2 (opt.)","smT2e":"Fin plage 2 (opt.)","smWork":"Jour travaillé","smVis":"Visible en saisie","smPn":"Prime nuit auto","smPr":"Prime astreinte auto","btnRemove":"Supprimer","btnSaveShift":"Enregistrer poste","pasteTitle":"Restaurer depuis texte","pasteSub":"Collez ici le texte JSON copié précédemment depuis Mi Cuadrante.","btnRestoreData":"Restaurer les données","btnCancel":"Annuler","btnConfirm":"Confirmer","undo":"Annuler","errSave":"Impossible d'enregistrer sur cet appareil","toastEnterTimes":"Indiquez au moins début et fin","toastCalc":"Calculé : {h}","toastMovedExtra":"+{h} ajoutées en heures sup.","toastMovedBank":"+{h} ajoutées en banque d'heures","toastPrevEmpty":"La veille est vide","toastCopiedPrev":"Copié de la veille · touchez Enregistrer","toastDaySaved":"Journée enregistrée","toastDayCleared":"Jour effacé","toastNeedPattern":"Créez ou choisissez d'abord un cycle","toastNeedStart":"Choisissez la date de début","toastNeedEnd":"Indiquez une date de fin","toastEndAfterStart":"La date de fin doit suivre le début","confirmYearTitle":"Remplir toute l'année {y}","confirmYearMsg":"Votre cycle sera appliqué aux 365 jours de l'année sélectionnée.","toastFilledDays":"{n} jours remplis","toastProfileOn":"Profil « {name} » activé","toastCfgSaved":"Configuration enregistrée","toastRatesSaved":"Tarifs enregistrés","toastNeedCodeName":"Indiquez le code et le nom du poste","toastShiftSaved":"Poste {code} enregistré","toastShiftDeleted":"Poste supprimé","toastCsvOk":"Excel CSV exporté","toastExportErr":"Échec de l'exportation","toastBackupOk":"Sauvegarde enregistrée","toastBackupFallback":"Utilisez « Copier texte » comme sauvegarde","toastCopiedClip":"Copie dans le presse-papiers","toastSelectCopy":"Sélectionnez et copiez le texte","confirmRestoreTitle":"Restaurer la sauvegarde","confirmRestoreMsg":"Vos postes et tarifs actuels seront remplacés par la sauvegarde.","toastRestored":"Données restaurées avec succès","toastInvalidBackup":"Sauvegarde non valide","toastIcsOk":"Calendrier .ics exporté","toastNoShiftsShare":"Aucun poste ce mois-ci à partager","toastCopiedWa":"Résumé copié pour WhatsApp","toastShareErr":"Impossible de partager","toastUndone":"Modifications annulées","toastAdPrivacyHint":"Gérez vos préférences publicitaires dans les paramètres Google d'Android","toastAssigned":"{name} attribué","toastPresetLoaded":"Modèle chargé","icsSecondSpan":"(2e plage)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Planning Excel","backupShareTitle":"Sauvegarde Mi Cuadrante","icsShareTitle":"Calendrier Mi Cuadrante","csvHeaders":["Date","Poste","Horaire","Heures","H.Sup normales","H.Sup nuit","H.Sup férié","Banque h","Repas","Km","Primes/Sup €","Repas/Km €","Total €","Note"],"sh_M":"Matin","sh_T":"Après-midi","sh_N":"Nuit","sh_D12":"12h Jour","sh_N12":"12h Nuit","sh_O":"Bureau","sh_JP":"J. Coupée","sh_TT":"Télétravail","sh_G24":"Garde 24h","sh_R":"Astreinte","sh_L":"Repos","sh_V":"Congés","sh_P":"Absence","sh_AP":"RTT / Perso","sh_B":"Arrêt mal.","prof_parada12_n":"Industrie / Arrêt 12h","prof_parada12_s":"7,6 h base · 1 696 h/an · 22 congés","prof_rotativo8_n":"Postes 3x8 Rotatifs","prof_rotativo8_s":"M/A/N · 1 760 h/an · 22 congés","prof_oficina_n":"Bureau / Continue","prof_oficina_s":"Lun-Ven + Télétravail · 1 760 h/an","prof_partida_n":"Journée Coupée / Com.","prof_partida_s":"Double plage · 1 780 h/an","prof_guardia24_n":"Santé / Gardes 24h","prof_guardia24_s":"Postes + 12h/24h · 1 645 h/an","prof_todos_n":"Tout afficher","prof_todos_s":"Tous les postes visibles","pre_0":"Lun-Ven Bureau (5O-2L)","pre_1":"Lun-Ven Coupée (5JP-2L)","pre_2":"Hybride (3O-2TT-2L)","pre_3":"2M-2T-2N-4L","pre_4":"3M-3T-3N-3L","pre_5":"5x2 Rotatif M/T/N","pre_6":"Arrêt 12h Jour (6-1)","pre_7":"Arrêt 12h Nuit (6-1)","pre_8":"Arrêt Rotatif 12h","pre_9":"Garde 24h + 3R","pre_10":"Commerce Lun-Sam (6JP-1L)","rate_he":"Heure sup. normale","rate_hn":"Heure sup. nuit","rate_hf":"Heure sup. fériée","rate_pn":"Prime poste nuit","rate_pr":"Prime astreinte / arrêt","rate_pf":"Prime jour férié","rate_meal":"Indemnité repas","rate_km":"Frais kilométriques","unit_h":"€/h","unit_d":"€/jour","unit_e":"€","unit_km":"€/km","df_h":"Heures (h)","df_he":"Sup. normale","df_hn":"Sup. nuit","df_hf":"Sup. fériée","df_hc":"Banque (+/- h)","df_meals":"Nb repas","df_km":"Kilomètres","col_emerald":"Émeraude","col_amber":"Ambre","col_orange":"Orange","col_indigo":"Indigo","col_teal":"Turquoise","col_violet":"Violet","col_cyan":"Cyan","col_blue":"Bleu","col_sky":"Ciel","col_fuchsia":"Fuchsia","col_rose":"Rose","col_lime":"Citron","col_yellow":"Jaune","col_red":"Rouge","col_slate":"Gris"},"pt":{"docTitle":"Mi Cuadrante: Turnos, Horários e Horas Extra","appName":"Mi Cuadrante","subtitleDefault":"Turnos, Horários e Salário","today":"Hoje","shareMonthTitle":"Partilhar resumo do mês","prevMonth":"Mês anterior","nextMonth":"Mês seguinte","printPdf":"Imprimir / PDF","excel":"Excel","kpiOrd":"Horário","kpiExtra":"H. Extra","kpiPluses":"Subs./Ex.","kpiDietas":"Ref./Km","workedShort":"trab.","freeShort":"folga","bankShort":"Banco","totalMonth":"Total mês:","saveBackupBtn":"Guardar cópia","backupDaysAgo":"Última cópia há {n} dias.","backupFirstMsg":"Guarde uma cópia de segurança dos seus turnos.","quickTouch":"Modo toque rápido","tapToEdit":"Toque num dia para editar","erasingDays":"A apagar dias ao tocar","paintingShift":"A marcar {name}","detailChip":"✏️ Detalhe","eraseChip":"🧽 Apagar","weekdays":["SEG","TER","QUA","QUI","SEX","SÁB","DOM"],"monthsShort":["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],"legExtras":"Extras","legNote":"Nota","legBank":"Banco","legHoliday":"● Feriado","swipeHint":"Deslize ◀ ▶","tabCalendar":"Escala","tabCycles":"Ciclos","tabDetails":"Balanço","tabRates":"Definições","badgeAuto":"Automatização","cyclesTitle":"Gerador de escalas e ciclos","cyclesSub":"Serve para semanas fixas de escritório, horário repartido, turnos rotativos ou paragens técnicas.","presetsLbl":"Modelos prontos a usar","buildSeqLbl":"Construir sequência dia a dia","yourPattern":"O seu padrão ({n} dias):","delLast":"Apagar último","clearAll":"Limpar","emptyCycleHint":"Escolha um modelo ou toque nos turnos acima","startDateLbl":"Data de início (Dia 1)","endDateLbl":"Data de fim (opcional)","ifExistsLbl":"Se já existir um turno nessas datas","modeOverwrite":"Substituir turnos existentes","modeKeep":"Manter dias já preenchidos (férias, trocas…)","fillMonth":"Preencher mês","applyRange":"Aplicar intervalo","fillYear":"⚡ Preencher ano completo","annualComp":"Balanço anual","doneYear":"Feitas {y}","remaining":"Restantes","extrasYear":"Extras {y}","vacations":"Férias","personalDays":"Dispensas","hourBank":"Banco horas","monthSummaryTitle":"Resumo económico e turnos do mês","noShiftsMonth":"Ainda não há turnos registados este mês.","totalMoneyMonth":"Total económico do mês","logTitle":"Registo e pesquisa de notas","scopeMonth":"Este mês","scopeYear":"Todo o ano","searchPh":"Pesquisar notas, turnos, colegas…","noRecords":"Sem registos correspondentes.","extraShort":"extra","mealsShort":"ref.","dayUnit":"d","langCardTitle":"Idioma da aplicação","langCardSub":"Altere o idioma dos menus, turnos e datas instantaneamente.","langModalBadge":"Bem-vindo","langModalTitle":"Escolha o seu idioma","langModalSub":"Pode alterá-lo a qualquer momento nas Definições.","langContinue":"Continuar","langChanged":"Idioma alterado para Português","badgeUniversal":"Universal","profileTitle":"Tipo de horário e cômputo","profileSub":"Escolha um perfil base para adaptar os turnos visíveis e horas anuais, ou edite à medida.","cfgAnn":"Horas/ano","cfgVac":"Férias","cfgAp":"Dispensas","saveConfigBtn":"Guardar configuração laboral","ratesTitle":"As suas tarifas e subsídios (€ brutos)","ratesSub":"Deixe a 0 os conceitos que não se aplicam ao seu contrato.","saveRatesBtn":"Guardar tarifas","shiftsMgrTitle":"Os meus turnos e horários","newShiftBtn":"+ Novo turno","shiftsMgrSub":"Ative apenas os turnos que usa ou edite as horas (inclui duplo período para horário repartido).","visibleLbl":"Visível","hiddenLbl":"Oculto","appearanceTitle":"Aparência do calendário","thDark":"Escuro","thOled":"OLED","thLight":"Claro","showTimesLbl":"Mostrar horas nas células do calendário","backupTitle":"Cópia de segurança e calendário","backupSub":"As suas escalas são guardadas de forma privada no dispositivo. Faça cópias regularmente.","btnSaveFile":"💾 Guardar ficheiro","btnRestoreFile":"📂 Restaurar ficheiro","btnCopyText":"📋 Copiar texto","btnPasteBackup":"📥 Colar cópia","btnExportIcs":"📅 Exportar para Google / Apple (.ics)","btnShareWa":"💬 Partilhar escala do mês (WhatsApp)","infoTitle":"Informação e privacidade","btnAdPrivacy":"🛡️ Privacidade anúncios","btnPrivacyPol":"📄 Política privacidade","btnMoreApps":"🚀 Experimentar mais apps · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Armazenamento local","editDayBadge":"Editar jornada","shiftTypeLbl":"Turno / Tipo de dia","copyPrevBtn":"Copiar dia anterior","realTimeTitle":"Horário real (opcional · suporta repartido)","calcHoursBtn":"Calcular horas","t1Start":"Período 1 início","t1End":"Período 1 fim","t2Start":"Período 2 início","t2End":"Período 2 fim","overtimeMsg":"+{diff} acima da base ({base})","addExtraBtn":"+ Extra €","addBankBtn":"+ Banco","plusNight":"Subs. noite","plusStandby":"Prevenção/paragem","plusHoliday":"Subs. feriado","localHoliday":"Feriado local","notePh":"Nota (ex. paragem linha 2, troca com João, médico…)","dayEstLbl":"Estimado para este dia:","btnDelete":"Apagar","btnSaveDay":"Guardar jornada","editShiftTitle":"Editar turno {code}","createShiftTitle":"Criar turno personalizado","smCode":"Sigla (1–4 letras)","smCodePh":"Ex. M6","smName":"Nome","smNamePh":"Ex. Manhã 6h","smHours":"Horas do turno","smColor":"Cor","smT1s":"Início período 1","smT1e":"Fim período 1","smT2s":"Início período 2 (opc.)","smT2e":"Fim período 2 (opc.)","smWork":"Dia trabalhado","smVis":"Visível no pincel","smPn":"Subs. noite auto","smPr":"Prevenção auto","btnRemove":"Eliminar","btnSaveShift":"Guardar turno","pasteTitle":"Restaurar a partir de texto","pasteSub":"Cole aqui o texto JSON que copiou anteriormente do Mi Cuadrante.","btnRestoreData":"Restaurar dados","btnCancel":"Cancelar","btnConfirm":"Confirmar","undo":"Desfazer","errSave":"Não foi possível guardar neste dispositivo","toastEnterTimes":"Introduza pelo menos início e fim","toastCalc":"Calculado: {h}","toastMovedExtra":"+{h} passadas a horas extra","toastMovedBank":"+{h} passadas ao banco de horas","toastPrevEmpty":"O dia anterior está vazio","toastCopiedPrev":"Copiado do dia anterior · toque em Guardar","toastDaySaved":"Jornada guardada","toastDayCleared":"Dia apagado","toastNeedPattern":"Crie ou escolha primeiro um padrão","toastNeedStart":"Escolha a data de início","toastNeedEnd":"Indique a data de fim para aplicar um intervalo","toastEndAfterStart":"A data de fim deve ser posterior ao início","confirmYearTitle":"Preencher todo o ano {y}","confirmYearMsg":"O seu padrão será aplicado aos 365 dias do ano selecionado.","toastFilledDays":"{n} dias preenchidos","toastProfileOn":"Perfil \"{name}\" ativado","toastCfgSaved":"Configuração laboral guardada","toastRatesSaved":"Tarifas guardadas","toastNeedCodeName":"Indique a sigla e o nome do turno","toastShiftSaved":"Turno {code} guardado","toastShiftDeleted":"Turno eliminado","toastCsvOk":"Excel CSV exportado","toastExportErr":"Não foi possível exportar","toastBackupOk":"Cópia de segurança guardada","toastBackupFallback":"Use \"Copiar texto\" como cópia","toastCopiedClip":"Cópia copiada para a área de transferência","toastSelectCopy":"Selecione e copie o texto","confirmRestoreTitle":"Restaurar cópia de segurança","confirmRestoreMsg":"Os seus turnos e tarifas atuais serão substituídos pela cópia.","toastRestored":"Dados restaurados com sucesso","toastInvalidBackup":"Cópia de segurança inválida","toastIcsOk":"Calendário .ics exportado","toastNoShiftsShare":"Não há turnos neste mês para partilhar","toastCopiedWa":"Resumo do mês copiado para WhatsApp","toastShareErr":"Não foi possível partilhar","toastUndone":"Alterações desfeitas","toastAdPrivacyHint":"Pode gerir os anúncios nas Definições Google do seu Android","toastAssigned":"{name} atribuído","toastPresetLoaded":"Modelo carregado","icsSecondSpan":"(2º período)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Escala Excel","backupShareTitle":"Cópia Mi Cuadrante","icsShareTitle":"Calendário Mi Cuadrante","csvHeaders":["Data","Turno","Horário","Jornada h","H.Extra normal","H.Extra noite","H.Extra feriado","Banco h","Refeições","Km","Subs./Extra €","Ref./Km €","Total €","Nota"],"sh_M":"Manhã","sh_T":"Tarde","sh_N":"Noite","sh_D12":"12h Dia","sh_N12":"12h Noite","sh_O":"Escritório","sh_JP":"Repartido","sh_TT":"Teletrab.","sh_G24":"Plantão 24h","sh_R":"Prevenção","sh_L":"Folga","sh_V":"Férias","sh_P":"Licença","sh_AP":"Dispensa","sh_B":"Baixa Méd.","prof_parada12_n":"Indústria / Paragem 12h","prof_parada12_s":"7,6 h base · 1.696 h/ano · 22 férias","prof_rotativo8_n":"Turnos Rotativos 8h","prof_rotativo8_s":"M/T/N · 1.760 h/ano · 22 férias","prof_oficina_n":"Escritório / Contínuo","prof_oficina_s":"Seg-Sex + Teletrab. · 1.760 h/ano","prof_partida_n":"Horário Repartido / Com.","prof_partida_s":"Duplo período · 1.780 h/ano","prof_guardia24_n":"Saúde / Plantões 24h","prof_guardia24_s":"Turnos + 12h/24h · 1.645 h/ano","prof_todos_n":"Mostrar todos","prof_todos_s":"Todos os turnos visíveis","pre_0":"Seg-Sex Escritório (5O-2L)","pre_1":"Seg-Sex Repartido (5JP-2L)","pre_2":"Híbrido (3O-2TT-2L)","pre_3":"2M-2T-2N-4L","pre_4":"3M-3T-3N-3L","pre_5":"5x2 Rotativo M/T/N","pre_6":"Paragem 12h Dia (6-1)","pre_7":"Paragem 12h Noite (6-1)","pre_8":"Paragem Rotativa 12h","pre_9":"Plantão 24h + 3L","pre_10":"Comércio Seg-Sáb (6JP-1L)","rate_he":"Hora extra normal","rate_hn":"Hora extra noturna","rate_hf":"Hora extra feriado","rate_pn":"Subsídio noturno","rate_pr":"Subsídio prevenção","rate_pf":"Subsídio feriado trab.","rate_meal":"Valor 1 refeição","rate_km":"Quilometragem","unit_h":"€/h","unit_d":"€/dia","unit_e":"€","unit_km":"€/km","df_h":"Jornada (h)","df_he":"Extra normal","df_hn":"Extra noite","df_hf":"Extra feriado","df_hc":"Banco (+/- h)","df_meals":"Nº refeições","df_km":"Quilómetros","col_emerald":"Esmeralda","col_amber":"Âmbar","col_orange":"Laranja","col_indigo":"Índigo","col_teal":"Turquesa","col_violet":"Violeta","col_cyan":"Ciano","col_blue":"Azul","col_sky":"Celeste","col_fuchsia":"Fúcsia","col_rose":"Rosa","col_lime":"Lima","col_yellow":"Amarelo","col_red":"Vermelho","col_slate":"Cinza"},"it":{"docTitle":"Mi Cuadrante: Turni, Orari e Straordinari","appName":"Mi Cuadrante","subtitleDefault":"Turni, Orari e Busta Paga","today":"Oggi","shareMonthTitle":"Condividi riepilogo del mese","prevMonth":"Mese precedente","nextMonth":"Mese successivo","printPdf":"Stampa / PDF","excel":"Excel","kpiOrd":"Ore","kpiExtra":"Straord.","kpiPluses":"Inden./Ex.","kpiDietas":"Pasti/Km","workedShort":"lav.","freeShort":"rip.","bankShort":"Banca","totalMonth":"Totale mese:","saveBackupBtn":"Salva copia","backupDaysAgo":"Ultimo backup {n} giorni fa.","backupFirstMsg":"Salva una copia di backup dei tuoi turni.","quickTouch":"Inserimento rapido","tapToEdit":"Tocca un giorno per modificare","erasingDays":"Cancellazione al tocco","paintingShift":"Assegnazione {name}","detailChip":"✏️ Dettaglio","eraseChip":"🧽 Cancella","weekdays":["LUN","MAR","MER","GIO","VEN","SAB","DOM"],"monthsShort":["Gen","Feb","Mar","Apr","Mag","Giu","Lug","Ago","Set","Ott","Nov","Dic"],"legExtras":"Extra","legNote":"Nota","legBank":"Banca","legHoliday":"● Festivo","swipeHint":"Scorri ◀ ▶","tabCalendar":"Turni","tabCycles":"Cicli","tabDetails":"Bilancio","tabRates":"Impostazioni","badgeAuto":"Automazione","cyclesTitle":"Generatore di turni e cicli","cyclesSub":"Perfetto per ufficio fisso, orario spezzato, turni a rotazione o fermate impianto per date.","presetsLbl":"Modelli pronti all'uso","buildSeqLbl":"Costruisci sequenza giorno per giorno","yourPattern":"Il tuo schema ({n} giorni):","delLast":"Elimina ultimo","clearAll":"Svuota","emptyCycleHint":"Scegli un modello o tocca i turni sopra","startDateLbl":"Data inizio (Giorno 1)","endDateLbl":"Data fine (opzionale)","ifExistsLbl":"Se esiste già un turno in quelle date","modeOverwrite":"Sovrascrivi i turni esistenti","modeKeep":"Mantieni i giorni già compilati (ferie, cambi…)","fillMonth":"Compila mese","applyRange":"Applica periodo","fillYear":"⚡ Compila tutto l'anno","annualComp":"Bilancio annuale","doneYear":"Fatte {y}","remaining":"Restanti","extrasYear":"Extra {y}","vacations":"Ferie","personalDays":"Permessi","hourBank":"Banca ore","monthSummaryTitle":"Riepilogo economico e turni del mese","noShiftsMonth":"Nessun turno registrato in questo mese.","totalMoneyMonth":"Totale economico mese","logTitle":"Registro e ricerca note","scopeMonth":"Questo mese","scopeYear":"Tutto l'anno","searchPh":"Cerca note, turni, colleghi…","noRecords":"Nessun risultato trovato.","extraShort":"str.","mealsShort":"pasti","dayUnit":"g","langCardTitle":"Lingua dell'app","langCardSub":"Cambia istantaneamente la lingua di menu, turni e date.","langModalBadge":"Benvenuto","langModalTitle":"Scegli la tua lingua","langModalSub":"Potrai cambiarla in qualsiasi momento nelle Impostazioni.","langContinue":"Continua","langChanged":"Lingua impostata su Italiano","badgeUniversal":"Universale","profileTitle":"Profilo orario e annuale","profileSub":"Scegli un profilo per adattare i turni visibili e le ore annuali, oppure personalizza ogni valore.","cfgAnn":"Ore/anno","cfgVac":"Ferie","cfgAp":"Permessi","saveConfigBtn":"Salva configurazione","ratesTitle":"Tariffe e indennità (€ lordi)","ratesSub":"Lascia a 0 le voci non previste dal tuo contratto.","saveRatesBtn":"Salva tariffe","shiftsMgrTitle":"I miei turni e orari","newShiftBtn":"+ Nuovo turno","shiftsMgrSub":"Attiva solo i turni che usi o modifica le ore (supporta doppia fascia per orario spezzato).","visibleLbl":"Visibile","hiddenLbl":"Nascosto","appearanceTitle":"Aspetto del calendario","thDark":"Scuro","thOled":"OLED","thLight":"Chiaro","showTimesLbl":"Mostra orario nelle caselle del calendario","backupTitle":"Backup ed esportazione calendario","backupSub":"I tuoi turni restano salvati in privato sul dispositivo. Fai backup periodici.","btnSaveFile":"💾 Salva file","btnRestoreFile":"📂 Ripristina file","btnCopyText":"📋 Copia testo","btnPasteBackup":"📥 Incolla backup","btnExportIcs":"📅 Esporta su Google / Apple (.ics)","btnShareWa":"💬 Condividi turni del mese (WhatsApp)","infoTitle":"Informazioni e privacy","btnAdPrivacy":"🛡️ Privacy annunci","btnPrivacyPol":"📄 Informativa privacy","btnMoreApps":"🚀 Prova altre app e giochi · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Archiviazione locale","editDayBadge":"Modifica giornata","shiftTypeLbl":"Turno / Tipo di giornata","copyPrevBtn":"Copia giorno prec.","realTimeTitle":"Orario effettivo (opz. · supporta spezzato)","calcHoursBtn":"Calcola ore","t1Start":"Fascia 1 inizio","t1End":"Fascia 1 fine","t2Start":"Fascia 2 inizio","t2End":"Fascia 2 fine","overtimeMsg":"+{diff} oltre la base ({base})","addExtraBtn":"+ Extra €","addBankBtn":"+ Banca","plusNight":"Inden. notte","plusStandby":"Reperib./fermata","plusHoliday":"Inden. festivo","localHoliday":"Festività locale","notePh":"Nota (es. fermata linea 2, cambio con Marco, visita…)","dayEstLbl":"Stima della giornata:","btnDelete":"Cancella","btnSaveDay":"Salva giornata","editShiftTitle":"Modifica turno {code}","createShiftTitle":"Crea turno personalizzato","smCode":"Sigla (1–4 car.)","smCodePh":"Es. M6","smName":"Nome","smNamePh":"Es. Mattina 6h","smHours":"Ore del turno","smColor":"Colore","smT1s":"Inizio fascia 1","smT1e":"Fine fascia 1","smT2s":"Inizio fascia 2 (opz.)","smT2e":"Fine fascia 2 (opz.)","smWork":"Giorno lavorato","smVis":"Visibile in rapido","smPn":"Inden. notte auto","smPr":"Reperibilità auto","btnRemove":"Elimina","btnSaveShift":"Salva turno","pasteTitle":"Ripristina da testo","pasteSub":"Incolla qui il testo JSON copiato in precedenza da Mi Cuadrante.","btnRestoreData":"Ripristina dati","btnCancel":"Annulla","btnConfirm":"Conferma","undo":"Annulla","errSave":"Impossibile salvare su questo dispositivo","toastEnterTimes":"Inserisci almeno inizio e fine","toastCalc":"Calcolato: {h}","toastMovedExtra":"+{h} aggiunte agli straordinari","toastMovedBank":"+{h} aggiunte alla banca ore","toastPrevEmpty":"Il giorno precedente è vuoto","toastCopiedPrev":"Copiato dal giorno precedente · tocca Salva","toastDaySaved":"Giornata salvata","toastDayCleared":"Giorno cancellato","toastNeedPattern":"Crea o scegli prima uno schema","toastNeedStart":"Scegli la data di inizio","toastNeedEnd":"Indica la data di fine per il periodo","toastEndAfterStart":"La data di fine deve seguire l'inizio","confirmYearTitle":"Compila tutto l'anno {y}","confirmYearMsg":"Lo schema verrà applicato a tutti i 365 giorni dell'anno selezionato.","toastFilledDays":"{n} giorni compilati","toastProfileOn":"Profilo \"{name}\" attivato","toastCfgSaved":"Configurazione salvata","toastRatesSaved":"Tariffe salvate","toastNeedCodeName":"Inserisci sigla e nome del turno","toastShiftSaved":"Turno {code} salvato","toastShiftDeleted":"Turno eliminato","toastCsvOk":"Excel CSV esportato","toastExportErr":"Impossibile esportare","toastBackupOk":"Backup salvato","toastBackupFallback":"Usa \"Copia testo\" come backup","toastCopiedClip":"Copia salvata negli appunti","toastSelectCopy":"Seleziona e copia il testo","confirmRestoreTitle":"Ripristina backup","confirmRestoreMsg":"I turni e le tariffe attuali verranno sostituiti dal backup.","toastRestored":"Dati ripristinati con successo","toastInvalidBackup":"Backup non valido","toastIcsOk":"Calendario .ics esportato","toastNoShiftsShare":"Nessun turno in questo mese da condividere","toastCopiedWa":"Riepilogo copiato per WhatsApp","toastShareErr":"Impossibile condividere","toastUndone":"Modifiche annullate","toastAdPrivacyHint":"Puoi gestire gli annunci dalle Impostazioni Google del tuo Android","toastAssigned":"{name} assegnato","toastPresetLoaded":"Modello caricato","icsSecondSpan":"(2ª fascia)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Turni Excel","backupShareTitle":"Backup Mi Cuadrante","icsShareTitle":"Calendario Mi Cuadrante","csvHeaders":["Data","Turno","Orario","Ore ord.","Str. normale","Str. notte","Str. festivo","Banca h","Pasti","Km","Inden./Str. €","Pasti/Km €","Totale €","Nota"],"sh_M":"Mattina","sh_T":"Pomeriggio","sh_N":"Notte","sh_D12":"12h Giorno","sh_N12":"12h Notte","sh_O":"Ufficio","sh_JP":"Spezzato","sh_TT":"Smart Work","sh_G24":"Guardia 24h","sh_R":"Reperib.","sh_L":"Riposo","sh_V":"Ferie","sh_P":"Permesso","sh_AP":"ROL / Pers.","sh_B":"Malattia","prof_parada12_n":"Industria / Fermata 12h","prof_parada12_s":"7,6 h base · 1.696 h/anno · 22 ferie","prof_rotativo8_n":"Turni Rotativi 8h","prof_rotativo8_s":"M/P/N · 1.760 h/anno · 22 ferie","prof_oficina_n":"Ufficio / Continuato","prof_oficina_s":"Lun-Ven + Smart Work · 1.760 h/anno","prof_partida_n":"Spezzato / Commercio","prof_partida_s":"Doppia fascia · 1.780 h/anno","prof_guardia24_n":"Sanità / Guardie 24h","prof_guardia24_s":"Turni + 12h/24h · 1.645 h/anno","prof_todos_n":"Mostra tutti","prof_todos_s":"Tutti i turni visibili","pre_0":"Lun-Ven Ufficio (5O-2L)","pre_1":"Lun-Ven Spezzato (5JP-2L)","pre_2":"Ibrido (3O-2TT-2L)","pre_3":"2M-2T-2N-4L","pre_4":"3M-3T-3N-3L","pre_5":"5x2 Rotativo M/P/N","pre_6":"Fermata 12h Giorno (6-1)","pre_7":"Fermata 12h Notte (6-1)","pre_8":"Fermata Rotativa 12h","pre_9":"Guardia 24h + 3L","pre_10":"Commercio Lun-Sab (6JP-1L)","rate_he":"Straordinario feriale","rate_hn":"Straordinario notturno","rate_hf":"Straordinario festivo","rate_pn":"Indennità notturna","rate_pr":"Indennità reperibilità","rate_pf":"Indennità festivo lav.","rate_meal":"Buono pasto / diaria","rate_km":"Rimborso km","unit_h":"€/h","unit_d":"€/g","unit_e":"€","unit_km":"€/km","df_h":"Ore (h)","df_he":"Str. normale","df_hn":"Str. notte","df_hf":"Str. festivo","df_hc":"Banca (+/- h)","df_meals":"Nº pasti","df_km":"Chilometri","col_emerald":"Smeraldo","col_amber":"Ambra","col_orange":"Arancione","col_indigo":"Indaco","col_teal":"Turchese","col_violet":"Viola","col_cyan":"Ciano","col_blue":"Blu","col_sky":"Celeste","col_fuchsia":"Fucsia","col_rose":"Rosa","col_lime":"Lime","col_yellow":"Giallo","col_red":"Rosso","col_slate":"Grigio"},"de":{"docTitle":"Mi Cuadrante: Schichtplan, Arbeitszeit & Überstunden","appName":"Mi Cuadrante","subtitleDefault":"Schichten, Zeiten & Lohn","today":"Heute","shareMonthTitle":"Monatsübersicht teilen","prevMonth":"Vorheriger Monat","nextMonth":"Nächster Monat","printPdf":"Drucken / PDF","excel":"Excel","kpiOrd":"Sollzeit","kpiExtra":"Überst.","kpiPluses":"Zul./Üst.","kpiDietas":"Spesen/Km","workedShort":"Arb.","freeShort":"Frei","bankShort":"Konto","totalMonth":"Monat gesamt:","saveBackupBtn":"Sichern","backupDaysAgo":"Letzte Sicherung vor {n} Tagen.","backupFirstMsg":"Erstelle eine Sicherungskopie deiner Schichten.","quickTouch":"Schnelleingabe","tapToEdit":"Tag antippen zum Bearbeiten","erasingDays":"Tage werden beim Tippen gelöscht","paintingShift":"Male: {name}","detailChip":"✏️ Details","eraseChip":"🧽 Löschen","weekdays":["MO","DI","MI","DO","FR","SA","SO"],"monthsShort":["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],"legExtras":"Extras","legNote":"Notiz","legBank":"Konto","legHoliday":"● Feiertag","swipeHint":"Wischen ◀ ▶","tabCalendar":"Plan","tabCycles":"Zyklen","tabDetails":"Bilanz","tabRates":"Optionen","badgeAuto":"Automatik","cyclesTitle":"Schicht- & Zyklusgenerator","cyclesSub":"Für feste Bürowochen, geteilte Dienste, Wechselschichten oder zeitweise Anlagenstillstände.","presetsLbl":"Fertige Vorlagen","buildSeqLbl":"Abfolge Tag für Tag erstellen","yourPattern":"Dein Muster ({n} Tage):","delLast":"Letzten löschen","clearAll":"Leeren","emptyCycleHint":"Vorlage wählen oder oben Schichten antippen","startDateLbl":"Startdatum (Tag 1)","endDateLbl":"Enddatum (optional)","ifExistsLbl":"Falls an diesen Tagen schon eine Schicht existiert","modeOverwrite":"Vorhandene Schichten überschreiben","modeKeep":"Gefüllte Tage behalten (Urlaub, Tausch…)","fillMonth":"Monat füllen","applyRange":"Zeitraum füllen","fillYear":"⚡ Ganzes Jahr füllen","annualComp":"Jahresbilanz","doneYear":"Gearbeitet {y}","remaining":"Offen","extrasYear":"Extras {y}","vacations":"Urlaub","personalDays":"Sonderfrei","hourBank":"Zeitkonto","monthSummaryTitle":"Finanz- & Schichtübersicht des Monats","noShiftsMonth":"In diesem Monat noch keine Schichten erfasst.","totalMoneyMonth":"Monatliche Zulagen gesamt","logTitle":"Verlauf & Notizsuche","scopeMonth":"Dieser Monat","scopeYear":"Ganzes Jahr","searchPh":"Notizen, Schichten, Kollegen suchen…","noRecords":"Keine passenden Einträge.","extraShort":"Üst.","mealsShort":"Spesen","dayUnit":"T","langCardTitle":"App-Sprache","langCardSub":"Sprache für Menüs, Schichten und Daten sofort ändern.","langModalBadge":"Willkommen","langModalTitle":"Sprache auswählen","langModalSub":"Du kannst die Sprache jederzeit in den Optionen ändern.","langContinue":"Weiter","langChanged":"Sprache auf Deutsch gestellt","badgeUniversal":"Universal","profileTitle":"Arbeitszeitprofil & Jahresstunden","profileSub":"Wähle ein Profil für sichtbare Schichten und Jahresstunden oder passe alles frei an.","cfgAnn":"Std./Jahr","cfgVac":"Urlaub","cfgAp":"Sonderfrei","saveConfigBtn":"Arbeitsprofil speichern","ratesTitle":"Deine Sätze & Zulagen (€ brutto)","ratesSub":"Lasse nicht zutreffende Positionen auf 0.","saveRatesBtn":"Tarife speichern","shiftsMgrTitle":"Meine Schichten & Zeiten","newShiftBtn":"+ Neue Schicht","shiftsMgrSub":"Aktiviere nur benötigte Schichten oder bearbeite Zeiten (inkl. Doppelschicht).","visibleLbl":"Sichtbar","hiddenLbl":"Ausgeblendet","appearanceTitle":"Darstellung","thDark":"Dunkel","thOled":"OLED","thLight":"Hell","showTimesLbl":"Uhrzeit in Kalenderfeldern anzeigen","backupTitle":"Sicherung & Kalenderexport","backupSub":"Deine Daten bleiben privat auf deinem Gerät. Erstelle regelmäßig eine Sicherung.","btnSaveFile":"💾 Datei speichern","btnRestoreFile":"📂 Datei laden","btnCopyText":"📋 Text kopieren","btnPasteBackup":"📥 Text einfügen","btnExportIcs":"📅 Export zu Google / Apple (.ics)","btnShareWa":"💬 Monatsplan teilen (WhatsApp)","infoTitle":"Info & Datenschutz","btnAdPrivacy":"🛡️ Werbe-Datenschutz","btnPrivacyPol":"📄 Datenschutzerklärung","btnMoreApps":"🚀 Weitere Apps & Spiele · Ediciones Cantero","footerTxt":"Mi Cuadrante v4.2 · Ediciones Cantero · Lokaler Speicher","editDayBadge":"Arbeitstag bearbeiten","shiftTypeLbl":"Schicht / Tagesart","copyPrevBtn":"Vortag kopieren","realTimeTitle":"Echte Zeiten (opt. · geteilter Dienst)","calcHoursBtn":"Stunden berechnen","t1Start":"Block 1 Beginn","t1End":"Block 1 Ende","t2Start":"Block 2 Beginn","t2End":"Block 2 Ende","overtimeMsg":"+{diff} über Basis ({base})","addExtraBtn":"+ Üst. €","addBankBtn":"+ Konto","plusNight":"Nachtzulage","plusStandby":"Bereitschaft","plusHoliday":"Feiertagszul.","localHoliday":"Lokaler Feiertag","notePh":"Notiz (z. B. Linie 2, Tausch mit Max, Arzt…)","dayEstLbl":"Geschätzt für diesen Tag:","btnDelete":"Löschen","btnSaveDay":"Tag speichern","editShiftTitle":"Schicht {code} bearbeiten","createShiftTitle":"Eigene Schicht erstellen","smCode":"Kürzel (1–4 Z.)","smCodePh":"z. B. F6","smName":"Name","smNamePh":"z. B. Früh 6h","smHours":"Schichtstunden","smColor":"Farbe","smT1s":"Beginn Block 1","smT1e":"Ende Block 1","smT2s":"Beginn Block 2 (opt.)","smT2e":"Ende Block 2 (opt.)","smWork":"Arbeitstag","smVis":"In Schnelleingabe","smPn":"Auto Nachtzulage","smPr":"Auto Bereitschaft","btnRemove":"Entfernen","btnSaveShift":"Schicht speichern","pasteTitle":"Aus Text wiederherstellen","pasteSub":"Füge hier den zuvor aus Mi Cuadrante kopierten JSON-Text ein.","btnRestoreData":"Daten wiederherstellen","btnCancel":"Abbrechen","btnConfirm":"Bestätigen","undo":"Rückgängig","errSave":"Speichern auf diesem Gerät fehlgeschlagen","toastEnterTimes":"Mindestens Beginn und Ende eingeben","toastCalc":"Berechnet: {h}","toastMovedExtra":"+{h} zu Überstunden hinzugefügt","toastMovedBank":"+{h} zum Zeitkonto hinzugefügt","toastPrevEmpty":"Vortag ist leer","toastCopiedPrev":"Vom Vortag kopiert · auf Speichern tippen","toastDaySaved":"Arbeitstag gespeichert","toastDayCleared":"Tag gelöscht","toastNeedPattern":"Zuerst ein Muster erstellen oder wählen","toastNeedStart":"Startdatum wählen","toastNeedEnd":"Enddatum für Zeitraum angeben","toastEndAfterStart":"Enddatum muss nach dem Start liegen","confirmYearTitle":"Ganzes Jahr {y} füllen","confirmYearMsg":"Dein Muster wird auf alle 365 Tage des gewählten Jahres angewendet.","toastFilledDays":"{n} Tage ausgefüllt","toastProfileOn":"Profil „{name}“ aktiviert","toastCfgSaved":"Arbeitsprofil gespeichert","toastRatesSaved":"Tarife gespeichert","toastNeedCodeName":"Kürzel und Schichtnamen angeben","toastShiftSaved":"Schicht {code} gespeichert","toastShiftDeleted":"Schicht entfernt","toastCsvOk":"Excel CSV exportiert","toastExportErr":"Export fehlgeschlagen","toastBackupOk":"Sicherung gespeichert","toastBackupFallback":"Nutze „Text kopieren“ als Sicherung","toastCopiedClip":"In Zwischenablage kopiert","toastSelectCopy":"Text markieren und kopieren","confirmRestoreTitle":"Sicherung wiederherstellen","confirmRestoreMsg":"Aktuelle Schichten und Tarife werden durch die Sicherung ersetzt.","toastRestored":"Daten erfolgreich wiederhergestellt","toastInvalidBackup":"Ungültige Sicherung","toastIcsOk":".ics-Kalender exportiert","toastNoShiftsShare":"Keine Schichten in diesem Monat zum Teilen","toastCopiedWa":"Monatsübersicht für WhatsApp kopiert","toastShareErr":"Teilen fehlgeschlagen","toastUndone":"Änderungen rückgängig gemacht","toastAdPrivacyHint":"Werbeeinstellungen können in den Android Google-Einstellungen verwaltet werden","toastAssigned":"{name} zugewiesen","toastPresetLoaded":"Vorlage geladen","icsSecondSpan":"(2. Block)","shareTitle":"📅 Mi Cuadrante — {m}","csvTitle":"Excel-Schichtplan","backupShareTitle":"Mi Cuadrante Sicherung","icsShareTitle":"Mi Cuadrante Kalender","csvHeaders":["Datum","Schicht","Uhrzeit","Regelzeit h","Üst. normal","Üst. Nacht","Üst. Feiertag","Zeitkonto h","Spesen","Km","Zul./Üst. €","Spesen/Km €","Gesamt €","Notiz"],"sh_M":"Früh","sh_T":"Spät","sh_N":"Nacht","sh_D12":"12h Tag","sh_N12":"12h Nacht","sh_O":"Büro","sh_JP":"Geteilt","sh_TT":"Homeoffice","sh_G24":"24h Dienst","sh_R":"Bereitsch.","sh_L":"Frei","sh_V":"Urlaub","sh_P":"Freistell.","sh_AP":"Sonderfrei","sh_B":"Krank","prof_parada12_n":"Industrie / 12h Revision","prof_parada12_s":"7,6 h Basis · 1.696 h/Jahr · 22 Url.","prof_rotativo8_n":"8h Wechselschicht","prof_rotativo8_s":"F/S/N · 1.760 h/Jahr · 22 Url.","prof_oficina_n":"Büro / Normalzeit","prof_oficina_s":"Mo-Fr + Homeoffice · 1.760 h/Jahr","prof_partida_n":"Geteilt / Handel","prof_partida_s":"Doppelblock · 1.780 h/Jahr","prof_guardia24_n":"Gesundheit / 24h","prof_guardia24_s":"Schichten + 12h/24h · 1.645 h/Jahr","prof_todos_n":"Alle anzeigen","prof_todos_s":"Alle Schichten sichtbar","pre_0":"Mo-Fr Büro (5O-2L)","pre_1":"Mo-Fr Geteilt (5JP-2L)","pre_2":"Hybrid (3O-2TT-2L)","pre_3":"2F-2S-2N-4Frei","pre_4":"3F-3S-3N-3Frei","pre_5":"5x2 Wechsel F/S/N","pre_6":"12h Tag-Revision (6-1)","pre_7":"12h Nacht-Revision (6-1)","pre_8":"12h Wechsel-Revision","pre_9":"24h Dienst + 3 Frei","pre_10":"Handel Mo-Sa (6JP-1L)","rate_he":"Überstunden normal","rate_hn":"Überstunden Nacht","rate_hf":"Überstunden Feiertag","rate_pn":"Nachtschichtzulage","rate_pr":"Bereitschaftszulage","rate_pf":"Feiertagszulage","rate_meal":"Verpflegungspauschale","rate_km":"Kilometergeld","unit_h":"€/h","unit_d":"€/Tag","unit_e":"€","unit_km":"€/km","df_h":"Stunden (h)","df_he":"Üst. normal","df_hn":"Üst. Nacht","df_hf":"Üst. Feiertag","df_hc":"Konto (+/- h)","df_meals":"Anz. Spesen","df_km":"Kilometer","col_emerald":"Smaragd","col_amber":"Bernstein","col_orange":"Orange","col_indigo":"Indigo","col_teal":"Türkis","col_violet":"Violett","col_cyan":"Cyan","col_blue":"Blau","col_sky":"Himmelblau","col_fuchsia":"Fuchsia","col_rose":"Rosa","col_lime":"Limette","col_yellow":"Gelb","col_red":"Rot","col_slate":"Grau"}};
+const COLORS = ['emerald','amber','orange','indigo','teal','violet','cyan','blue','sky','fuchsia','rose','lime','yellow','red','slate'];
+
 const $ = id => document.getElementById(id);
 const p2 = n => String(n).padStart(2, '0');
 const num = v => { const n = parseFloat(String(v).replace(',', '.')); return Number.isFinite(n) ? n : 0; };
 const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
-const eur = n => n.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
-const fmtH = n => (Number.isInteger(round2(n)) ? round2(n) : round2(n).toLocaleString('es-ES', { maximumFractionDigits: 2 })) + ' h';
+const curLang = () => (I18N[S.cfg.lang] ? S.cfg.lang : 'es');
+const curLocale = () => (LANGS.find(l => l.code === curLang()) || LANGS[0]).locale;
+function t(key, vars) {
+  const dict = I18N[curLang()] || I18N.es;
+  let val = dict[key] !== undefined ? dict[key] : (I18N.es[key] !== undefined ? I18N.es[key] : key);
+  if (typeof val === 'string' && vars) {
+    for (const k in vars) val = val.replaceAll('{' + k + '}', String(vars[k]));
+  }
+  return val;
+}
+const eur = n => n.toLocaleString(curLocale(), { style: 'currency', currency: 'EUR' });
+const fmtH = n => (Number.isInteger(round2(n)) ? round2(n) : round2(n).toLocaleString(curLocale(), { maximumFractionDigits: 2 })) + ' h';
 const ymd = d => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
 const toUTC = d => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -839,53 +883,58 @@ const DEFAULT_SHIFTS = {
 };
 
 const PROFILES = [
-  { id: 'parada12', name: 'Industria / Parada 12h', sub: '7,6 h base · 1.696 h/año · 22 vac.', ann: 1696, vac: 22, ap: 2, dayH: 7.6, vis: ['M','T','N','D12','N12','R','L','V','P'] },
-  { id: 'rotativo8', name: 'Turnos Rotativos 8h', sub: 'M/T/N · 1.760 h/año · 22 vac.', ann: 1760, vac: 22, ap: 2, dayH: 8, vis: ['M','T','N','R','L','V','P','B'] },
-  { id: 'oficina', name: 'Oficina / Continua', sub: 'L-V + Teletrabajo · 1.760 h/año', ann: 1760, vac: 22, ap: 3, dayH: 8, vis: ['O','TT','JP','L','V','AP','P','B'] },
-  { id: 'partida', name: 'Jornada Partida / Com.', sub: 'Doble tramo · 1.780 h/año', ann: 1780, vac: 22, ap: 2, dayH: 8, vis: ['JP','M','T','O','L','V','AP','B'] },
-  { id: 'guardia24', name: 'Sanidad / Guardias', sub: 'Turnos + 12h/24h · 1.645 h/año', ann: 1645, vac: 22, ap: 6, dayH: 8, vis: ['M','T','N','D12','N12','G24','L','V','AP'] },
-  { id: 'todos', name: 'Mostrar todos', sub: 'Todos los turnos visibles', ann: 1760, vac: 22, ap: 2, dayH: 8, vis: Object.keys(DEFAULT_SHIFTS) }
+  { id: 'parada12',  ann: 1696, vac: 22, ap: 2, dayH: 7.6, vis: ['M','T','N','D12','N12','R','L','V','P'] },
+  { id: 'rotativo8', ann: 1760, vac: 22, ap: 2, dayH: 8,   vis: ['M','T','N','R','L','V','P','B'] },
+  { id: 'oficina',   ann: 1760, vac: 22, ap: 3, dayH: 8,   vis: ['O','TT','JP','L','V','AP','P','B'] },
+  { id: 'partida',   ann: 1780, vac: 22, ap: 2, dayH: 8,   vis: ['JP','M','T','O','L','V','AP','B'] },
+  { id: 'guardia24', ann: 1645, vac: 22, ap: 6, dayH: 8,   vis: ['M','T','N','D12','N12','G24','L','V','AP'] },
+  { id: 'todos',     ann: 1760, vac: 22, ap: 2, dayH: 8,   vis: Object.keys(DEFAULT_SHIFTS) }
 ];
 
 const PRESETS = [
-  ['L-V Oficina (5O-2L)', ['O','O','O','O','O','L','L']],
-  ['L-V Partida (5JP-2L)', ['JP','JP','JP','JP','JP','L','L']],
-  ['Híbrido (3O-2TT-2L)', ['O','O','O','TT','TT','L','L']],
-  ['2M-2T-2N-4L', ['M','M','T','T','N','N','L','L','L','L']],
-  ['3M-3T-3N-3L', ['M','M','M','T','T','T','N','N','N','L','L','L']],
-  ['5x2 Rotativo M/T/N', ['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L']],
-  ['Parada 12h Día (6-1)', ['D12','D12','D12','D12','D12','D12','L']],
-  ['Parada 12h Noche (6-1)', ['N12','N12','N12','N12','N12','N12','L']],
-  ['Parada Rotativa 12h', ['D12','D12','N12','N12','L','L']],
-  ['Guardia 24h + 3L', ['G24','L','L','L']],
-  ['Comercio L-S (6JP-1L)', ['JP','JP','JP','JP','JP','JP','L']]
+  ['pre_0',  ['O','O','O','O','O','L','L']],
+  ['pre_1',  ['JP','JP','JP','JP','JP','L','L']],
+  ['pre_2',  ['O','O','O','TT','TT','L','L']],
+  ['pre_3',  ['M','M','T','T','N','N','L','L','L','L']],
+  ['pre_4',  ['M','M','M','T','T','T','N','N','N','L','L','L']],
+  ['pre_5',  ['M','M','M','M','M','L','L','T','T','T','T','T','L','L','N','N','N','N','N','L','L']],
+  ['pre_6',  ['D12','D12','D12','D12','D12','D12','L']],
+  ['pre_7',  ['N12','N12','N12','N12','N12','N12','L']],
+  ['pre_8',  ['D12','D12','N12','N12','L','L']],
+  ['pre_9',  ['G24','L','L','L']],
+  ['pre_10', ['JP','JP','JP','JP','JP','JP','L']]
 ];
 
 const RATES = [
-  ['he', 'Hora extra normal', '€/h'],
-  ['hn', 'Hora extra nocturna', '€/h'],
-  ['hf', 'Hora extra festiva', '€/h'],
-  ['pn', 'Plus turno noche', '€/día'],
-  ['pr', 'Plus retén / parada', '€/día'],
-  ['pf', 'Plus festivo trabajado', '€/día'],
-  ['meal', 'Valor 1 dieta', '€'],
-  ['km', 'Kilometraje', '€/km']
+  ['he',   'rate_he',   'unit_h'],
+  ['hn',   'rate_hn',   'unit_h'],
+  ['hf',   'rate_hf',   'unit_h'],
+  ['pn',   'rate_pn',   'unit_d'],
+  ['pr',   'rate_pr',   'unit_d'],
+  ['pf',   'rate_pf',   'unit_d'],
+  ['meal', 'rate_meal', 'unit_e'],
+  ['km',   'rate_km',   'unit_km']
 ];
 
 const DF = [
-  ['h', 'Jornada (h)', 0.5, 0],
-  ['he', 'Extra normal', 0.5, 0],
-  ['hn', 'Extra noche', 0.5, 0],
-  ['hf', 'Extra festiva', 0.5, 0],
-  ['hc', 'Bolsa (+/- h)', 0.5, -24],
-  ['meals', 'Nº dietas', 1, 0],
-  ['km', 'Kilómetros', 10, 0]
+  ['h',     'df_h',     0.5, 0],
+  ['he',    'df_he',    0.5, 0],
+  ['hn',    'df_hn',    0.5, 0],
+  ['hf',    'df_hf',    0.5, 0],
+  ['hc',    'df_hc',    0.5, -24],
+  ['meals', 'df_meals', 1,   0],
+  ['km',    'df_km',    10,  0]
 ];
+
+function detectBrowserLang() {
+  const raw = (navigator.language || 'es').slice(0, 2).toLowerCase();
+  return I18N[raw] ? raw : 'es';
+}
 
 let S = {
   days: {},
   rates: { he: 0, hn: 0, hf: 0, pn: 0, pr: 0, pf: 0, meal: 0, km: 0.26 },
-  cfg: { profile: 'rotativo8', annualHours: 1760, vacDays: 22, apDays: 2, defaultDayHours: 8, theme: 'dark', showTimesInGrid: false, customHolidays: [] },
+  cfg: { lang: detectBrowserLang(), langChosen: false, profile: 'rotativo8', annualHours: 1760, vacDays: 22, apDays: 2, defaultDayHours: 8, theme: 'dark', showTimesInGrid: false, customHolidays: [] },
   shifts: structuredClone(DEFAULT_SHIFTS),
   cycle: [],
   lastBackup: 0
@@ -896,6 +945,14 @@ let paint = null, mk = null, ms = null, undoSnap = null, editingShift = null, pi
 let confirmCb = null, lastOvertimeDiff = 0;
 
 function getShift(code) { return S.shifts[code] || DEFAULT_SHIFTS[code] || null; }
+function shiftLabel(code, sh) {
+  const obj = sh || getShift(code);
+  if (!obj) return code || '';
+  if (DEFAULT_SHIFTS[code] && !obj.customName && obj.n === DEFAULT_SHIFTS[code].n) {
+    return t('sh_' + code);
+  }
+  return obj.n;
+}
 function visibleShiftKeys() { return Object.keys(S.shifts).filter(k => S.shifts[k].vis !== false); }
 
 function load() {
@@ -904,7 +961,10 @@ function load() {
     if (!j || typeof j !== 'object') return;
     if (j.days && typeof j.days === 'object') S.days = j.days;
     if (j.rates && typeof j.rates === 'object') S.rates = { ...S.rates, ...j.rates };
-    if (j.cfg && typeof j.cfg === 'object') S.cfg = { ...S.cfg, ...j.cfg, customHolidays: Array.isArray(j.cfg.customHolidays) ? j.cfg.customHolidays : [] };
+    if (j.cfg && typeof j.cfg === 'object') {
+      S.cfg = { ...S.cfg, ...j.cfg, customHolidays: Array.isArray(j.cfg.customHolidays) ? j.cfg.customHolidays : [] };
+      if (!I18N[S.cfg.lang]) S.cfg.lang = detectBrowserLang();
+    }
     if (j.shifts && typeof j.shifts === 'object') {
       const merged = structuredClone(DEFAULT_SHIFTS);
       for (const k in j.shifts) merged[k] = { ...(merged[k] || {}), ...j.shifts[k] };
@@ -917,7 +977,65 @@ function load() {
 
 function save() {
   try { localStorage.setItem(KEY, JSON.stringify(S)); }
-  catch (e) { toast('No se pudo guardar en este dispositivo'); }
+  catch (e) { toast(t('errSave')); }
+}
+
+/* Traducción global de la UI */
+function applyStaticTranslations() {
+  document.documentElement.lang = curLang();
+  document.title = t('docTitle');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (k) el.textContent = t(k);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-ph'));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    el.title = t(el.getAttribute('data-i18n-title'));
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+    el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
+  });
+  const wds = t('weekdays');
+  $('weekdaysRow').innerHTML = wds.map((d, i) => `<div${i >= 5 ? ' class="wknd"' : ''}>${esc(d)}</div>`).join('');
+  const curCol = $('sm_color').value || 'emerald';
+  $('sm_color').innerHTML = COLORS.map(c => `<option value="${c}">${esc(t('col_' + c))}</option>`).join('');
+  $('sm_color').value = curCol;
+}
+
+function renderLangPickers() {
+  const btns = (fn) => LANGS.map(l =>
+    `<button type="button" class="lang-btn ${curLang() === l.code ? 'active' : ''}" onclick="${fn}('${l.code}')"><span class="lang-flag">${l.flag}</span><span>${esc(l.name)}</span></button>`
+  ).join('');
+  $('settingsLangGrid').innerHTML = btns('setLanguage');
+  $('firstLangGrid').innerHTML = btns('previewFirstLang');
+}
+
+function previewFirstLang(code) {
+  if (!I18N[code]) return;
+  S.cfg.lang = code;
+  applyStaticTranslations();
+  renderLangPickers();
+  renderPaint(); renderCycle(); renderSettings(); render(); checkBackup();
+}
+
+function confirmFirstLang() {
+  S.cfg.langChosen = true;
+  save();
+  closeModal('langModal');
+  toast(t('langChanged'));
+}
+
+function setLanguage(code) {
+  if (!I18N[code]) return;
+  S.cfg.lang = code;
+  S.cfg.langChosen = true;
+  save();
+  applyStaticTranslations();
+  renderLangPickers();
+  renderPaint(); renderCycle(); renderSettings(); render(); checkBackup();
+  toast(t('langChanged'));
 }
 
 /* Festivos nacionales de España + locales personalizados */
@@ -925,8 +1043,8 @@ function easter(y) {
   const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
   const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
   const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
-  const m = Math.floor((a + 11 * h + 22 * l) / 451), t = h + l - 7 * m + 114;
-  return new Date(y, Math.floor(t / 31) - 1, t % 31 + 1);
+  const m = Math.floor((a + 11 * h + 22 * l) / 451), t0 = h + l - 7 * m + 114;
+  return new Date(y, Math.floor(t0 / 31) - 1, t0 % 31 + 1);
 }
 const HC = {};
 function isNationalHol(d) {
@@ -1015,17 +1133,17 @@ function yearSummary(y) {
 
 /* Render principal */
 function render() {
-  const y = cur.getFullYear(), m = cur.getMonth(), s = summary(y, m), today = ymd(new Date());
-  $('monthLabel').textContent = cur.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+  const y = cur.getFullYear(), m = cur.getMonth(), s = summary(y, m), today = ymd(new Date()), loc = curLocale();
+  $('monthLabel').textContent = cur.toLocaleDateString(loc, { month: 'long', year: 'numeric' });
   $('stOrd').textContent = fmtH(s.ord);
   $('stHours').textContent = fmtH(s.hrs);
   $('stMoney').textContent = eur(s.ex);
   $('stAl').textContent = eur(s.al);
   $('stTotal').textContent = eur(s.ex + s.al);
-  $('stDays').textContent = `${s.worked} trab. · ${s.free} lib.${s.hc ? ` · Bolsa ${s.hc > 0 ? '+' : ''}${round2(s.hc)}h` : ''}`;
+  $('stDays').textContent = `${s.worked} ${t('workedShort')} · ${s.free} ${t('freeShort')}${s.hc ? ` · ${t('bankShort')} ${s.hc > 0 ? '+' : ''}${round2(s.hc)}h` : ''}`;
 
   const prof = PROFILES.find(p => p.id === S.cfg.profile);
-  $('profileSubtitle').textContent = prof ? prof.name : 'Turnos, Jornadas y Nómina';
+  $('profileSubtitle').textContent = prof ? t('prof_' + prof.id + '_n') : t('subtitleDefault');
 
   const pad = (new Date(y, m, 1).getDay() + 6) % 7;
   let html = '<div></div>'.repeat(pad);
@@ -1038,7 +1156,8 @@ function render() {
     const hasHc = d && num(d.hc) !== 0;
     const t1s = d?.t1s ?? sh?.t1s ?? '';
     const subTxt = S.cfg.showTimesInGrid && t1s ? t1s.slice(0, 5) : (d?.h !== undefined && sh && num(d.h) !== num(sh.h) ? fmtH(d.h) : '');
-    html += `<button data-k="${k}" aria-label="${dt.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}${sh ? ', ' + sh.n : ''}" class="day-cell ${sh ? 'c-' + sh.c : ''} ${k === today ? 'today' : ''} ${hol ? 'hol' : ''}">
+    const shTxt = sh ? shiftLabel(d.s, sh) : '';
+    html += `<button data-k="${k}" aria-label="${esc(dt.toLocaleDateString(loc, { weekday: 'long', day: 'numeric', month: 'long' }) + (shTxt ? ', ' + shTxt : ''))}" class="day-cell ${sh ? 'c-' + sh.c : ''} ${k === today ? 'today' : ''} ${hol ? 'hol' : ''}">
       <span class="day-num num">${i}</span>
       <span class="day-code">${sh ? esc(d.s) : ''}</span>
       ${subTxt ? `<span class="day-sub num">${esc(subTxt)}</span>` : ''}
@@ -1053,27 +1172,27 @@ function render() {
 function renderPaint() {
   const keys = visibleShiftKeys();
   const items = [
-    ['', '✏️ Detalle', ''],
-    ['__ERASE__', '🧽 Borrar', 'c-rose'],
-    ...keys.map(k => [k, `${k} · ${S.shifts[k].n}`, 'c-' + S.shifts[k].c])
+    ['', t('detailChip'), ''],
+    ['__ERASE__', t('eraseChip'), 'c-rose'],
+    ...keys.map(k => [k, `${k} · ${shiftLabel(k, S.shifts[k])}`, 'c-' + S.shifts[k].c])
   ];
   $('paintSelector').innerHTML = items.map(([k, l, cls]) =>
     `<button data-p="${esc(k)}" class="chip ${cls} ${(paint || '') === k ? 'active' : ''}">${esc(l)}</button>`
   ).join('');
-  if (paint === '__ERASE__') $('paintHint').textContent = 'Borrando días al tocar';
-  else if (paint && S.shifts[paint]) $('paintHint').textContent = `Pintando ${S.shifts[paint].n}`;
-  else $('paintHint').textContent = 'Toca un día para editar';
+  if (paint === '__ERASE__') $('paintHint').textContent = t('erasingDays');
+  else if (paint && S.shifts[paint]) $('paintHint').textContent = t('paintingShift', { name: shiftLabel(paint, S.shifts[paint]) });
+  else $('paintHint').textContent = t('tapToEdit');
 }
 
 function renderCycle() {
-  $('presets').innerHTML = PRESETS.map(([l], i) => `<button data-pre="${i}" class="chip">${esc(l)}</button>`).join('');
+  $('presets').innerHTML = PRESETS.map(([k], i) => `<button data-pre="${i}" class="chip">${esc(t(k))}</button>`).join('');
   $('cycleAdderBtns').innerHTML = visibleShiftKeys().map(k =>
     `<button data-add="${esc(k)}" class="chip c-${S.shifts[k].c}" style="padding:7px 11px">${esc(k)}</button>`
   ).join('');
   $('cycleSequencePreview').innerHTML = S.cycle.length
-    ? S.cycle.map((k, i) => `<button data-rm="${i}" title="Quitar día ${i + 1}" class="chip c-${(getShift(k)?.c) || 'slate'}" style="padding:5px 9px">${esc(k)}</button>`).join('')
-    : '<span style="font-size:11.5px;color:var(--mute)">Elige una plantilla o pulsa turnos arriba</span>';
-  $('cycleLen').textContent = S.cycle.length;
+    ? S.cycle.map((k, i) => `<button data-rm="${i}" class="chip c-${(getShift(k)?.c) || 'slate'}" style="padding:5px 9px">${esc(k)}</button>`).join('')
+    : `<span style="font-size:11.5px;color:var(--mute)">${esc(t('emptyCycleHint'))}</span>`;
+  $('cycleLenText').textContent = t('yourPattern', { n: S.cycle.length });
 }
 
 function renderDetails() {
@@ -1086,44 +1205,44 @@ function renderDetails() {
   $('yrPct').textContent = pct + ' %';
   $('yrBar').style.width = pct + '%';
   $('annualCards').innerHTML = `
-    <div class="kpi"><span>Hechas ${y}</span><b>${fmtH(yr.ord)}</b></div>
-    <div class="kpi sk"><span>Restantes</span><b>${fmtH(rem)}</b></div>
-    <div class="kpi em"><span>Extras ${y}</span><b>${eur(yr.money)}</b></div>
-    <div class="kpi"><span>Vacaciones</span><b>${yr.vac} / ${S.cfg.vacDays}</b></div>
-    <div class="kpi am"><span>A. Propios</span><b>${yr.ap} / ${S.cfg.apDays}</b></div>
-    <div class="kpi vi"><span>Bolsa horas</span><b>${yr.hc > 0 ? '+' : ''}${fmtH(yr.hc)}</b></div>
+    <div class="kpi"><span>${esc(t('doneYear', { y }))}</span><b>${fmtH(yr.ord)}</b></div>
+    <div class="kpi sk"><span>${esc(t('remaining'))}</span><b>${fmtH(rem)}</b></div>
+    <div class="kpi em"><span>${esc(t('extrasYear', { y }))}</span><b>${eur(yr.money)}</b></div>
+    <div class="kpi"><span>${esc(t('vacations'))}</span><b>${yr.vac} / ${S.cfg.vacDays}</b></div>
+    <div class="kpi am"><span>${esc(t('personalDays'))}</span><b>${yr.ap} / ${S.cfg.apDays}</b></div>
+    <div class="kpi vi"><span>${esc(t('hourBank'))}</span><b>${yr.hc > 0 ? '+' : ''}${fmtH(yr.hc)}</b></div>
   `;
 
   const totShifts = Object.values(s.cnt).reduce((a, b) => a + b, 0) || 1;
   const bars = Object.keys(s.cnt).sort((a, b) => s.cnt[b] - s.cnt[a]).map(k => {
     const sh = getShift(k) || { n: k, c: 'slate' };
-    return `<div class="bar-row"><span class="bar-lbl">${esc(k)} · ${esc(sh.n)}</span><div class="bar-track"><div class="c-${sh.c}" style="height:100%;width:${(s.cnt[k] / totShifts) * 100}%;border-radius:999px"></div></div><span class="bar-val">${s.cnt[k]} d</span></div>`;
+    return `<div class="bar-row"><span class="bar-lbl">${esc(k)} · ${esc(shiftLabel(k, sh))}</span><div class="bar-track"><div class="c-${sh.c}" style="height:100%;width:${(s.cnt[k] / totShifts) * 100}%;border-radius:999px"></div></div><span class="bar-val">${s.cnt[k]} ${esc(t('dayUnit'))}</span></div>`;
   }).join('');
 
-  const LB = { he: 'H. extra normales', hn: 'H. extra nocturnas', hf: 'H. extra festivas', pn: 'Plus noche', pr: 'Plus retén / parada', pf: 'Plus festivo trabajado', meal: 'Dietas', km: 'Kilometraje' };
+  const LB = { he: 'rate_he', hn: 'rate_hn', hf: 'rate_hf', pn: 'rate_pn', pr: 'rate_pr', pf: 'rate_pf', meal: 'rate_meal', km: 'rate_km' };
   const moneyRows = Object.keys(LB).filter(k => s.c[k] > 0).map(k =>
-    `<div class="stat-row"><span style="color:var(--mute)">${LB[k]}</span><b class="num">${eur(s.c[k])}</b></div>`
+    `<div class="stat-row"><span style="color:var(--mute)">${esc(t(LB[k]))}</span><b class="num">${eur(s.c[k])}</b></div>`
   ).join('');
 
-  $('breakdown').innerHTML = (bars || '<p class="section-sub">Aún no hay turnos registrados este mes.</p>') +
+  $('breakdown').innerHTML = (bars || `<p class="section-sub">${esc(t('noShiftsMonth'))}</p>`) +
     (moneyRows ? `<div class="divider"></div>${moneyRows}` : '') +
     `<div class="divider"></div>
-     <div class="stat-row" style="font-size:13.5px"><b>Total económico mes</b><b class="num" style="color:var(--accent-bright)">${eur(s.ex + s.al)}</b></div>`;
+     <div class="stat-row" style="font-size:13.5px"><b>${esc(t('totalMoneyMonth'))}</b><b class="num" style="color:var(--accent-bright)">${eur(s.ex + s.al)}</b></div>`;
 
   const scope = $('logScope').value;
   const q = ($('noteSearch').value || '').trim().toLowerCase();
   const list = (scope === 'year' ? yr.log : s.log).filter(({ k, d, res }) => {
     if (!q) return true;
-    const hay = `${k} ${d.s || ''} ${res.sh?.n || ''} ${d.note || ''}`.toLowerCase();
+    const hay = `${k} ${d.s || ''} ${res.sh ? shiftLabel(d.s, res.sh) : ''} ${d.note || ''}`.toLowerCase();
     return hay.includes(q);
   });
 
   $('logList').innerHTML = list.length ? list.map(({ k, d, res }) => {
     const bits = [];
-    if (res.sh) bits.push(res.sh.n);
-    if (res.exH) bits.push(`${fmtH(res.exH)} extra`);
-    if (res.hcH) bits.push(`Bolsa ${res.hcH > 0 ? '+' : ''}${fmtH(res.hcH)}`);
-    if (d.meals) bits.push(`${d.meals} diet.`);
+    if (res.sh) bits.push(shiftLabel(d.s, res.sh));
+    if (res.exH) bits.push(`${fmtH(res.exH)} ${t('extraShort')}`);
+    if (res.hcH) bits.push(`${t('bankShort')} ${res.hcH > 0 ? '+' : ''}${fmtH(res.hcH)}`);
+    if (d.meals) bits.push(`${d.meals} ${t('mealsShort')}`);
     if (d.km) bits.push(`${d.km} km`);
     return `<button data-k="${k}" class="log-item">
       <div>
@@ -1133,44 +1252,46 @@ function renderDetails() {
       </div>
       <b class="num" style="color:var(--accent-bright);flex-shrink:0">${eur(res.tot)}</b>
     </button>`;
-  }).join('') : '<p class="section-sub">Sin registros coincidentes.</p>';
+  }).join('') : `<p class="section-sub">${esc(t('noRecords'))}</p>`;
 }
 
 function renderSettings() {
+  renderLangPickers();
   $('profileGrid').innerHTML = PROFILES.map(p =>
-    `<button class="profile-btn ${S.cfg.profile === p.id ? 'active' : ''}" onclick="applyProfile('${p.id}')"><b>${esc(p.name)}</b><span>${esc(p.sub)}</span></button>`
+    `<button class="profile-btn ${S.cfg.profile === p.id ? 'active' : ''}" onclick="applyProfile('${p.id}')"><b>${esc(t('prof_' + p.id + '_n'))}</b><span>${esc(t('prof_' + p.id + '_s'))}</span></button>`
   ).join('');
   $('cfg_ann').value = S.cfg.annualHours;
   $('cfg_vac').value = S.cfg.vacDays;
   $('cfg_ap').value = S.cfg.apDays;
   $('cfg_times').checked = !!S.cfg.showTimesInGrid;
 
-  $('rateFields').innerHTML = RATES.map(([k, l, u]) =>
-    `<div><label class="lbl" for="r_${k}">${l} (${u})</label><input type="number" inputmode="decimal" step="0.01" min="0" id="r_${k}" class="inp num" value="${S.rates[k] ?? 0}"></div>`
+  $('rateFields').innerHTML = RATES.map(([k, lk, uk]) =>
+    `<div><label class="lbl" for="r_${k}">${esc(t(lk))} (${esc(t(uk))})</label><input type="number" inputmode="decimal" step="0.01" min="0" id="r_${k}" class="inp num" value="${S.rates[k] ?? 0}"></div>`
   ).join('');
 
   $('shiftManagerList').innerHTML = Object.keys(S.shifts).map(k => {
     const sh = S.shifts[k];
     const hrsTxt = sh.t1s && sh.t1e ? `${sh.t1s}-${sh.t1e}${sh.t2s && sh.t2e ? ' / ' + sh.t2s + '-' + sh.t2e : ''}` : `${fmtH(sh.h)}`;
+    const nm = shiftLabel(k, sh);
     return `<div class="shift-mgr-item">
       <div style="display:flex;align-items:center;gap:8px;min-width:0">
         <span class="chip c-${sh.c}" style="padding:4px 8px;min-width:44px;justify-content:center">${esc(k)}</span>
         <div style="min-width:0">
-          <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sh.n)}</div>
+          <div style="font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(nm)}</div>
           <div style="font-size:10.5px;color:var(--mute)" class="num">${esc(hrsTxt)} · ${fmtH(sh.h)}</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        <button class="pill-btn" style="padding:5px 8px;font-size:11px;opacity:${sh.vis === false ? '.5' : '1'}" onclick="toggleShiftVis('${esc(k)}')">${sh.vis === false ? 'Oculto' : 'Visible'}</button>
-        <button class="icon-btn" style="width:30px;height:30px" onclick="openShiftEditor('${esc(k)}')" aria-label="Editar ${esc(sh.n)}">✎</button>
+        <button class="pill-btn" style="padding:5px 8px;font-size:11px;opacity:${sh.vis === false ? '.5' : '1'}" onclick="toggleShiftVis('${esc(k)}')">${esc(sh.vis === false ? t('hiddenLbl') : t('visibleLbl'))}</button>
+        <button class="icon-btn" style="width:30px;height:30px" onclick="openShiftEditor('${esc(k)}')" aria-label="${esc(nm)}">✎</button>
       </div>
     </div>`;
   }).join('');
 
-  ['dark', 'oled', 'light'].forEach(t => {
-    const b = $('th-' + t);
-    b.style.borderColor = S.cfg.theme === t ? 'var(--accent-bright)' : 'var(--line)';
-    b.style.color = S.cfg.theme === t ? 'var(--accent-bright)' : 'var(--ink)';
+  ['dark', 'oled', 'light'].forEach(th => {
+    const b = $('th-' + th);
+    b.style.borderColor = S.cfg.theme === th ? 'var(--accent-bright)' : 'var(--line)';
+    b.style.color = S.cfg.theme === th ? 'var(--accent-bright)' : 'var(--ink)';
   });
 }
 
@@ -1181,12 +1302,12 @@ function openDay(k) {
   ms = d.s || null;
   const sh = ms ? getShift(ms) : null;
   const dt = new Date(k + 'T00:00:00');
-  $('mTitle').textContent = dt.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('mTitle').textContent = dt.toLocaleDateString(curLocale(), { weekday: 'long', day: 'numeric', month: 'long' });
 
-  $('mFields').innerHTML = DF.map(([f, l, st, mn]) => {
+  $('mFields').innerHTML = DF.map(([f, lk, st, mn]) => {
     const val = f === 'h' ? (d.h !== undefined ? d.h : (sh ? sh.h : '')) : (d[f] ?? '');
     return `<div class="step-box">
-      <label class="lbl" style="margin:0;font-size:10px" for="d_${f}">${l}</label>
+      <label class="lbl" style="margin:0;font-size:10px" for="d_${f}">${esc(t(lk))}</label>
       <div class="step-ctrl">
         <button type="button" class="step-btn" onclick="stepField('${f}',${-st},${mn})">−</button>
         <input type="number" inputmode="decimal" step="${st}" min="${mn}" id="d_${f}" value="${val}" placeholder="0" class="num" oninput="updateDayPreview()">
@@ -1216,7 +1337,7 @@ function drawModalShifts() {
   if (ms && !keys.includes(ms) && S.shifts[ms]) keys.unshift(ms);
   $('mShifts').innerHTML = keys.map(k => {
     const sh = S.shifts[k];
-    return `<button type="button" data-ms="${esc(k)}" class="chip c-${sh.c} ${ms === k ? 'active' : ''}" style="justify-content:center;padding:8px 5px">${esc(k)} · ${esc(sh.n)}</button>`;
+    return `<button type="button" data-ms="${esc(k)}" class="chip c-${sh.c} ${ms === k ? 'active' : ''}" style="justify-content:center;padding:8px 5px">${esc(k)} · ${esc(shiftLabel(k, sh))}</button>`;
   }).join('');
 }
 
@@ -1251,18 +1372,18 @@ function stepField(f, delta, minV) {
 
 function calcHoursFromTime(silent) {
   const tot = calcSpanHours($('d_t1s').value, $('d_t1e').value, $('d_t2s').value, $('d_t2e').value);
-  if (!tot) { if (!silent) toast('Introduce al menos inicio y fin'); return; }
+  if (!tot) { if (!silent) toast(t('toastEnterTimes')); return; }
   const base = ms && getShift(ms) ? num(getShift(ms).h) : num(S.cfg.defaultDayHours);
   $('d_h').value = tot;
   if (base > 0 && tot > base) {
     lastOvertimeDiff = round2(tot - base);
-    $('overtimeMsg').textContent = `+${fmtH(lastOvertimeDiff)} sobre tu base (${fmtH(base)})`;
+    $('overtimeMsg').textContent = t('overtimeMsg', { diff: fmtH(lastOvertimeDiff), base: fmtH(base) });
     $('overtimeHint').classList.remove('hidden');
   } else {
     $('overtimeHint').classList.add('hidden');
   }
   updateDayPreview();
-  if (!silent) toast(`Calculado: ${fmtH(tot)}`);
+  if (!silent) toast(t('toastCalc', { h: fmtH(tot) }));
 }
 
 function applyOvertime(target) {
@@ -1273,7 +1394,7 @@ function applyOvertime(target) {
   el.value = round2(num(el.value) + lastOvertimeDiff);
   $('overtimeHint').classList.add('hidden');
   updateDayPreview();
-  toast(`+${fmtH(lastOvertimeDiff)} pasadas a ${target === 'he' ? 'horas extra' : 'bolsa'}`);
+  toast(t(target === 'he' ? 'toastMovedExtra' : 'toastMovedBank', { h: fmtH(lastOvertimeDiff) }));
 }
 
 function readDayForm() {
@@ -1304,14 +1425,14 @@ function updateDayPreview() {
 function prevKey(k) { const p = new Date(k + 'T00:00:00'); p.setDate(p.getDate() - 1); return ymd(p); }
 function copyPrev() {
   const pk = prevKey(mk), d = S.days[pk];
-  if (!d) return toast('El día anterior está vacío');
+  if (!d) return toast(t('toastPrevEmpty'));
   ms = d.s || null;
   DF.forEach(([f]) => { $('d_' + f).value = d[f] ?? ''; });
   ['t1s', 't1e', 't2s', 't2e'].forEach(f => { $('d_' + f).value = d[f] ?? ''; });
   $('d_pn').checked = !!d.pn; $('d_pr').checked = !!d.pr; $('d_pf').checked = !!d.pf;
   $('d_note').value = d.note || '';
   drawModalShifts(); updateDayPreview();
-  toast('Copiado del día anterior · pulsa Guardar');
+  toast(t('toastCopiedPrev'));
 }
 
 function saveDay() {
@@ -1323,13 +1444,13 @@ function saveDay() {
 
   const hasContent = d.s || d.he || d.hn || d.hf || d.hc || d.meals || d.km || d.note || d.h > 0 || d.pn || d.pr || d.pf;
   if (hasContent) S.days[mk] = d; else delete S.days[mk];
-  save(); closeModal('dayModal'); render(); checkBackup(); undoable('Jornada guardada');
+  save(); closeModal('dayModal'); render(); checkBackup(); undoable(t('toastDaySaved'));
 }
 
 function clearDay() {
   snap();
   delete S.days[mk];
-  save(); closeModal('dayModal'); render(); undoable('Día borrado');
+  save(); closeModal('dayModal'); render(); undoable(t('toastDayCleared'));
 }
 
 /* Ciclos */
@@ -1338,19 +1459,18 @@ function clearCycle() { S.cycle = []; save(); renderCycle(); }
 
 function triggerApplyCycle(scope) {
   const L = S.cycle.length, sd = $('cycleStart').value, ed = $('cycleEnd').value;
-  if (!L) return toast('Primero crea o elige un patrón');
-  if (!sd) return toast('Elige la fecha de inicio');
+  if (!L) return toast(t('toastNeedPattern'));
+  if (!sd) return toast(t('toastNeedStart'));
   const y = cur.getFullYear(), m = cur.getMonth();
-  let from, to, label;
+  let from, to;
   if (scope === 'year') {
-    from = new Date(y, 0, 1); to = new Date(y, 11, 31); label = `todo el año ${y}`;
+    from = new Date(y, 0, 1); to = new Date(y, 11, 31);
   } else if (scope === 'range') {
-    if (!ed) return toast('Indica la Fecha fin para aplicar un rango');
+    if (!ed) return toast(t('toastNeedEnd'));
     from = new Date(sd + 'T00:00:00'); to = new Date(ed + 'T00:00:00');
-    if (to < from) return toast('La fecha fin debe ser posterior al inicio');
-    label = `del ${sd} al ${ed}`;
+    if (to < from) return toast(t('toastEndAfterStart'));
   } else {
-    from = new Date(y, m, 1); to = new Date(y, m + 1, 0); label = $('monthLabel').textContent;
+    from = new Date(y, m, 1); to = new Date(y, m + 1, 0);
   }
 
   const exec = () => {
@@ -1372,11 +1492,11 @@ function triggerApplyCycle(scope) {
       };
       n++;
     }
-    save(); render(); checkBackup(); undoable(`${n} días rellenados`);
+    save(); render(); checkBackup(); undoable(t('toastFilledDays', { n }));
   };
 
   if (scope === 'year') {
-    askConfirm(`Rellenar ${label}`, 'Se aplicará tu patrón a los 365 días del año seleccionado.', () => AdMobBridge.showInterstitialThen(exec));
+    askConfirm(t('confirmYearTitle', { y }), t('confirmYearMsg'), () => AdMobBridge.showInterstitialThen(exec));
   } else {
     exec();
   }
@@ -1394,19 +1514,19 @@ function applyProfile(id) {
   else { S.shifts.M.h = 8; S.shifts.T.h = 8; S.shifts.N.h = 8; }
   Object.keys(S.shifts).forEach(k => { S.shifts[k].vis = p.vis.includes(k); });
   save(); renderSettings(); renderPaint(); renderCycle(); render();
-  toast(`Perfil "${p.name}" activado`);
+  toast(t('toastProfileOn', { name: t('prof_' + p.id + '_n') }));
 }
 
 function saveConfig() {
   S.cfg.annualHours = Math.max(0, num($('cfg_ann').value));
   S.cfg.vacDays = Math.max(0, num($('cfg_vac').value));
   S.cfg.apDays = Math.max(0, num($('cfg_ap').value));
-  save(); render(); toast('Configuración laboral guardada');
+  save(); render(); toast(t('toastCfgSaved'));
 }
 
 function saveRates() {
   RATES.forEach(([k]) => { S.rates[k] = Math.max(0, round2(num($('r_' + k).value))); });
-  save(); render(); toast('Tarifas guardadas');
+  save(); render(); toast(t('toastRatesSaved'));
 }
 
 function toggleShiftVis(k) {
@@ -1418,10 +1538,10 @@ function toggleShiftVis(k) {
 function openShiftEditor(code) {
   editingShift = code;
   const sh = code ? S.shifts[code] : { n: '', h: 8, t1s: '08:00', t1e: '16:00', t2s: '', t2e: '', c: 'emerald', work: true, pn: false, pr: false, vis: true };
-  $('smTitle').textContent = code ? `Editar turno ${code}` : 'Crear turno personalizado';
+  $('smTitle').textContent = code ? t('editShiftTitle', { code }) : t('createShiftTitle');
   $('sm_code').value = code || '';
   $('sm_code').disabled = !!code;
-  $('sm_name').value = sh.n || '';
+  $('sm_name').value = code ? shiftLabel(code, sh) : '';
   $('sm_h').value = sh.h ?? 8;
   $('sm_color').value = sh.c || 'emerald';
   $('sm_t1s').value = sh.t1s || ''; $('sm_t1e').value = sh.t1e || '';
@@ -1437,11 +1557,13 @@ function openShiftEditor(code) {
 function saveShift() {
   const code = (editingShift || $('sm_code').value.trim().toUpperCase().replace(/[^A-Z0-9Ñ]/g, '')).slice(0, 4);
   const name = $('sm_name').value.trim();
-  if (!code || !name) return toast('Indica sigla y nombre del turno');
+  if (!code || !name) return toast(t('toastNeedCodeName'));
   const prev = S.shifts[code] || {};
+  const isDefaultName = DEFAULT_SHIFTS[code] && (name === t('sh_' + code) || name === DEFAULT_SHIFTS[code].n);
   S.shifts[code] = {
     ...prev,
-    n: name,
+    n: isDefaultName ? DEFAULT_SHIFTS[code].n : name,
+    customName: !isDefaultName,
     h: Math.max(0, round2(num($('sm_h').value))),
     c: $('sm_color').value,
     t1s: $('sm_t1s').value, t1e: $('sm_t1e').value,
@@ -1452,7 +1574,7 @@ function saveShift() {
     pr: $('sm_pr').checked
   };
   save(); closeModal('shiftModal'); renderSettings(); renderPaint(); renderCycle(); render();
-  toast(`Turno ${code} guardado`);
+  toast(t('toastShiftSaved', { code }));
 }
 
 function deleteShift() {
@@ -1460,14 +1582,14 @@ function deleteShift() {
   delete S.shifts[editingShift];
   S.cycle = S.cycle.filter(k => k !== editingShift);
   save(); closeModal('shiftModal'); renderSettings(); renderPaint(); renderCycle(); render();
-  toast('Turno eliminado');
+  toast(t('toastShiftDeleted'));
 }
 
 /* Tema y apariencia */
-function setTheme(t) {
-  S.cfg.theme = t;
-  document.documentElement.setAttribute('data-theme', t);
-  $('metaTheme').setAttribute('content', t === 'light' ? '#f1f5f9' : (t === 'oled' ? '#000000' : '#020617'));
+function setTheme(th) {
+  S.cfg.theme = th;
+  document.documentElement.setAttribute('data-theme', th);
+  $('metaTheme').setAttribute('content', th === 'light' ? '#f1f5f9' : (th === 'oled' ? '#000000' : '#020617'));
   save(); renderSettings();
 }
 function toggleShowTimes(v) { S.cfg.showTimesInGrid = !!v; save(); render(); }
@@ -1476,10 +1598,10 @@ function toggleShowTimes(v) { S.cfg.showTimesInGrid = !!v; save(); render(); }
 function openMonthPicker() { pickerYear = cur.getFullYear(); renderMonthPicker(); openModal('monthModal'); }
 function renderMonthPicker() {
   $('pickerYearLbl').textContent = pickerYear;
-  const names = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const names = t('monthsShort');
   $('monthPickerGrid').innerHTML = names.map((nm, idx) => {
     const act = pickerYear === cur.getFullYear() && idx === cur.getMonth();
-    return `<button class="btn btn-sm ${act ? 'btn-primary' : 'btn-soft'}" onclick="pickMonth(${idx})">${nm}</button>`;
+    return `<button class="btn btn-sm ${act ? 'btn-primary' : 'btn-soft'}" onclick="pickMonth(${idx})">${esc(nm)}</button>`;
   }).join('');
 }
 function pickMonth(m) { cur = new Date(pickerYear, m, 1); closeModal('monthModal'); render(); }
@@ -1508,8 +1630,8 @@ function triggerExportCSV() { AdMobBridge.showInterstitialThen(exportCSV); }
 async function exportCSV() {
   const y = cur.getFullYear(), m = cur.getMonth();
   const f = n => round2(n).toFixed(2).replace('.', ',');
-  const q = t => { t = String(t || ''); return '"' + (/^[=+\-@]/.test(t) ? "'" + t : t).replace(/"/g, '""') + '"'; };
-  const rows = [['Fecha','Turno','Horario','Jornada h','H.extra normal','H.extra noche','H.extra festiva','Bolsa h','Dietas','Km','Pluses/Extra €','Dietas/Km €','Total €','Nota'].join(';')];
+  const q = txt => { txt = String(txt || ''); return '"' + (/^[=+\-@]/.test(txt) ? "'" + txt : txt).replace(/"/g, '""') + '"'; };
+  const rows = [t('csvHeaders').join(';')];
   const n = new Date(y, m + 1, 0).getDate();
   for (let i = 1; i <= n; i++) {
     const k = `${y}-${p2(m + 1)}-${p2(i)}`, d = S.days[k]; if (!d) continue;
@@ -1517,21 +1639,21 @@ async function exportCSV() {
     const hrs = [d.t1s && d.t1e ? `${d.t1s}-${d.t1e}` : '', d.t2s && d.t2e ? `${d.t2s}-${d.t2e}` : ''].filter(Boolean).join(' / ');
     rows.push([k, d.s || '', hrs, f(res.ordH), f(num(d.he)), f(num(d.hn)), f(num(d.hf)), f(num(d.hc)), d.meals || 0, d.km || 0, f(res.ex), f(res.al), f(res.tot), q(d.note)].join(';'));
   }
-  const ok = await shareOrDownload(`MiCuadrante-${y}-${p2(m + 1)}.csv`, 'text/csv;charset=utf-8', '\ufeff' + rows.join('\r\n'), 'Cuadrante Excel');
-  toast(ok ? 'Excel CSV exportado' : 'No se pudo exportar');
+  const ok = await shareOrDownload(`MiCuadrante-${y}-${p2(m + 1)}.csv`, 'text/csv;charset=utf-8', '\ufeff' + rows.join('\r\n'), t('csvTitle'));
+  toast(t(ok ? 'toastCsvOk' : 'toastExportErr'));
 }
 
 async function downloadBackup() {
   S.lastBackup = Date.now(); save(); checkBackup();
-  const ok = await shareOrDownload(`MiCuadrante-backup-${ymd(new Date())}.json`, 'application/json', JSON.stringify(S), 'Copia Mi Cuadrante');
-  toast(ok ? 'Copia de seguridad guardada' : 'Usa "Copiar texto" como respaldo');
+  const ok = await shareOrDownload(`MiCuadrante-backup-${ymd(new Date())}.json`, 'application/json', JSON.stringify(S), t('backupShareTitle'));
+  toast(t(ok ? 'toastBackupOk' : 'toastBackupFallback'));
 }
 
 async function copyBackupText() {
   S.lastBackup = Date.now(); save(); checkBackup();
   const txt = JSON.stringify(S);
-  try { await navigator.clipboard.writeText(txt); toast('Copia copiada al portapapeles'); }
-  catch (e) { $('pasteArea').value = txt; openModal('pasteModal'); toast('Selecciona y copia el texto'); }
+  try { await navigator.clipboard.writeText(txt); toast(t('toastCopiedClip')); }
+  catch (e) { $('pasteArea').value = txt; openModal('pasteModal'); toast(t('toastSelectCopy')); }
 }
 
 function openPasteModal() { $('pasteArea').value = ''; openModal('pasteModal'); }
@@ -1548,23 +1670,24 @@ function restoreFromJsonText(raw) {
   try {
     const j = JSON.parse(raw);
     if (!j || typeof j.days !== 'object') throw 0;
-    askConfirm('Restaurar copia de seguridad', 'Se reemplazarán tus turnos y tarifas actuales por los de la copia.', () => {
+    askConfirm(t('confirmRestoreTitle'), t('confirmRestoreMsg'), () => {
       S.days = j.days;
       if (j.rates) S.rates = { ...S.rates, ...j.rates };
       if (j.cfg) S.cfg = { ...S.cfg, ...j.cfg };
+      if (!I18N[S.cfg.lang]) S.cfg.lang = detectBrowserLang();
       if (j.shifts) S.shifts = { ...structuredClone(DEFAULT_SHIFTS), ...j.shifts };
       if (Array.isArray(j.cycle)) S.cycle = j.cycle.filter(k => S.shifts[k]);
       S.lastBackup = Date.now();
-      save(); setTheme(S.cfg.theme || 'dark'); renderSettings(); renderPaint(); renderCycle(); render(); checkBackup();
-      toast('Datos restaurados con éxito');
+      save(); applyStaticTranslations(); setTheme(S.cfg.theme || 'dark'); renderSettings(); renderPaint(); renderCycle(); render(); checkBackup();
+      toast(t('toastRestored'));
     });
-  } catch (err) { toast('Copia de seguridad no válida'); }
+  } catch (err) { toast(t('toastInvalidBackup')); }
 }
 
 async function exportICS() {
   const rows = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mi Cuadrante//ES','CALSCALE:GREGORIAN'];
   const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
-  const escICS = t => String(t || '').replace(/[\\;,]/g, '\\$&').replace(/\n/g, '\\n');
+  const escICS = txt => String(txt || '').replace(/[\\;,]/g, '\\$&').replace(/\n/g, '\\n');
   const makeDt = (k, hm, addDay) => {
     const d = new Date(k + 'T00:00:00'); if (addDay) d.setDate(d.getDate() + 1);
     return `${ymd(d).replace(/-/g, '')}T${hm.replace(':', '')}00`;
@@ -1572,61 +1695,62 @@ async function exportICS() {
   Object.keys(S.days).sort().forEach(k => {
     const d = S.days[k], sh = d.s ? getShift(d.s) : null;
     if (!sh || d.s === 'L') return;
+    const lbl = shiftLabel(d.s, sh);
     const t1s = d.t1s || sh.t1s, t1e = d.t1e || sh.t1e, t2s = d.t2s || sh.t2s, t2e = d.t2e || sh.t2e;
     if (t1s && t1e) {
       const next1 = t1e <= t1s;
-      rows.push('BEGIN:VEVENT', `UID:${k}-1@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART:${makeDt(k, t1s, false)}`, `DTEND:${makeDt(k, t1e, next1)}`, `SUMMARY:${escICS(sh.n)}`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
+      rows.push('BEGIN:VEVENT', `UID:${k}-1@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART:${makeDt(k, t1s, false)}`, `DTEND:${makeDt(k, t1e, next1)}`, `SUMMARY:${escICS(lbl)}`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
       if (t2s && t2e) {
         const next2 = t2e <= t2s;
-        rows.push('BEGIN:VEVENT', `UID:${k}-2@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART:${makeDt(k, t2s, false)}`, `DTEND:${makeDt(k, t2e, next2)}`, `SUMMARY:${escICS(sh.n)} (2º tramo)`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
+        rows.push('BEGIN:VEVENT', `UID:${k}-2@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART:${makeDt(k, t2s, false)}`, `DTEND:${makeDt(k, t2e, next2)}`, `SUMMARY:${escICS(lbl + ' ' + t('icsSecondSpan'))}`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
       }
     } else {
       const e = new Date(k + 'T00:00:00'); e.setDate(e.getDate() + 1);
-      rows.push('BEGIN:VEVENT', `UID:${k}@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${k.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${ymd(e).replace(/-/g, '')}`, `SUMMARY:${escICS(sh.n)}`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
+      rows.push('BEGIN:VEVENT', `UID:${k}@micuadrante`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${k.replace(/-/g, '')}`, `DTEND;VALUE=DATE:${ymd(e).replace(/-/g, '')}`, `SUMMARY:${escICS(lbl)}`, ...(d.note ? [`DESCRIPTION:${escICS(d.note)}`] : []), 'END:VEVENT');
     }
   });
   rows.push('END:VCALENDAR');
-  const ok = await shareOrDownload('MiCuadrante.ics', 'text/calendar;charset=utf-8', rows.join('\r\n'), 'Calendario Mi Cuadrante');
-  toast(ok ? 'Calendario .ics exportado' : 'No se pudo exportar');
+  const ok = await shareOrDownload('MiCuadrante.ics', 'text/calendar;charset=utf-8', rows.join('\r\n'), t('icsShareTitle'));
+  toast(t(ok ? 'toastIcsOk' : 'toastExportErr'));
 }
 
 async function shareMonthText() {
-  const y = cur.getFullYear(), m = cur.getMonth(), n = new Date(y, m + 1, 0).getDate();
-  const title = `📅 Mi Cuadrante — ${cur.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}`;
+  const y = cur.getFullYear(), m = cur.getMonth(), n = new Date(y, m + 1, 0).getDate(), loc = curLocale();
+  const title = t('shareTitle', { m: cur.toLocaleDateString(loc, { month: 'long', year: 'numeric' }) });
   const lines = [title, ''];
   for (let i = 1; i <= n; i++) {
     const dt = new Date(y, m, i), k = ymd(dt), d = S.days[k];
     if (!d?.s) continue;
     const sh = getShift(d.s);
-    const wd = dt.toLocaleDateString('es-ES', { weekday: 'short' });
+    const wd = dt.toLocaleDateString(loc, { weekday: 'short' });
     const tm = d.t1s && d.t1e ? ` (${d.t1s}-${d.t1e}${d.t2s && d.t2e ? ' / ' + d.t2s + '-' + d.t2e : ''})` : '';
-    lines.push(`${p2(i)} ${wd}: ${sh ? sh.n : d.s}${tm}${d.note ? ' · ' + d.note : ''}`);
+    lines.push(`${p2(i)} ${wd}: ${sh ? shiftLabel(d.s, sh) : d.s}${tm}${d.note ? ' · ' + d.note : ''}`);
   }
-  if (lines.length <= 2) return toast('No hay turnos en este mes para compartir');
+  if (lines.length <= 2) return toast(t('toastNoShiftsShare'));
   const text = lines.join('\n');
   try {
     if (navigator.share) { await navigator.share({ title, text }); return; }
     await navigator.clipboard.writeText(text);
-    toast('Resumen del mes copiado para WhatsApp');
-  } catch (e) { if (e.name !== 'AbortError') toast('No se pudo compartir'); }
+    toast(t('toastCopiedWa'));
+  } catch (e) { if (e.name !== 'AbortError') toast(t('toastShareErr')); }
 }
 
 function checkBackup() {
   const age = S.lastBackup ? (Date.now() - S.lastBackup) / 86400000 : Infinity;
   const show = Object.keys(S.days).length >= 7 && age > 30;
   $('backupBanner').classList.toggle('hidden', !show);
-  if (show) $('backupMsg').textContent = S.lastBackup ? `Hace ${Math.floor(age)} días de tu última copia.` : 'Guarda una copia de seguridad de tus turnos.';
+  if (show) $('backupMsg').textContent = S.lastBackup ? t('backupDaysAgo', { n: Math.floor(age) }) : t('backupFirstMsg');
 }
 
 /* Navegación, Undo, Modales y Toast */
-function tab(t) {
+function tab(tb) {
   ['calendar', 'cycles', 'details', 'rates'].forEach(x => {
-    $('view-' + x).classList.toggle('hidden', x !== t);
-    $('tab-' + x).classList.toggle('active', x === t);
-    $('tab-' + x).setAttribute('aria-selected', x === t);
+    $('view-' + x).classList.toggle('hidden', x !== tb);
+    $('tab-' + x).classList.toggle('active', x === tb);
+    $('tab-' + x).setAttribute('aria-selected', x === tb);
   });
-  if (t === 'details') renderDetails();
-  if (t === 'rates') renderSettings();
+  if (tb === 'details') renderDetails();
+  if (tb === 'rates') renderSettings();
 }
 function changeMonth(delta) { cur.setMonth(cur.getMonth() + delta); render(); }
 function goToday() { cur = new Date(); cur.setDate(1); tab('calendar'); render(); }
@@ -1641,21 +1765,21 @@ function snap() { undoSnap = JSON.stringify({ days: S.days, hols: S.cfg.customHo
 function undo() {
   if (!undoSnap) return;
   const p = JSON.parse(undoSnap); S.days = p.days; S.cfg.customHolidays = p.hols; undoSnap = null;
-  save(); render(); toast('Cambios deshechos');
+  save(); render(); toast(t('toastUndone'));
 }
 let toastTimer;
 function toast(msg, act, fn) {
-  const t = $('toast'); t.replaceChildren(document.createTextNode(msg));
+  const el = $('toast'); el.replaceChildren(document.createTextNode(msg));
   if (act && fn) {
     const b = document.createElement('button'); b.textContent = act;
-    b.onclick = () => { fn(); t.classList.remove('show'); };
-    t.append(b);
+    b.onclick = () => { fn(); el.classList.remove('show'); };
+    el.append(b);
   }
-  t.classList.add('show');
+  el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), act ? 5500 : 2300);
+  toastTimer = setTimeout(() => el.classList.remove('show'), act ? 5500 : 2300);
 }
-function undoable(msg) { toast(msg, 'Deshacer', undo); }
+function undoable(msg) { toast(msg, t('undo'), undo); }
 
 function openPrivacyPolicy() {
   const url = window.Capacitor ? 'privacidad.html' : 'https://k4nt3r0.github.io/MiCuadrante/privacidad.html';
@@ -1663,7 +1787,7 @@ function openPrivacyPolicy() {
 }
 async function openAdPrivacy() {
   const ok = await AdMobBridge.showPrivacyOptions();
-  if (!ok) toast('Puedes gestionar los anuncios desde Ajustes de Google en tu Android');
+  if (!ok) toast(t('toastAdPrivacyHint'));
 }
 
 /* Eventos delegados */
@@ -1672,7 +1796,7 @@ $('calendarGrid').addEventListener('click', e => {
   const k = b.dataset.k;
   if (paint === '__ERASE__') {
     if (!S.days[k]) return;
-    snap(); delete S.days[k]; save(); render(); undoable('Día borrado');
+    snap(); delete S.days[k]; save(); render(); undoable(t('toastDayCleared'));
   } else if (paint && S.shifts[paint]) {
     const sh = S.shifts[paint], dt = new Date(k + 'T00:00:00');
     snap();
@@ -1681,7 +1805,7 @@ $('calendarGrid').addEventListener('click', e => {
       t1s: sh.t1s || '', t1e: sh.t1e || '', t2s: sh.t2s || '', t2e: sh.t2e || '',
       pn: !!sh.pn, pr: !!sh.pr, pf: !!(sh.work && isHol(dt))
     };
-    save(); render(); checkBackup(); undoable(`${sh.n} asignado`);
+    save(); render(); checkBackup(); undoable(t('toastAssigned', { name: shiftLabel(paint, sh) }));
   } else {
     openDay(k);
   }
@@ -1689,7 +1813,7 @@ $('calendarGrid').addEventListener('click', e => {
 $('logList').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b) openDay(b.dataset.k); });
 $('paintSelector').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (!b) return; paint = b.dataset.p || null; renderPaint(); });
 $('mShifts').addEventListener('click', e => { const b = e.target.closest('[data-ms]'); if (b) selectModalShift(b.dataset.ms); });
-$('presets').addEventListener('click', e => { const b = e.target.closest('[data-pre]'); if (!b) return; S.cycle = [...PRESETS[+b.dataset.pre][1]]; save(); renderCycle(); toast('Plantilla cargada'); });
+$('presets').addEventListener('click', e => { const b = e.target.closest('[data-pre]'); if (!b) return; S.cycle = [...PRESETS[+b.dataset.pre][1]]; save(); renderCycle(); toast(t('toastPresetLoaded')); });
 $('cycleAdderBtns').addEventListener('click', e => { const b = e.target.closest('[data-add]'); if (!b) return; S.cycle.push(b.dataset.add); save(); renderCycle(); });
 $('cycleSequencePreview').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (!b) return; S.cycle.splice(+b.dataset.rm, 1); save(); renderCycle(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') ['dayModal','shiftModal','monthModal','pasteModal','confirmModal'].forEach(closeModal); });
@@ -1778,7 +1902,12 @@ load();
 document.documentElement.setAttribute('data-theme', S.cfg.theme || 'dark');
 $('metaTheme').setAttribute('content', S.cfg.theme === 'light' ? '#f1f5f9' : (S.cfg.theme === 'oled' ? '#000000' : '#020617'));
 $('cycleStart').value = ymd(cur);
+applyStaticTranslations();
 renderPaint(); renderCycle(); renderSettings(); tab('calendar'); render(); checkBackup();
+if (!S.cfg.langChosen) {
+  renderLangPickers();
+  openModal('langModal');
+}
 try { navigator.storage?.persist?.(); } catch (e) {}
 if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 addEventListener('load', () => AdMobBridge.init());
