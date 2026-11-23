@@ -1,4 +1,4 @@
-const CACHE = 'cuadrante-v4';
+const CACHE = 'cuadrante-v5';
 const ASSETS = ['./', 'index.html', 'privacidad.html', 'icon.svg', 'manifest.json'];
 
 self.addEventListener('install', e => {
