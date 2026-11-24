@@ -193,6 +193,28 @@ jobs:
           """
           with open(proguard_path, "a", encoding="utf-8") as f:
               f.write("\n" + "\n".join(line.strip() for line in rules.splitlines()) + "\n")
+          # 6. Nombres localizados de la app en el lanzador Android (values-*/strings.xml)
+          localized_names = {
+              "values-es": "Mi Cuadrante",
+              "values-en": "MyRoster",
+              "values-fr": "MonPlanning",
+              "values-pt": "MinhaEscala",
+              "values-it": "MioTurno",
+              "values-de": "MeinDienstplan",
+          }
+          res_base = "android/app/src/main/res"
+          for folder, app_label in localized_names.items():
+              loc_dir = os.path.join(res_base, folder)
+              os.makedirs(loc_dir, exist_ok=True)
+              xml_content = (
+                  '<?xml version="1.0" encoding="utf-8"?>\n'
+                  '<resources>\n'
+                  f'    <string name="app_name">{app_label}</string>\n'
+                  f'    <string name="title_activity_main">{app_label}</string>\n'
+                  '</resources>\n'
+              )
+              with open(os.path.join(loc_dir, "strings.xml"), "w", encoding="utf-8") as f:
+                  f.write(xml_content)
           EOF
 
       - name: Firmar y compilar AAB y APK
